@@ -69,7 +69,7 @@ pypro init -n deep-vision -t dl --description "Vision Transformer implementation
 pypro init -n churn-prediction -t ml
 ```
 
-## 🏗️ Project### 🧱 Structure
+## 🏗️ Project 🧱 Structure
 
 <img src="https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/folder-src.svg" width="16" /> **Standard Layout**
 ```text
