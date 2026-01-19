@@ -34,12 +34,18 @@ class ProjectGenerator:
                  license: str = DEFAULT_LICENSE, 
                  builder: str = DEFAULT_BUILDER, 
                  framework: str = "pytorch",
+                 scripts: Optional[dict] = None,
                  verbose: bool = False):
         self.raw_name = name
         self.project_name = sanitize_project_name(name)
         self.description = description or name
         self.type = type
         self.framework = framework
+        self.scripts = scripts or {}
+        # Default script for the main package if none provided (and it's a root project mostly)
+        if not self.scripts:
+             self.scripts = {self.project_name: f"{self.project_name}.main:app"}
+             
         self.author = author
         if not self.author or self.author == "Your Name":
              self.author, self.author_email = get_author_from_git()
@@ -200,7 +206,9 @@ class ProjectGenerator:
             "has_config": self.use_config,
             "use_readme": self.use_readme,
             "use_env": self.use_env,
+            "use_env": self.use_env,
             "framework": self.framework,
+            "scripts": self.scripts,
         }
         
         if not is_subpackage:

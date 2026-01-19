@@ -68,7 +68,9 @@ class ConfigEngine:
                     use_env=settings_conf.get("use_env", False),
                     use_config=settings_conf.get("use_config", True),
                     use_tests=settings_conf.get("use_tests", True),
+                    use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
+                    scripts={project_name: f"{project_name}.main:app"}, # Simple default for hydration 
                     verbose=self.verbose
                 )
                  # generate() expects parent dir, and will operate on parent/name (which is self.root_path)
@@ -87,6 +89,20 @@ class ConfigEngine:
                 else:
                      console.print(Panel(f"🚀 [bold green]Creating New Project:[/bold green] {project_name}", border_style="green"))
                 
+                # Prepare Scripts (Root + Workspace Members)
+                packages = workspace_conf.get("packages", [])
+                
+                # Start with Root Script
+                project_scripts = {project_name: f"{project_name}.main:app"}
+                
+                # Add Subpackage Scripts
+                for pkg in packages:
+                    pkg_name = pkg.get("name")
+                    # Sanitize checking
+                    from viperx.utils import sanitize_project_name
+                    pkg_name_clean = sanitize_project_name(pkg_name)
+                    project_scripts[pkg_name_clean] = f"{pkg_name_clean}.main:app"
+
                 # Create Root (or Hydrate)
                 gen = ProjectGenerator(
                     name=project_name,
@@ -99,6 +115,7 @@ class ConfigEngine:
                     use_config=settings_conf.get("use_config", True),
                     use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
+                    scripts=project_scripts,
                     verbose=self.verbose
                 )
                 gen.generate(self.root_path)

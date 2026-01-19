@@ -39,6 +39,11 @@ dependencies = [
     {% endif %}
 ]
 
+[project.scripts]
+{% for name, entry in scripts.items() %}
+{{ name }} = "{{ entry }}"
+{% endfor %}
+
 [build-system]
 {% if builder == 'hatch' %}
 requires = ["hatchling"]
