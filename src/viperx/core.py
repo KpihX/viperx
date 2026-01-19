@@ -58,7 +58,7 @@ class ProjectGenerator:
         
         # Jinja Setup
         self.env = Environment(
-            loader=PackageLoader("pypro", "templates"),
+            loader=PackageLoader("viperx", "templates"),
             autoescape=select_autoescape()
         )
 
@@ -271,7 +271,7 @@ class ProjectGenerator:
                  # Safe fallback
                  console.print("[yellow]Warning: Could not parse members list. Adding manually at end.[/yellow]")
                  with open(pyproject_path, "a") as f:
-                     f.write(f"\n# Added by pypro\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
+                     f.write(f"\n# Added by viperx\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
 
         # Generate the package in the root
         # We reuse generate logic but strictly in the current dir

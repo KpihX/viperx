@@ -4,10 +4,12 @@ from pathlib import Path
 from rich import print
 from rich.panel import Panel
 from rich.console import Console
+import shutil
 
 from viperx.core import ProjectGenerator, TYPE_CLASSIC, TYPE_ML, TYPE_DL, DEFAULT_LICENSE, DEFAULT_BUILDER
 from viperx.utils import validate_project_name, check_uv_installed
-from .constants import (
+from viperx.config_engine import ConfigEngine
+from viperx.constants import (
     PROJECT_TYPES,
     DL_FRAMEWORKS,
     FRAMEWORK_PYTORCH,
@@ -53,7 +55,13 @@ def cli_callback(
 
 @app.command()
 def init(
-    name: str = typer.Option(..., "--name", "-n", help="Name of the project"),
+    # --- Config Driven Mode ---
+    config: Path = typer.Option(
+        None, "--config", "-c",
+        help="Path to a viperx.yaml configuration file. If provided, ignores other options."
+    ),
+    # --- Interactive Mode Options ---
+    name: str = typer.Option(None, "--name", "-n", help="Name of the project"),
     description: str = typer.Option(None, "--description", "-d", help="Project description"),
     type: str = typer.Option(
         TYPE_CLASSIC, "--type", "-t", 
@@ -82,9 +90,23 @@ def init(
     """
     Initialize a new Python project.
     
-    Creates a new directory with the specified name and sets up the project structure
-    based on the selected type (`classic`, `ml`, `dl`).
+    Can stem from a config file (Declarative) or CLI arguments (Imperative).
     """
+    # 1. Declarative Mode
+    if config:
+        if not config.exists():
+            console.print(f"[bold red]Error:[/bold red] Configuration file '{config}' not found.")
+            raise typer.Exit(code=1)
+            
+        engine = ConfigEngine(config, verbose=verbose or state["verbose"])
+        engine.apply()
+        return
+
+    # 2. Imperative Mode (Validation)
+    if not name:
+         console.print("[bold red]Error:[/bold red] Missing option '--name' / '-n'. Required in manual mode.")
+         raise typer.Exit(code=1)
+
     if type not in PROJECT_TYPES:
         console.print(f"[bold red]Error:[/bold red] Invalid type '{type}'. Must be one of: {', '.join(PROJECT_TYPES)}")
         raise typer.Exit(code=1)
@@ -106,6 +128,42 @@ def init(
     
     # Generate in current directory
     generator.generate(Path.cwd())
+
+# Config Management Group
+config_app = typer.Typer(
+    help="Manage Declarative Configuration (viperx.yaml).",
+    no_args_is_help=True
+)
+app.add_typer(config_app, name="config")
+
+@config_app.command("init")
+def config_init(
+    filename: Path = typer.Option("viperx.yaml", "--output", "-o", help="Output filename")
+):
+    """
+    Generate a template viperx.yaml configuration file.
+    Use this to start a 'Project as Code' workflow.
+    """
+    from viperx.constants import TEMPLATES_DIR
+    import jinja2
+    
+    template_path = TEMPLATES_DIR / "viperx_config.yaml.j2"
+    if not template_path.exists():
+         console.print("[bold red]Error:[/bold red] Config template not found.")
+         raise typer.Abort()
+         
+    with open(template_path, "r") as f:
+        content = f.read()
+        
+    if filename.exists():
+        if not typer.confirm(f"File {filename} already exists. Overwrite?"):
+            raise typer.Abort()
+            
+    with open(filename, "w") as f:
+        f.write(content)
+        
+    console.print(Panel(f"✅ Generated configuration template: [bold green]{filename}[/bold green]\n\nRun [bold]viperx init -c {filename}[/bold] to create your project.", border_style="green"))
+
 
 # Package management group
 package_app = typer.Typer(

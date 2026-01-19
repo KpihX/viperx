@@ -1,0 +1,15 @@
+project_name: "test-config-proj"
+author: "Your Name"
+description: "A robust project built with ViperX"
+version: "0.1.0"
+
+# Data Sources (URLs or Kaggle Handles)
+data_urls:
+  iris: "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+  titanic: "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+
+datasets:
+  # Notebook Name: Kaggle Dataset Handle
+  Base_Kaggle: "titanic"
+  # Usage: kh.dataset_download(SETTINGS['datasets']['titanic'])
+  titanic: "heptapod/titanic"

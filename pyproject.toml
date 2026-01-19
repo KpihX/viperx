@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "0.8.2"
+version = "0.9.0"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
@@ -19,6 +19,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "rich>=14.2.0",
     "typer>=0.21.1",
+    "pyyaml>=6.0.1",
 ]
 
 [project.scripts]
