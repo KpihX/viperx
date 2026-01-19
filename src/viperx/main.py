@@ -35,11 +35,39 @@ app = typer.Typer(
 state = {"verbose": False}
 console = Console(force_terminal=True)
 
-@app.callback()
+
+    """
+    **ViperX**: Professional Python Project Initializer.
+    
+    Automates the creation of professional-grade Python projects using `uv`.
+    Supports Standard Libraries, Machine Learning, and Deep Learning templates.
+    """
+    if verbose:
+        state["verbose"] = True
+        console.print("[dim]Verbose mode enabled[/dim]")
+
+def version_callback(value: bool):
+    if value:
+        import importlib.metadata
+        try:
+            version = importlib.metadata.version("viperx")
+        except importlib.metadata.PackageNotFoundError:
+            version = "unknown"
+        console.print(f"ViperX CLI Version: [bold green]{version}[/bold green]")
+        raise typer.Exit()
+
+@app.callback(invoke_without_command=True)
 def cli_callback(
+    ctx: typer.Context,
     verbose: bool = typer.Option(
         False, "-v", "--verbose", 
         help="Enable verbose logging."
+    ),
+    version: bool = typer.Option(
+        None, "--version", "-V",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version and exit."
     )
 ):
     """
@@ -51,7 +79,6 @@ def cli_callback(
     if verbose:
         state["verbose"] = True
         console.print("[dim]Verbose mode enabled[/dim]")
-
 
 @app.command()
 def init(
