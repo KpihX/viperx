@@ -75,13 +75,14 @@ def cli_callback(
 # Config Management Group (The Main Entry Point)
 config_app = typer.Typer(
     help="Manage Declarative Configuration (viperx.yaml).",
-    no_args_is_help=True
+    no_args_is_help=False,  # Allow running without subcommands (acts as apply)
 )
 app.add_typer(config_app, name="config")
 
 
-@config_app.command("apply")
-def config_apply(
+@config_app.callback(invoke_without_command=True)
+def config_main(
+    ctx: typer.Context,
     # --- Config Driven Mode ---
     config: Path = typer.Option(
         None, "--config", "-c",
@@ -115,10 +116,17 @@ def config_apply(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose logging"),
 ):
     """
-    Apply configuration to create or update a project.
+    **Configure & Initialize**: Apply configuration to create or update a project.
     
-    Can stem from a config file (Declarative) or CLI arguments (Imperative).
+    usage: [bold]viperx config [OPTIONS][/bold]
+           [bold]viperx config get[/bold]
     """
+    # Check if a subcommand (like 'get') is invoked
+    if ctx.invoked_subcommand is not None:
+        return
+
+    # --- Apply Logic (Former Init) ---
+    
     # 1. Declarative Mode
     if config:
         if not config.exists():
@@ -131,6 +139,10 @@ def config_apply(
 
     # 2. Imperative Mode (Validation)
     if not name:
+         # Implicitly show help if no options provided?
+         # Or error out. User expects correct run.
+         # If user runs `viperx config` with NO args, and NO config, what happens?
+         # "Missing option name".
          console.print("[bold red]Error:[/bold red] Missing option '--name' / '-n'. Required in manual mode.")
          raise typer.Exit(code=1)
 
