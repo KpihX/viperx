@@ -136,6 +136,13 @@ class ProjectGenerator:
         # 4. Overwrite/Add Files
         self._generate_files(project_dir, is_subpackage)
         
+        
+        # Cleanup extra files for subpackages
+        if is_subpackage:
+            for f in [".gitignore", ".python-version"]:
+                if (project_dir / f).exists():
+                    (project_dir / f).unlink()
+        
         # 5. Git & Final Steps
         console.print(f"\n[bold green]✓ Project {self.raw_name} created successfully![/bold green]")
         if not is_subpackage:
@@ -189,8 +196,14 @@ class ProjectGenerator:
             "framework": self.framework,
         }
         
-        # pyproject.toml (Overwrite uv's basic one to add our specific deps)
-        self._render("pyproject.toml.j2", root / "pyproject.toml", context)
+        if not is_subpackage:
+            # pyproject.toml (Overwrite uv's basic one to add our specific deps)
+            self._render("pyproject.toml.j2", root / "pyproject.toml", context)
+        else:
+             # Subpackages: remove default pyproject.toml from uv init
+             if (root / "pyproject.toml").exists():
+                 (root / "pyproject.toml").unlink()
+                 self.log("Removed default pyproject.toml (Subpackage: Code Only)")
         
         # Determine Package Root
         if is_subpackage:
@@ -210,19 +223,30 @@ class ProjectGenerator:
         self._render("__init__.py.j2", pkg_root / "__init__.py", context)
         
         # README.md
-        if self.use_readme:
-             self._render("README.md.j2", root / "README.md", context)
-        else:
-             if (root / "README.md").exists():
-                 (root / "README.md").unlink()
-                 self.log("Removed default README.md (requested --no-readme)")
+        if not is_subpackage:
+            if self.use_readme:
+                 self._render("README.md.j2", root / "README.md", context)
+            else:
+                 if (root / "README.md").exists():
+                     (root / "README.md").unlink()
+                     self.log("Removed default README.md (requested --no-readme)")
+        elif (root / "README.md").exists() and is_subpackage:
+               # Remove default README for subpackage if user wants purely code?
+               # User said "p1/p1 on met directement le code", didn't explicitly forbid README.
+               # But usually modules don't have READMEs.
+               # Let's clean it.
+               (root / "README.md").unlink()
+
         
         # LICENSE
-        license_text = LICENSES.get(self.license, LICENSES["MIT"])
-        license_text = license_text.format(year=datetime.now().year, author=self.author)
-        with open(root / "LICENSE", "w") as f:
-            f.write(license_text)
-        self.log(f"Generated LICENSE ({self.license})")
+        if not is_subpackage:
+            license_text = LICENSES.get(self.license, LICENSES["MIT"])
+            license_text = license_text.format(year=datetime.now().year, author=self.author)
+            with open(root / "LICENSE", "w") as f:
+                f.write(license_text)
+            self.log(f"Generated LICENSE ({self.license})")
+        elif (root / "LICENSE").exists():
+            (root / "LICENSE").unlink()
 
         # Config files
         if self.use_config:
@@ -249,10 +273,12 @@ class ProjectGenerator:
             self.log(f"Created .env and .env.example in {pkg_root.relative_to(root)}")
                 
         # .gitignore
-        with open(root / ".gitignore", "a") as f:
-            # Add data/ to gitignore but allow .gitkeep
-            f.write("\n# ViperX specific\n.ipynb_checkpoints/\n# Isolated Env\nsrc/**/.env\n# Data (Local)\ndata/*\n!data/.gitkeep\n")
-        self.log("Updated .gitignore")
+        # Only for Root
+        if not is_subpackage: 
+            with open(root / ".gitignore", "a") as f:
+                # Add data/ to gitignore but allow .gitkeep
+                f.write("\n# ViperX specific\n.ipynb_checkpoints/\n# Isolated Env\nsrc/**/.env\n# Data (Local)\ndata/*\n!data/.gitkeep\n")
+            self.log("Updated .gitignore")
 
     def _render(self, template_name: str, target_path: Path, context: dict):
         template = self.env.get_template(template_name)

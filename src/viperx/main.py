@@ -14,14 +14,13 @@ from viperx.constants import (
     DL_FRAMEWORKS,
     FRAMEWORK_PYTORCH,
 )
-
-    import importlib.metadata
-    try:
-        version = importlib.metadata.version("viperx")
-    except importlib.metadata.PackageNotFoundError:
-        version = "unknown"
-        
-    HELP_TEXT = f"""
+import importlib.metadata
+try:
+    version = importlib.metadata.version("viperx")
+except importlib.metadata.PackageNotFoundError:
+    version = "unknown"
+    
+HELP_TEXT = f"""
 [bold green]ViperX[/bold green] (v{version}): Professional Python Project Initializer
 .
     
@@ -29,49 +28,17 @@ from viperx.constants import (
     Supports Standard Libraries, Machine Learning, and Deep Learning templates.
     """
 
-    app = typer.Typer(
-        help=HELP_TEXT,
-        add_completion=False,
-        no_args_is_help=True,
-        rich_markup_mode="markdown",
-        epilog="Made with ❤️  by KpihX"
-    )
-
-    # Re-apply callbacks and commands...
-    # (Since I am editing the FILE, I need to be careful not to delete commands if I replace app definition)
-    # The user request "replace_file_content" works on blocks.
-    # I will replace the top block defining HELP_TEXT and app.
-    
-if __name__ == "__main__":
-    try:
-        app()
-    except SystemExit as e:
-        if e.code != 0:
-            # On error (non-zero exit), display help as requested
-            from typer.main import get_command
-            import click
-            cli = get_command(app)
-            # Create a dummy context to render help
-            with click.Context(cli) as ctx:
-                console.print("\n[bold]Usage Guide:[/bold]")
-                console.print(cli.get_help(ctx))
-            # Re-raise to maintain exit code
-            raise
+app = typer.Typer(
+    help=HELP_TEXT,
+    add_completion=False,
+    no_args_is_help=True,
+    rich_markup_mode="markdown",
+    epilog="Made with ❤️  by KpihX"
+)
 
 # Global state for verbose flag
 state = {"verbose": False}
 console = Console(force_terminal=True)
-
-
-def version_callback(value: bool):
-    if value:
-        import importlib.metadata
-        try:
-            version = importlib.metadata.version("viperx")
-        except importlib.metadata.PackageNotFoundError:
-            version = "unknown"
-        console.print(f"ViperX CLI Version: [bold green]{version}[/bold green]")
-        raise typer.Exit()
 
 @app.callback(invoke_without_command=True)
 def cli_callback(
@@ -96,9 +63,23 @@ def cli_callback(
     if verbose:
         state["verbose"] = True
         console.print("[dim]Verbose mode enabled[/dim]")
+        
+def version_callback(value: bool):
+    if value:
+        console.print(f"ViperX CLI Version: [bold green]{version}[/bold green]")
+        raise typer.Exit()
 
-@app.command()
-def init(
+
+# Config Management Group (The Main Entry Point)
+config_app = typer.Typer(
+    help="Manage Declarative Configuration (viperx.yaml).",
+    no_args_is_help=True
+)
+app.add_typer(config_app, name="config")
+
+
+@config_app.command("apply")
+def config_apply(
     # --- Config Driven Mode ---
     config: Path = typer.Option(
         None, "--config", "-c",
@@ -132,7 +113,7 @@ def init(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose logging"),
 ):
     """
-    Initialize a new Python project.
+    Apply configuration to create or update a project.
     
     Can stem from a config file (Declarative) or CLI arguments (Imperative).
     """
@@ -172,6 +153,7 @@ def init(
     
     # Generate in current directory
     generator.generate(Path.cwd())
+
 
 # Config Management Group
 config_app = typer.Typer(

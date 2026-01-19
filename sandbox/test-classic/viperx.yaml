@@ -44,7 +44,7 @@ workspace:
     #   use_tests: true
     - name: "preprocess"
       description: "processing utilities"
-      use_env: false
+      use_env: true
       use_config: true
       use_tests: true
     - name: "proprocess"
