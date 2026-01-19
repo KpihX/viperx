@@ -41,6 +41,12 @@ viperx init -n churn-pred -t ml
 
 # Deep Learning ( + PyTorch/TensorFlow, CUDA checks)
 viperx init -n deep-vision -t dl --framework pytorch
+# Deep Learning ( + PyTorch/TensorFlow, CUDA checks)
+viperx init -n deep-vision -t dl --framework pytorch
+
+# ✨ Declarative Config (Infrastructure as Code)
+viperx config init                  # Generate template
+viperx init -c viperx.yaml          # Apply config
 ```
 
 ### `package`
@@ -137,7 +143,29 @@ viperx init -n vision-ai -t dl
 
 # Deep Learning (TensorFlow)
 viperx init -n tf-legacy -t dl -f tensorflow
+# Deep Learning (TensorFlow)
+viperx init -n tf-legacy -t dl -f tensorflow
+
+# From Config File
+viperx init -c viperx.yaml
 ```
+
+### `config` - Declarative Mode
+
+Manage your project infrastructure using a YAML file.
+
+```bash
+viperx config init
+```
+Generates a `viperx.yaml` template in the current directory.
+
+```bash
+viperx init --config viperx.yaml
+```
+Applies the configuration. This is **idempotent**:
+- Creates the project if it doesn't exist.
+- **Hydrates** the directory if it exists but is empty (e.g., git init).
+- **Updates** the workspace if the project exists (adds missing packages defined in YAML).
 
 ### `package` - Manage Workspace
 

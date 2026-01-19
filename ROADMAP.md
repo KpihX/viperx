@@ -12,6 +12,19 @@ This document tracks the evolution of `pypro`.
 
 ## ✅ Done
 
+- [x] **V9: Declarative Config (Infrastucture as Code)**
+    - [x] `viperx.yaml` schema definition.
+    - [x] `ConfigEngine` for parsing and idempotent execution.
+    - [x] `viperx config init` and `viperx init --config`.
+    - [x] Advanced robustness (Hydration, Git integration).
+
+- [x] **V4-V8: Ecosystem & Polish**
+    - [x] **Rebranding**: PyPro -> ViperX (v0.8.0).
+    - [x] **Data Loading**: `data_loader.py` and `data/` caching (v0.7.0).
+    - [x] **Isolation**: Strict `.env` encapsulation (v0.6.0).
+    - [x] **DL Choice**: `--framework pytorch/tensorflow` (v0.5.0).
+    - [x] **Refactor**: CLI Hygiene and `package` subcommand group.
+
 - [x] **V3.1: Multi-Package & Polish**
     - [x] Global `-v`/`--verbose` flag for transparent logging.
     - [x] Command `add-package` to manage Workspaces.

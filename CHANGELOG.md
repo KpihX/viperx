@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2] - 2026-01-19 (Robustness & Hydration)
+
+### Fixed
+- **In-Place Hydration**: `viperx init` now correctly detects existing but uninitialized directories (e.g., git roots) and hydrates them instead of failing or creating nested folders.
+- **Git Integration**: Restored `.gitignore` generation which was missing in 0.9.0/0.9.1.
+- **Verification**: Added comprehensive "Real World" simulation tests.
+
+## [0.9.1] - 2026-01-19 (Stability Patch)
+
+### Fixed
+- **Conditional README**: fixed `uv build` failure when `use_readme=False` by conditionally excluding `readme` field from `pyproject.toml`.
+- **Entry Points**: Ensure `main.py` is generated for all project types (including `ml` and `dl`).
+
+## [0.9.0] - 2026-01-19 (V9 Declarative Config)
+
+### Added
+- **Declarative Configuration**: New `viperx.yaml` support for "Infrastructure as Code".
+- **`viperx config init`**: Command to generate a comprehensive, commented configuration template.
+- **`viperx init --config`**: Support for driving project creation/update from a YAML file.
+- **Config Engine**: Smart orchestration engine that handles idempotent updates (adding missing packages to workspace).
+
 ## [0.8.0] - 2026-01-19 (ViperX Rebranding)
 
 ### Changed
