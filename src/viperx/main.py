@@ -36,16 +36,6 @@ state = {"verbose": False}
 console = Console(force_terminal=True)
 
 
-    """
-    **ViperX**: Professional Python Project Initializer.
-    
-    Automates the creation of professional-grade Python projects using `uv`.
-    Supports Standard Libraries, Machine Learning, and Deep Learning templates.
-    """
-    if verbose:
-        state["verbose"] = True
-        console.print("[dim]Verbose mode enabled[/dim]")
-
 def version_callback(value: bool):
     if value:
         import importlib.metadata
