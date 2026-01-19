@@ -60,12 +60,16 @@ class ConfigEngine:
             current_root = self.root_path
         else:
             # We are outside, check if it exists
-            if target_dir.exists():
+            if target_dir.exists() and (target_dir / "pyproject.toml").exists():
                 console.print(Panel(f"♻️  [bold blue]Updating Existing Project:[/bold blue] {project_name}", border_style="blue"))
                 current_root = target_dir
             else:
-                console.print(Panel(f"🚀 [bold green]Creating New Project:[/bold green] {project_name}", border_style="green"))
-                # Create Root
+                if target_dir.exists():
+                     console.print(Panel(f"⚠️  [bold yellow]Directory exists but not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
+                else:
+                     console.print(Panel(f"🚀 [bold green]Creating New Project:[/bold green] {project_name}", border_style="green"))
+                
+                # Create Root (or Hydrate)
                 gen = ProjectGenerator(
                     name=project_name,
                     description=project_conf.get("description", ""),

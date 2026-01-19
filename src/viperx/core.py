@@ -87,19 +87,26 @@ class ProjectGenerator:
         """Main generation flow using uv init."""
         project_dir = target_dir / self.raw_name
         
-        if project_dir.exists():
-            console.print(f"[bold red]Error:[/bold red] Directory {project_dir} already exists.")
-            return
-
-        console.print(f"[bold green]Creating project {self.raw_name} ({self.type})...[/bold green]")
-        
         # 1. Scaffolding with uv init
         try:
-            # We use --package as requested for a general package structure
-            subprocess.run(
-                ["uv", "init", "--package", "--no-workspace", self.raw_name], 
-                check=True, cwd=target_dir, capture_output=True
-            )
+            if project_dir.exists():
+                if (project_dir / "pyproject.toml").exists():
+                    console.print(f"[bold red]Error:[/bold red] Directory {project_dir} is already a project.")
+                    return
+                # Hydrate existing directory
+                console.print(f"  [yellow]Hydrating existing directory {project_dir}...[/yellow]")
+                subprocess.run(
+                    ["uv", "init", "--package", "--no-workspace"], 
+                    check=True, cwd=project_dir, capture_output=True
+                )
+            else:
+                # Create new
+                subprocess.run(
+                    ["uv", "init", "--package", "--no-workspace", self.raw_name], 
+                    check=True, cwd=target_dir, capture_output=True
+                )
+            console.print("  [blue]✓ Scaffolding created with uv init[/blue]")
+        except subprocess.CalledProcessError as e:
             console.print("  [blue]✓ Scaffolding created with uv init --package[/blue]")
         except subprocess.CalledProcessError as e:
              console.print(f"[bold red]Error running uv init:[/bold red] {e}")
@@ -150,6 +157,7 @@ class ProjectGenerator:
             "project_type": self.type,
             "use_uv": self.builder == "uv",
             "has_config": self.use_config,
+            "use_readme": self.use_readme,
             "framework": self.framework,
         }
         
@@ -187,8 +195,10 @@ class ProjectGenerator:
             self._render("config.py.j2", pkg_root / "config.py", context)
             
         # Entry points & Logic
+        self._render("main.py.j2", pkg_root / "main.py", context)
+
         if self.type == TYPE_CLASSIC:
-             self._render("main.py.j2", pkg_root / "main.py", context)
+             pass 
         elif self.type in [TYPE_ML, TYPE_DL]:
              # Render Notebooks
              self._render("Base_Kaggle.ipynb.j2", root / NOTEBOOKS_DIR / "Base_Kaggle.ipynb", context)
@@ -273,13 +283,16 @@ class ProjectGenerator:
                  with open(pyproject_path, "a") as f:
                      f.write(f"\n# Added by viperx\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
 
-        # Generate the package in the root
-        # We reuse generate logic but strictly in the current dir
-        self.generate(workspace_root)
+        # Generate the package in the root IF it doesn't exist
+        pkg_dir = workspace_root / self.raw_name
+        if pkg_dir.exists():
+            self.log(f"Package directory {self.raw_name} exists. Skipping generation.")
+        else:
+            self.generate(workspace_root)
         
         # Post-generation: Ensure root knows about it
-        console.print(f"[bold green]✓ Added {self.raw_name} to workspace successfully.[/bold green]")
-        console.print(f"  Run [bold]uv sync[/bold] to link the new package.")
+        console.print(f"[bold green]✓ Synced {self.raw_name} with workspace.[/bold green]")
+        # console.print(f"  Run [bold]uv sync[/bold] to link the new package.")
 
     def delete_from_workspace(self, workspace_root: Path):
         """Remove a package from the workspace."""
