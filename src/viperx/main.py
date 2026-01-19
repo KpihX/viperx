@@ -26,7 +26,7 @@ app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
     rich_markup_mode="markdown",
-    epilog="Made with ❤️ by Ivann KAMDEM (ViperX)"
+    epilog="Made with ❤️ by KpihX"
 )
 
 # Global state for verbose flag
