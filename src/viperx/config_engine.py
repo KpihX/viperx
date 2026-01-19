@@ -70,7 +70,7 @@ class ConfigEngine:
                     use_tests=settings_conf.get("use_tests", True),
                     use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
-                    scripts={project_name: f"{project_name}.main:app"}, # Simple default for hydration 
+                    scripts={project_name: f"{project_name}.main:main"}, # Simple default for hydration 
                     verbose=self.verbose
                 )
                  # generate() expects parent dir, and will operate on parent/name (which is self.root_path)
@@ -93,7 +93,7 @@ class ConfigEngine:
                 packages = workspace_conf.get("packages", [])
                 
                 # Start with Root Script
-                project_scripts = {project_name: f"{project_name}.main:app"}
+                project_scripts = {project_name: f"{project_name}.main:main"}
                 
                 # Add Subpackage Scripts
                 for pkg in packages:
@@ -101,7 +101,7 @@ class ConfigEngine:
                     # Sanitize checking
                     from viperx.utils import sanitize_project_name
                     pkg_name_clean = sanitize_project_name(pkg_name)
-                    project_scripts[pkg_name_clean] = f"{pkg_name_clean}.main:app"
+                    project_scripts[pkg_name_clean] = f"{pkg_name_clean}.main:main"
 
                 # Create Root (or Hydrate)
                 gen = ProjectGenerator(

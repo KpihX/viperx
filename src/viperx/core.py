@@ -44,7 +44,7 @@ class ProjectGenerator:
         self.scripts = scripts or {}
         # Default script for the main package if none provided (and it's a root project mostly)
         if not self.scripts:
-             self.scripts = {self.project_name: f"{self.project_name}.main:app"}
+             self.scripts = {self.project_name: f"{self.project_name}.main:main"}
              
         self.author = author
         if not self.author or self.author == "Your Name":
