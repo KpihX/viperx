@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.7] - 2026-01-19 (Docs Sync)
+
+### Fixed
+- **Changelog**: Synced missing release notes for 0.9.4 - 0.9.6.
+
+## [0.9.6] - 2026-01-19 (CLI Hygiene)
+
+### Changed
+- **Config Command**: Renamed `viperx config init` to `viperx config get`.
+
+## [0.9.5] - 2026-01-19 (Refactor Phase 2)
+
+### Changed
+- **Workspace Layout**: Workspace members are now generated in `src/<package_name>` with a **Flat Layout** (no internal `src`).
+- **Path Logic**: Root project remains in `src/`, members in `src/` (flat).
+
+## [0.9.4] - 2026-01-19 (Refactor Phase 1)
+
+### Changed
+- **Templates**: Cleaned `pyproject.toml` (pure uv), `config.yaml` (minimal).
+- **Defaults**: `use_env=False`, `use_tests=True`.
+
 ## [0.9.2] - 2026-01-19 (Robustness & Hydration)
 
 ### Fixed
