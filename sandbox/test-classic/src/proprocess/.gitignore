@@ -1,8 +1,0 @@
-
-# ViperX specific
-.ipynb_checkpoints/
-# Isolated Env
-src/**/.env
-# Data (Local)
-data/*
-!data/.gitkeep

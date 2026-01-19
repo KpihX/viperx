@@ -142,6 +142,13 @@ class ProjectGenerator:
             console.print(f"  [dim]cd {self.raw_name} && uv sync[/dim]")
 
     def _create_extra_dirs(self, root: Path, is_subpackage: bool = False):
+        if is_subpackage:
+            # Ultra-Flat Layout: root IS the package root
+            pkg_root = root
+        else:
+            # Standard Layout: root / src / package_name
+            pkg_root = root / SRC_DIR / self.project_name
+            
         # Notebooks for ML/DL (Only for Root Project usually)
         if not is_subpackage and self.type in [TYPE_ML, TYPE_DL]:
             (root / NOTEBOOKS_DIR).mkdir(exist_ok=True)
