@@ -272,7 +272,7 @@ class ProjectGenerator:
             console.print("[yellow]Upgrading project to Workspace...[/yellow]")
             # Append workspace definition
             with open(pyproject_path, "a") as f:
-                f.write(f"\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
+                f.write(f"\n[tool.uv.workspace]\nmembers = [\"src/{self.raw_name}\"]\n")
             self.log("Added [tool.uv.workspace] section")
         else:
             # Add member to specific list if it exists
@@ -293,7 +293,8 @@ class ProjectGenerator:
                     # Naively replace the closing bracket
                     # Better: parse, but for now robust string insertion
                     # Cleanest way without breaking formatting involves finding the last element
-                    new_member = f', "{self.raw_name}"'
+                    # Cleanest way without breaking formatting involves finding the last element
+                    new_member = f', "src/{self.raw_name}"'
                     # Warning: This regex replace is basic. `uv` handles toml well, maybe we should just edit safely.
                     # Let's try to append to the end of the content of the list
                     new_content = re.sub(members_pattern, lambda m: f'members = [{m.group(1)}{new_member}]', content, flags=re.DOTALL)
@@ -308,12 +309,14 @@ class ProjectGenerator:
                      f.write(f"\n# Added by viperx\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
 
         # Generate the package in the root IF it doesn't exist
-        pkg_dir = workspace_root / self.raw_name
+        pkg_dir = workspace_root / SRC_DIR / self.raw_name
         if pkg_dir.exists():
             self.log(f"Package directory {self.raw_name} exists. Skipping generation.")
         else:
             # Generate as SUBPACKAGE (Flat Layout)
-            self.generate(workspace_root, is_subpackage=True)
+            # We pass workspace_root / SRC_DIR as the target for generation
+            # self.generate(target = root/src) -> uv init root/src/pkg -> moves to flat
+            self.generate(workspace_root / SRC_DIR, is_subpackage=True)
         
         # Post-generation: Ensure root knows about it
         console.print(f"[bold green]✓ Synced {self.raw_name} with workspace.[/bold green]")
@@ -323,7 +326,7 @@ class ProjectGenerator:
         """Remove a package from the workspace."""
         console.print(f"[bold red]Removing package {self.raw_name} from workspace...[/bold red]")
         
-        target_dir = workspace_root / self.raw_name
+        target_dir = workspace_root / SRC_DIR / self.raw_name
         pyproject_path = workspace_root / "pyproject.toml"
 
         # 1. Remove directory
@@ -351,8 +354,8 @@ class ProjectGenerator:
             # Let's try to just remove the string and cleanup commas? 
             # Or better: specific regex for the element.
             
-            member_str_double = f'"{self.raw_name}"'
-            member_str_single = f"'{self.raw_name}'"
+            member_str_double = f'"src/{self.raw_name}"'
+            member_str_single = f"'src/{self.raw_name}'"
             
             new_content = content
             if member_str_double in new_content:
@@ -379,7 +382,7 @@ class ProjectGenerator:
         """Update a package (dependencies)."""
         console.print(f"[bold blue]Updating package {self.raw_name}...[/bold blue]")
         
-        target_dir = workspace_root / self.raw_name
+        target_dir = workspace_root / SRC_DIR / self.raw_name
         if not target_dir.exists():
             console.print(f"[red]Error: Package {self.raw_name} does not exist.[/red]")
             return
