@@ -29,8 +29,8 @@ console = Console()
 class ProjectGenerator:
     def __init__(self, name: str, description: str, type: str, 
                   author: str, 
-                  use_env: bool, use_config: bool, 
-                 use_readme: bool = True,
+                  use_env: bool = False, use_config: bool = True, 
+                 use_readme: bool = True, use_tests: bool = True,
                  license: str = DEFAULT_LICENSE, 
                  builder: str = DEFAULT_BUILDER, 
                  framework: str = "pytorch",
@@ -51,6 +51,7 @@ class ProjectGenerator:
         self.use_env = use_env
         self.use_config = use_config
         self.use_readme = use_readme
+        self.use_tests = use_tests
         self.verbose = verbose
         
         # Detect System Python
@@ -83,7 +84,7 @@ class ProjectGenerator:
         self.log(f"Python version: {self.python_version}")
 
 
-    def generate(self, target_dir: Path):
+    def generate(self, target_dir: Path, is_subpackage: bool = False):
         """Main generation flow using uv init."""
         project_dir = target_dir / self.raw_name
         
@@ -107,43 +108,60 @@ class ProjectGenerator:
                 )
             console.print("  [blue]✓ Scaffolding created with uv init[/blue]")
         except subprocess.CalledProcessError as e:
-            console.print("  [blue]✓ Scaffolding created with uv init --package[/blue]")
-        except subprocess.CalledProcessError as e:
              console.print(f"[bold red]Error running uv init:[/bold red] {e}")
              return
 
         # 2. Restructure / Clean up
-        # uv init creates src/project_name/
-        
+        # If is_subpackage, convert to Flat Layout
+        if is_subpackage:
+            src_path = project_dir / "src" / self.project_name
+            flat_path = project_dir / self.project_name
+            if src_path.exists():
+                if flat_path.exists():
+                     import shutil
+                     shutil.rmtree(flat_path)
+                src_path.rename(flat_path)
+                # Remove empty src
+                import shutil
+                if (project_dir / "src").exists():
+                    shutil.rmtree(project_dir / "src")
+                self.log("Converted to Flat Layout (Subpackage)")
+
         # 3. Create extra directories (First, so templates have target dirs)
-        self._create_extra_dirs(project_dir)
+        self._create_extra_dirs(project_dir, is_subpackage)
         
         # 4. Overwrite/Add Files
-        self._generate_files(project_dir)
+        self._generate_files(project_dir, is_subpackage)
         
         # 5. Git & Final Steps
-        # uv init already initialized git, we might want to amend/commit
         console.print(f"\n[bold green]✓ Project {self.raw_name} created successfully![/bold green]")
-        console.print(f"  [dim]cd {self.raw_name} && uv sync[/dim]")
+        if not is_subpackage:
+            console.print(f"  [dim]cd {self.raw_name} && uv sync[/dim]")
 
-    def _create_extra_dirs(self, root: Path):
-        # Notebooks for ML/DL
-        if self.type in [TYPE_ML, TYPE_DL]:
+    def _create_extra_dirs(self, root: Path, is_subpackage: bool = False):
+        # Notebooks for ML/DL (Only for Root Project usually)
+        if not is_subpackage and self.type in [TYPE_ML, TYPE_DL]:
             (root / NOTEBOOKS_DIR).mkdir(exist_ok=True)
             self.log("Created notebooks directory")
-            # Note: 'data/' directory is created lazily by data_loader when needed (local=True)
             
-        # Tests inside package (future proofing as requested)
-        src_pkg = root / SRC_DIR / self.project_name
-        (src_pkg / TESTS_DIR).mkdir(exist_ok=True)
-        # Create a dummy test file
-        with open(src_pkg / TESTS_DIR / "__init__.py", "w") as f:
-            pass
-        with open(src_pkg / TESTS_DIR / "test_core.py", "w") as f:
-            f.write("def test_dummy():\n    assert True\n")
-        self.log("Created internal tests directory")
+        # Tests
+        if self.use_tests:
+            # For Flat Layout (Subpackage), tests usually go to `tests/` at root
+            # For Src Layout (Root), inside `src/pkg/tests`? 
+            # User request: "create dossier tests ... que ce soit au init general ou pour sous package"
+            # Standard practice: `tests/` at project root.
+            # ViperX old behavior: `src/pkg/tests` (Line 137).
+            # Changing to standard `tests/` at project root for BOTH.
+            tests_dir = root / TESTS_DIR
+            tests_dir.mkdir(exist_ok=True)
+            
+            with open(tests_dir / "__init__.py", "w") as f:
+                pass
+            with open(tests_dir / "test_core.py", "w") as f:
+                f.write("def test_dummy():\n    assert True\n")
+            self.log(f"Created tests directory at {tests_dir.relative_to(root)}")
 
-    def _generate_files(self, root: Path):
+    def _generate_files(self, root: Path, is_subpackage: bool = False):
         self.log(f"Generating files for {self.project_name}...")
         context = {
             "project_name": self.raw_name,
@@ -158,18 +176,26 @@ class ProjectGenerator:
             "use_uv": self.builder == "uv",
             "has_config": self.use_config,
             "use_readme": self.use_readme,
+            "use_env": self.use_env,
             "framework": self.framework,
         }
         
         # pyproject.toml (Overwrite uv's basic one to add our specific deps)
         self._render("pyproject.toml.j2", root / "pyproject.toml", context)
         
-        # src/... files
-        pkg_root = root / SRC_DIR / self.project_name
+        # Determine Package Root
+        if is_subpackage:
+            # Flat Layout: root / package_name
+            pkg_root = root / self.project_name
+        else:
+            # Standard Layout: root / src / package_name
+            pkg_root = root / SRC_DIR / self.project_name
         
         # Ensure pkg root exists
         if not pkg_root.exists():
-             self.log(f"Warning: Package root {pkg_root} expected but not found. Check uv init output.", "yellow")
+             # If we messed up logic or uv failed
+             pkg_root.mkdir(parents=True, exist_ok=True)
+             self.log(f"Created package root {pkg_root}")
 
         # __init__.py
         self._render("__init__.py.j2", pkg_root / "__init__.py", context)
@@ -197,9 +223,7 @@ class ProjectGenerator:
         # Entry points & Logic
         self._render("main.py.j2", pkg_root / "main.py", context)
 
-        if self.type == TYPE_CLASSIC:
-             pass 
-        elif self.type in [TYPE_ML, TYPE_DL]:
+        if not is_subpackage and self.type in [TYPE_ML, TYPE_DL]:
              # Render Notebooks
              self._render("Base_Kaggle.ipynb.j2", root / NOTEBOOKS_DIR / "Base_Kaggle.ipynb", context)
              self._render("Base_General.ipynb.j2", root / NOTEBOOKS_DIR / "Base_General.ipynb", context)
@@ -288,7 +312,8 @@ class ProjectGenerator:
         if pkg_dir.exists():
             self.log(f"Package directory {self.raw_name} exists. Skipping generation.")
         else:
-            self.generate(workspace_root)
+            # Generate as SUBPACKAGE (Flat Layout)
+            self.generate(workspace_root, is_subpackage=True)
         
         # Post-generation: Ensure root knows about it
         console.print(f"[bold green]✓ Synced {self.raw_name} with workspace.[/bold green]")

@@ -1,57 +1,49 @@
-# 🐍 ViperX Project Configuration
+# 🐍 ViperX Project Configuration (v0.9.3)
 # =============================================================================
-# This file serves as the "Source of Truth" for your project infrastructure.
-# Use `viperx init -c viperx.yaml` to apply this configuration.
-# The tool is idempotent: running it multiple times will only apply new changes.
+# "Source of Truth" for your project infrastructure.
+# Run `viperx init -c viperx.yaml` to apply changes.
 # =============================================================================
 
 project:
-  # [Required] The root project name (kebab-case recommended)
-  name: "my-awesome-project"
+  # [Required] Root project name
+  name: "my-project"
   
-  # [Optional] Project description
-  description: "A robust project built with ViperX"
-  
-  # [Optional] Author details (defaults to git config if omitted)
-  author: "Your Name"
-  
-  # [Optional] License (MIT, Apache-2.0, GPLv3). Default: MIT
-  license: "MIT"
-  
-  # [Optional] Builder backend (default: uv)
-  builder: "uv"
+  # [Optional] Defaults (Inferred from git/system if omitted)
+  # description: "My robust project"
+  # author: "KpihX"
+  # license: "MIT"
+  # builder: "uv"
 
 settings:
-  # [Optional] Generate isolated .env files in src/<pkg>/? Default: true
-  use_env: true
+  # [Optional] Project Defaults (Applied to root & workspace members)
   
-  # [Optional] Generate config.py embedded loader? Default: true
+  # Generate isolated .env files in src/<pkg>/? (Default: false)
+  use_env: false
+  
+  # Generate config.py embedded loader? (Default: true)
   use_config: true
   
-  # [Optional] Project Type: classic | ml | dl (Default: classic)
-  # Applies to the ROOT package if created.
+  # Generate tests/ directory? (Default: true)
+  use_tests: true
+  
+  # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
   type: "classic"
   
-  # [Optional] DL Framework: pytorch | tensorflow (Only if type is dl)
-  framework: "pytorch"
+  # DL Framework: pytorch | tensorflow (Only if type is dl)
+  # framework: "pytorch"
 
 workspace:
-  # Define your packages (monorepo structure) here.
-  # If you add a new entry here and re-run init, ViperX will create it.
+  # Define workspace members (Monorepo / Utility Packages).
+  # These are minimal packages created at the workspace root (Flat Layout).
   packages:
-    # --- Example Package 1: Core Library (Classic) ---
-    # - name: "core-lib"
-    #   type: "classic"
-    #   description: "Core utilities shared across project"
-    #   use_readme: false
+    # --- Example 1: Shared Utilities ---
+    # - name: "shared-utils"
+    #   description: "Common tools"
+    #   # Defaults: use_env=false, use_config=true, use_tests=true
       
-    # --- Example Package 2: AI Engine (Deep Learning) ---
-    # - name: "vision-engine"
+    # --- Example 2: AI Submodule ---
+    # - name: "vision-core"
     #   type: "dl"
     #   framework: "pytorch"
-    #   description: "YOLOv8 implementation"
-    
-    # --- Example Package 3: API (Machine Learning) ---
-    # - name: "scoring-api"
-    #   type: "ml"
-    #   description: "Scikit-Learn inference headers"
+    #   use_env: true  # Override default
+

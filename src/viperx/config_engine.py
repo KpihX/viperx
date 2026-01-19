@@ -65,8 +65,9 @@ class ConfigEngine:
                     author=project_conf.get("author", None),
                     license=project_conf.get("license", DEFAULT_LICENSE),
                     builder=project_conf.get("builder", DEFAULT_BUILDER),
-                    use_env=settings_conf.get("use_env", True),
+                    use_env=settings_conf.get("use_env", False),
                     use_config=settings_conf.get("use_config", True),
+                    use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
                     verbose=self.verbose
                 )
@@ -94,8 +95,9 @@ class ConfigEngine:
                     author=project_conf.get("author", None),
                     license=project_conf.get("license", DEFAULT_LICENSE),
                     builder=project_conf.get("builder", DEFAULT_BUILDER),
-                    use_env=settings_conf.get("use_env", True),
+                    use_env=settings_conf.get("use_env", False),
                     use_config=settings_conf.get("use_config", True),
+                    use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
                     verbose=self.verbose
                 )
@@ -125,9 +127,10 @@ class ConfigEngine:
                     description=pkg.get("description", ""),
                     type=pkg.get("type", TYPE_CLASSIC),
                     author=project_conf.get("author", "Your Name"), # Inherit author
-                    use_env=settings_conf.get("use_env", True),     # Inherit settings
-                    use_config=settings_conf.get("use_config", True),
+                    use_env=pkg.get("use_env", settings_conf.get("use_env", False)),     # Inherit settings or default False
+                    use_config=pkg.get("use_config", settings_conf.get("use_config", True)), # Inherit or default True
                     use_readme=pkg.get("use_readme", True),
+                    use_tests=pkg.get("use_tests", settings_conf.get("use_tests", True)),
                     framework=pkg.get("framework", FRAMEWORK_PYTORCH),
                     verbose=self.verbose
                 )

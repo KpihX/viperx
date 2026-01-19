@@ -2,10 +2,12 @@ import yaml
 import importlib.resources
 from pathlib import Path
 from typing import Any, Dict
+{% if use_env %}
 from dotenv import load_dotenv
 
-# Load Environment Variables from the isolated .env file in this package (src/<pkg>/.env)
+# Load Environment Variables from the isolated .env file in this package
 load_dotenv(Path(__file__).parent / ".env")
+{% endif %}
 
 # Load configuration safely whether installed or local
 try:
