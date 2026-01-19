@@ -40,6 +40,11 @@ app = typer.Typer(
 state = {"verbose": False}
 console = Console(force_terminal=True)
 
+def version_callback(value: bool):
+    if value:
+        console.print(f"ViperX CLI Version: [bold green]{version}[/bold green]")
+        raise typer.Exit()
+
 @app.callback(invoke_without_command=True)
 def cli_callback(
     ctx: typer.Context,
@@ -64,10 +69,7 @@ def cli_callback(
         state["verbose"] = True
         console.print("[dim]Verbose mode enabled[/dim]")
         
-def version_callback(value: bool):
-    if value:
-        console.print(f"ViperX CLI Version: [bold green]{version}[/bold green]")
-        raise typer.Exit()
+
 
 
 # Config Management Group (The Main Entry Point)
