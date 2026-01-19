@@ -84,7 +84,7 @@ def init(
         help=f"DL Framework ({'|'.join(DL_FRAMEWORKS)}). Defaults to pytorch."
     ),
     use_env: bool = typer.Option(True, "--env/--no-env", help="Generate .env file"),
-    use_config: bool = typer.Option(True, "--config/--no-config", help="Generate embedded config"),
+    use_config: bool = typer.Option(True, "--embed-config/--no-embed-config", help="Generate embedded config"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose logging"),
 ):
     """
@@ -184,7 +184,7 @@ def package_add(
         help=f"DL Framework ({'|'.join(DL_FRAMEWORKS)}). Defaults to pytorch."
     ),
     use_env: bool = typer.Option(True, "--env/--no-env", help="Generate .env file"),
-    use_config: bool = typer.Option(True, "--config/--no-config", help="Generate embedded config"),
+    use_config: bool = typer.Option(True, "--embed-config/--no-embed-config", help="Generate embedded config"),
     use_readme: bool = typer.Option(True, "--readme/--no-readme", help="Generate README.md"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose logging"),
 ):

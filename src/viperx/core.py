@@ -149,11 +149,10 @@ class ProjectGenerator:
             # For Flat Layout (Subpackage), tests usually go to `tests/` at root
             # For Src Layout (Root), inside `src/pkg/tests`? 
             # User request: "create dossier tests ... que ce soit au init general ou pour sous package"
-            # Standard practice: `tests/` at project root.
-            # ViperX old behavior: `src/pkg/tests` (Line 137).
-            # Changing to standard `tests/` at project root for BOTH.
-            tests_dir = root / TESTS_DIR
-            tests_dir.mkdir(exist_ok=True)
+            # User request: "tests/ pour le package principal est dans src/name_package/ tout est isolé"
+            # So tests are INSIDE the package.
+            tests_dir = pkg_root / TESTS_DIR
+            tests_dir.mkdir(parents=True, exist_ok=True)
             
             with open(tests_dir / "__init__.py", "w") as f:
                 pass
