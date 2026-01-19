@@ -32,14 +32,10 @@ def validate_project_name(ctx, param, value):
     return value
 
 def check_builder_installed(builder: str) -> bool:
-    """Check if the specified builder (uv, hatch, flit, etc.) is installed."""
-    if builder == "uv":
-         return shutil.which("uv") is not None
-    elif builder == "hatch":
-         return shutil.which("hatch") is not None
-    elif builder == "flit":
-         return shutil.which("flit") is not None
-    # For others, assume pass or check generic executable
+    """
+    Check if the specified builder is installed.
+    Uses shutil.which() for robust path detection.
+    """
     return shutil.which(builder) is not None
 
 def get_author_from_git() -> tuple[str, str]:
