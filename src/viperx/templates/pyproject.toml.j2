@@ -40,8 +40,17 @@ dependencies = [
 ]
 
 [build-system]
+{% if builder == 'hatch' %}
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+{% elif builder == 'flit' %}
+requires = ["flit_core>=3.2,<4"]
+build-backend = "flit_core.buildapi"
+{% else %}
+# Default to Setuptools (Standard/Robust) to avoid Hatchling unless requested
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+{% endif %}
 
 {% if use_uv %}
 [tool.uv]
