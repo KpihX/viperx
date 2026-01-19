@@ -5,7 +5,7 @@ description = "test-classic"
 
 readme = "README.md"
 
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 authors = [
     { name = "Ivann KAMDEM", email = "kapoivha@gmail.com" }
 ]

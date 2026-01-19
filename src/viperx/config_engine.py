@@ -85,22 +85,53 @@ class ConfigEngine:
             else:
                 if target_dir.exists():
                      console.print(Panel(f"⚠️  [bold yellow]Directory exists but not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
-                else:
-                     console.print(Panel(f"🚀 [bold green]Creating New Project:[/bold green] {project_name}", border_style="green"))
-                
-                # Prepare Scripts (Root + Workspace Members)
+                # Prepare Scripts & Dependency Context
                 packages = workspace_conf.get("packages", [])
                 
-                # Start with Root Script
+                # --- Aggregate Global Dependencies ---
+                # Start with Root Settings
+                # Root is always present (ProjectGenerator uses these)
+                root_use_config = settings_conf.get("use_config", True)
+                root_use_env = settings_conf.get("use_env", False)
+                root_type = settings_conf.get("type", TYPE_CLASSIC)
+                root_framework = settings_conf.get("framework", FRAMEWORK_PYTORCH)
+                
+                glob_has_config = root_use_config
+                glob_has_env = root_use_env
+                glob_is_ml_dl = root_type in [TYPE_ML, TYPE_DL]
+                glob_is_dl = root_type == TYPE_DL
+                glob_frameworks = {root_framework} if glob_is_dl else set()
+
                 project_scripts = {project_name: f"{project_name}.main:main"}
                 
-                # Add Subpackage Scripts
                 for pkg in packages:
+                    # Scripts
                     pkg_name = pkg.get("name")
-                    # Sanitize checking
                     from viperx.utils import sanitize_project_name
                     pkg_name_clean = sanitize_project_name(pkg_name)
                     project_scripts[pkg_name_clean] = f"{pkg_name_clean}.main:main"
+                    
+                    # Dependency Aggregation
+                    # Inherit defaults if not defined in pkg
+                    p_config = pkg.get("use_config", settings_conf.get("use_config", True))
+                    p_env = pkg.get("use_env", settings_conf.get("use_env", False))
+                    p_type = pkg.get("type", TYPE_CLASSIC)
+                    p_framework = pkg.get("framework", FRAMEWORK_PYTORCH) # Defaults to pytorch if implicit
+
+                    if p_config: glob_has_config = True
+                    if p_env: glob_has_env = True
+                    if p_type in [TYPE_ML, TYPE_DL]: glob_is_ml_dl = True
+                    if p_type == TYPE_DL: 
+                         glob_is_dl = True
+                         glob_frameworks.add(p_framework)
+
+                dep_context = {
+                    "has_config": glob_has_config,
+                    "has_env": glob_has_env,
+                    "is_ml_dl": glob_is_ml_dl,
+                    "is_dl": glob_is_dl,
+                    "frameworks": list(glob_frameworks)
+                }
 
                 # Create Root (or Hydrate)
                 gen = ProjectGenerator(
@@ -115,6 +146,7 @@ class ConfigEngine:
                     use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
                     scripts=project_scripts,
+                    dependency_context=dep_context,
                     verbose=self.verbose
                 )
                 gen.generate(self.root_path)

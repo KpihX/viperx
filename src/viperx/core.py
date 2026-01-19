@@ -35,6 +35,7 @@ class ProjectGenerator:
                  builder: str = DEFAULT_BUILDER, 
                  framework: str = "pytorch",
                  scripts: Optional[dict] = None,
+                 dependency_context: Optional[dict] = None,
                  verbose: bool = False):
         self.raw_name = name
         self.project_name = sanitize_project_name(name)
@@ -42,6 +43,15 @@ class ProjectGenerator:
         self.type = type
         self.framework = framework
         self.scripts = scripts or {}
+        # Dependency Context (Global workspace features)
+        self.dependency_context = dependency_context or {
+            "has_config": use_config,
+            "has_env": use_env,
+            "is_ml_dl": type in ["ml", "dl"],
+            "is_dl": type == "dl",
+            "frameworks": [framework] if type == "dl" else []
+        }
+        
         # Default script for the main package if none provided (and it's a root project mostly)
         if not self.scripts:
              self.scripts = {self.project_name: f"{self.project_name}.main:main"}
@@ -234,6 +244,8 @@ class ProjectGenerator:
             "framework": self.framework,
             "scripts": self.scripts,
         }
+        # Merge dependency context overrides
+        context.update(self.dependency_context)
         
         if not is_subpackage:
             # pyproject.toml (Overwrite uv's basic one to add our specific deps)
