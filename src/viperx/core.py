@@ -340,57 +340,9 @@ class ProjectGenerator:
         """Add a new package to an existing workspace."""
         console.print(f"[bold green]Adding package {self.raw_name} to workspace...[/bold green]")
         
-        pyproject_path = workspace_root / "pyproject.toml"
-        if not pyproject_path.exists():
-            console.print("[red]Error: Not in a valid project root (pyproject.toml missing).[/red]")
-            return
-            
-        # Read pyproject.toml
-        with open(pyproject_path, "r") as f:
-            content = f.read()
-
-        # Check if it's already a workspace
-        is_workspace = "[tool.uv.workspace]" in content
-        
-        if not is_workspace:
-            console.print("[yellow]Upgrading project to Workspace...[/yellow]")
-            # Append workspace definition
-            with open(pyproject_path, "a") as f:
-                f.write(f"\n[tool.uv.workspace]\nmembers = [\"src/{self.raw_name}\"]\n")
-            self.log("Added [tool.uv.workspace] section")
-        else:
-            # Add member to specific list if it exists
-            # We use a simple regex approach to find 'members = [...]'
-            import re
-            members_pattern = r'members\s*=\s*\[(.*?)\]'
-            match = re.search(members_pattern, content, re.DOTALL)
-            
-            if match:
-                current_members = match.group(1)
-                # Check if already present
-                if f'"{self.raw_name}"' in current_members or f"'{self.raw_name}'" in current_members:
-                    self.log(f"Package {self.raw_name} is already in workspace members.")
-                else:
-                    # Append new member
-                    # We inject it into the list
-                    self.log("Adding member to existing workspace list")
-                    # Naively replace the closing bracket
-                    # Better: parse, but for now robust string insertion
-                    # Cleanest way without breaking formatting involves finding the last element
-                    # Cleanest way without breaking formatting involves finding the last element
-                    new_member = f', "src/{self.raw_name}"'
-                    # Warning: This regex replace is basic. `uv` handles toml well, maybe we should just edit safely.
-                    # Let's try to append to the end of the content of the list
-                    new_content = re.sub(members_pattern, lambda m: f'members = [{m.group(1)}{new_member}]', content, flags=re.DOTALL)
-                    with open(pyproject_path, "w") as f:
-                        f.write(new_content)
-            else:
-                 # Section exists but members key might be missing? Or weird formatting.
-                 # Append to section?
-                 # Safe fallback
-                 console.print("[yellow]Warning: Could not parse members list. Adding manually at end.[/yellow]")
-                 with open(pyproject_path, "a") as f:
-                     f.write(f"\n# Added by viperx\n[tool.uv.workspace]\nmembers = [\"{self.raw_name}\"]\n")
+        # User Request: Do not modify root pyproject.toml to add workspace members.
+        # "uv est assez intelligent"
+        pass
 
         # Generate the package in the root IF it doesn't exist
         pkg_dir = workspace_root / SRC_DIR / self.raw_name
