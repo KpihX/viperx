@@ -60,24 +60,24 @@ Initialize a new project with a single command:
 
 ```bash
 # Classic Package
-pypro init -n my-lib -d "My awesome library"
+viperx init -n my-lib -d "My awesome library"
 
 # Deep Learning Project (PyTorch ready)
-pypro init -n deep-vision -t dl --description "Vision Transformer implementation"
+viperx init -n deep-vision -t dl --description "Vision Transformer implementation"
 
 # Machine Learning Project (Scikit-learn ready)
-pypro init -n churn-prediction -t ml
+viperx init -n churn-prediction -t ml
 ```
 
-## 🏗️ Project 🧱 Structure
+## 🧱 Structure
 
-<img src="https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/folder-src.svg" width="16" /> **Standard Layout**
+📂 **Standard Layout**
 ```text
 my-lib/
 ├── pyproject.toml      # Managed by uv
 ├── README.md
+├── README.md
 ├── .gitignore
-├── data/               # Local datasets (ignored by git)
 └── src/
     └── my_lib/
         ├── __init__.py
@@ -114,7 +114,7 @@ deep-vision/
 ### `init` - Create a new project
 
 ```bash
-uv run pypro init [OPTIONS]
+viperx init [OPTIONS]
 ```
 
 **Options:**
@@ -130,13 +130,13 @@ uv run pypro init [OPTIONS]
 
 ```bash
 # Classic Library
-uv run pypro init -n my-lib
+viperx init -n my-lib
 
 # Deep Learning (PyTorch Default)
-uv run pypro init -n vision-ai -t dl
+viperx init -n vision-ai -t dl
 
 # Deep Learning (TensorFlow)
-uv run pypro init -n tf-legacy -t dl -f tensorflow
+viperx init -n tf-legacy -t dl -f tensorflow
 ```
 
 ### `package` - Manage Workspace
@@ -146,7 +146,8 @@ Manage packages in your workspace hierarchy (add, update, delete).
 #### `add`
 Add a new package to your project. Upgrades standalone projects to workspaces automatically.
 ```bash
-uv run pypro package add -n worker-node -t classic --no-readme
+```bash
+viperx package add -n worker-node -t classic --no-readme
 ```
 **Options:**
 - `--readme / --no-readme`: Generate a local `README.md` for the package. Default: `True`.
@@ -155,13 +156,13 @@ uv run pypro package add -n worker-node -t classic --no-readme
 #### `delete`
 Remove a package from the workspace (deletes folder & updates `pyproject.toml`).
 ```bash
-uv run pypro package delete -n worker-node
+viperx package delete -n worker-node
 ```
 
 #### `update`
 Update a package's dependencies (runs `uv lock --upgrade`).
 ```bash
-uv run pypro package update -n worker-node
+viperx package update -n worker-node
 ```
 
 ---## 📦 "Magical" Configuration
@@ -182,7 +183,7 @@ This project is built 100% with `uv`.
 
 1. Clone the repo
 2. Sync dependencies: `uv sync`
-3. Run the CLI: `uv run pypro`
+3. Run the CLI: `uv run viperx`
 
 ---
 *Built with ❤️ by KpihX*
