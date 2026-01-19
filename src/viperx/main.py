@@ -169,12 +169,7 @@ def config_main(
     generator.generate(Path.cwd())
 
 
-# Config Management Group
-config_app = typer.Typer(
-    help="Manage Declarative Configuration (viperx.yaml).",
-    no_args_is_help=True
-)
-app.add_typer(config_app, name="config")
+
 
 @config_app.command("get")
 def config_get(
