@@ -45,7 +45,7 @@ viperx init -n deep-vision -t dl --framework pytorch
 viperx init -n deep-vision -t dl --framework pytorch
 
 # ✨ Declarative Config (Infrastructure as Code)
-viperx config init                  # Generate template
+viperx config get                   # Generate template
 viperx init -c viperx.yaml          # Apply config
 ```
 
@@ -155,7 +155,7 @@ viperx init -c viperx.yaml
 Manage your project infrastructure using a YAML file.
 
 ```bash
-viperx config init
+viperx config get
 ```
 Generates a `viperx.yaml` template in the current directory.
 

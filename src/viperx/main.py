@@ -136,12 +136,12 @@ config_app = typer.Typer(
 )
 app.add_typer(config_app, name="config")
 
-@config_app.command("init")
-def config_init(
+@config_app.command("get")
+def config_get(
     filename: Path = typer.Option("viperx.yaml", "--output", "-o", help="Output filename")
 ):
     """
-    Generate a template viperx.yaml configuration file.
+    Get the default configuration template (viperx.yaml).
     Use this to start a 'Project as Code' workflow.
     """
     from viperx.constants import TEMPLATES_DIR
