@@ -15,21 +15,48 @@ from viperx.constants import (
     FRAMEWORK_PYTORCH,
 )
 
-HELP_TEXT = """
-[bold green]ViperX[/bold green]: Professional Python Project Initializer
+    import importlib.metadata
+    try:
+        version = importlib.metadata.version("viperx")
+    except importlib.metadata.PackageNotFoundError:
+        version = "unknown"
+        
+    HELP_TEXT = f"""
+[bold green]ViperX[/bold green] (v{version}): Professional Python Project Initializer
 .
     
     Automates the creation of professional-grade Python projects using `uv`.
     Supports Standard Libraries, Machine Learning, and Deep Learning templates.
     """
 
-app = typer.Typer(
-    help=HELP_TEXT,
-    add_completion=False,
-    no_args_is_help=True,
-    rich_markup_mode="markdown",
-    epilog="Made with ❤️ by KpihX"
-)
+    app = typer.Typer(
+        help=HELP_TEXT,
+        add_completion=False,
+        no_args_is_help=True,
+        rich_markup_mode="markdown",
+        epilog="Made with ❤️  by KpihX"
+    )
+
+    # Re-apply callbacks and commands...
+    # (Since I am editing the FILE, I need to be careful not to delete commands if I replace app definition)
+    # The user request "replace_file_content" works on blocks.
+    # I will replace the top block defining HELP_TEXT and app.
+    
+if __name__ == "__main__":
+    try:
+        app()
+    except SystemExit as e:
+        if e.code != 0:
+            # On error (non-zero exit), display help as requested
+            from typer.main import get_command
+            import click
+            cli = get_command(app)
+            # Create a dummy context to render help
+            with click.Context(cli) as ctx:
+                console.print("\n[bold]Usage Guide:[/bold]")
+                console.print(cli.get_help(ctx))
+            # Re-raise to maintain exit code
+            raise
 
 # Global state for verbose flag
 state = {"verbose": False}
@@ -265,4 +292,18 @@ def package_update(
     generator.update_package(Path.cwd())
 
 if __name__ == "__main__":
-    app()
+    try:
+        app()
+    except SystemExit as e:
+        if e.code != 0:
+            # On error (non-zero exit), display help as requested
+            from typer.main import get_command
+            import click
+            cli = get_command(app)
+            # Create a dummy context to render help
+            # We print it to stderr or stdout? Console prints to stdout usually.
+            # User wants it displayed immediately.
+            with click.Context(cli) as ctx:
+                 console.print("\n")
+                 console.print(cli.get_help(ctx))
+            raise
