@@ -55,8 +55,25 @@ class ConfigEngine:
         
         # Heuristic: Are we already in a folder named 'project_name'?
         if self.root_path.name == project_name:
-            # We are inside the project, performing update/expansion
-            console.print(Panel(f"♻️  [bold blue]Syncing Project:[/bold blue] {project_name}", border_style="blue"))
+            # We are inside the project folder
+            if not (self.root_path / "pyproject.toml").exists():
+                 console.print(Panel(f"⚠️  [bold yellow]Current directory matches name but is not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
+                 gen = ProjectGenerator(
+                    name=project_name,
+                    description=project_conf.get("description", ""),
+                    type=settings_conf.get("type", TYPE_CLASSIC),
+                    author=project_conf.get("author", None),
+                    license=project_conf.get("license", DEFAULT_LICENSE),
+                    builder=project_conf.get("builder", DEFAULT_BUILDER),
+                    use_env=settings_conf.get("use_env", True),
+                    use_config=settings_conf.get("use_config", True),
+                    framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
+                    verbose=self.verbose
+                )
+                 # generate() expects parent dir, and will operate on parent/name (which is self.root_path)
+                 gen.generate(self.root_path.parent)
+            else:
+                console.print(Panel(f"♻️  [bold blue]Syncing Project:[/bold blue] {project_name}", border_style="blue"))
             current_root = self.root_path
         else:
             # We are outside, check if it exists
