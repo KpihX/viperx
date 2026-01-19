@@ -27,7 +27,7 @@ settings:
   use_tests: true
 
   # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
-  type: "ml"
+  type: "classic"
 
   # DL Framework: pytorch | tensorflow (Only if type is dl)
   # framework: "pytorch"

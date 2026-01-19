@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from viperx.core import ProjectGenerator
-from viperx.constants import DEFAULT_LICENSE, DEFAULT_BUILDER, TYPE_CLASSIC, FRAMEWORK_PYTORCH
+from viperx.constants import DEFAULT_LICENSE, DEFAULT_BUILDER, TYPE_CLASSIC, TYPE_ML, TYPE_DL, FRAMEWORK_PYTORCH
 
 console = Console()
 
