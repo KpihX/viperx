@@ -68,7 +68,6 @@ class ConfigEngine:
                     use_env=settings_conf.get("use_env", False),
                     use_config=settings_conf.get("use_config", True),
                     use_tests=settings_conf.get("use_tests", True),
-                    use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
                     scripts={project_name: f"{project_name}.main:main"}, # Simple default for hydration 
                     verbose=self.verbose
