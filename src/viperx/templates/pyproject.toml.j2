@@ -54,8 +54,8 @@ requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
 {% endif %}
 
-{% if use_uv %}
+{%- if use_uv %}
 [tool.uv]
-managed = true
-{% endif %}
+package = true
+{%- endif %}
 

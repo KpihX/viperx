@@ -247,14 +247,9 @@ class ProjectGenerator:
         # Merge dependency context overrides
         context.update(self.dependency_context)
         
-        if not is_subpackage:
-            # pyproject.toml (Overwrite uv's basic one to add our specific deps)
-            self._render("pyproject.toml.j2", root / "pyproject.toml", context)
-        else:
-             # Subpackages: remove default pyproject.toml from uv init
-             if (root / "pyproject.toml").exists():
-                 (root / "pyproject.toml").unlink()
-                 self.log("Removed default pyproject.toml (Subpackage: Code Only)")
+        # pyproject.toml (Overwrite uv's basic one to add our specific deps)
+        # Even subpackages need this if they are Workspace Members (which they are in our model)
+        self._render("pyproject.toml.j2", root / "pyproject.toml", context)
         
         # Determine Package Root
         if is_subpackage:
