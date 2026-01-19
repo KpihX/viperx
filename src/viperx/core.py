@@ -60,8 +60,13 @@ class ProjectGenerator:
         self.use_tests = use_tests
         self.verbose = verbose
         
-        # Detect System Python
-        self.python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+        # Detect System Python (For logging/diagnostics)
+        self.system_python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+        
+        # Project Python Version (For requires-python in pyproject.toml)
+        # Driven by package constants to ensure compatibility/evolution
+        from viperx.constants import DEFAULT_PYTHON_VERSION
+        self.python_version = DEFAULT_PYTHON_VERSION
         
         
         # Validate Choices
@@ -112,7 +117,8 @@ class ProjectGenerator:
         console.print(f"[bold green]Creating project {self.raw_name} ({self.type})...[/bold green]")
         
         self.log(f"Target directory: {project_dir}")
-        self.log(f"Python version: {self.python_version}")
+        self.log(f"System Python: {self.system_python_version}")
+        self.log(f"Project Python: {self.python_version}")
 
 
     def generate(self, target_dir: Path, is_subpackage: bool = False):

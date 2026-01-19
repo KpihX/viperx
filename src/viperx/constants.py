@@ -2,7 +2,7 @@ from pathlib import Path
 
 # Project Defaults
 DEFAULT_VERSION = "0.1.0"
-DEFAULT_PYTHON_VERSION = "3.11"
+DEFAULT_PYTHON_VERSION = "3.12"
 DEFAULT_LICENSE = "MIT"
 DEFAULT_BUILDER = "uv"
 
