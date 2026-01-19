@@ -31,11 +31,27 @@ def validate_project_name(ctx, param, value):
         raise BadParameter("Project name must contain only letters, numbers, underscores, and hyphens.")
     return value
 
+from viperx.constants import SUPPORTED_BUILDERS
+
+def validate_choice(value: str, choices: list[str], name: str):
+    """
+    Validate that a value is within the allowed choices.
+    Raises ValueError with a friendly message if invalid.
+    """
+    if value not in choices:
+        raise ValueError(f"Invalid {name} '{value}'. Allowed: {', '.join(choices)}")
+    return value
+
 def check_builder_installed(builder: str) -> bool:
     """
-    Check if the specified builder is installed.
+    Check if the specified builder is valid AND installed.
     Uses shutil.which() for robust path detection.
     """
+    # 1. Validate against supported list
+    if builder not in SUPPORTED_BUILDERS:
+        return False
+        
+    # 2. Check existence
     return shutil.which(builder) is not None
 
 def get_author_from_git() -> tuple[str, str]:

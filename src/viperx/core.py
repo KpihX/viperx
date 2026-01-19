@@ -63,18 +63,36 @@ class ProjectGenerator:
         # Detect System Python
         self.python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
         
+        
+        # Validate Choices
+        from viperx.utils import validate_choice, check_builder_installed
+        from viperx.constants import PROJECT_TYPES, DL_FRAMEWORKS, TYPE_DL
+        
+        try:
+            validate_choice(self.type, PROJECT_TYPES, "project type")
+            if self.type == TYPE_DL:
+                validate_choice(self.framework, DL_FRAMEWORKS, "framework")
+            
+            # Validate Builder Existence & Support
+            if not check_builder_installed(self.builder):
+                 from viperx.constants import SUPPORTED_BUILDERS
+                 if self.builder not in SUPPORTED_BUILDERS:
+                      console.print(f"[bold red]Error:[/bold red] Invalid builder '[bold]{self.builder}[/bold]'.")
+                      console.print(f"Supported builders: [green]{', '.join(SUPPORTED_BUILDERS)}[/green]")
+                 else:
+                      console.print(f"[bold red]Error:[/bold red] The builder '[bold]{self.builder}[/bold]' is not installed or not in PATH.")
+                      console.print(f"Please install it (e.g., `pip install {self.builder}` or `curl -LsSf https://astral.sh/uv/install.sh | sh` for uv).")
+                 sys.exit(1)
+                 
+        except ValueError as e:
+            console.print(f"[bold red]Configuration Error:[/bold red] {e}")
+            sys.exit(1)
+
         # Jinja Setup
         self.env = Environment(
             loader=PackageLoader("viperx", "templates"),
             autoescape=select_autoescape()
         )
-        
-        # Validate Builder
-        from viperx.utils import check_builder_installed
-        if not check_builder_installed(self.builder):
-             console.print(f"[bold red]Error:[/bold red] The requested builder '[bold]{self.builder}[/bold]' is not installed or not in PATH.")
-             console.print(f"Please install it (e.g., `pip install {self.builder}` or `curl -LsSf https://astral.sh/uv/install.sh | sh` for uv).")
-             sys.exit(1)
 
     def log(self, message: str, style: str = "dim"):
         if self.verbose:
