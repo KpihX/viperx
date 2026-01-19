@@ -6,8 +6,8 @@
 
 project:
   # [Required] Root project name
-  name: "test-ml"
-
+  name: "my-project"
+  
   # [Optional] Defaults (Inferred from git/system if omitted)
   # description: "My robust project"
   # author: "KpihX"
@@ -16,19 +16,19 @@ project:
 
 settings:
   # [Optional] Project Defaults (Applied to root & workspace members)
-
+  
   # Generate isolated .env files in src/<pkg>/? (Default: false)
   use_env: false
-
+  
   # Generate config.py embedded loader? (Default: true)
   use_config: true
-
+  
   # Generate tests/ directory? (Default: true)
   use_tests: true
-
+  
   # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
-  type: "ml"
-
+  type: "classic"
+  
   # DL Framework: pytorch | tensorflow (Only if type is dl)
   # framework: "pytorch"
 
@@ -42,13 +42,4 @@ workspace:
     #   use_env: false
     #   use_config: true
     #   use_tests: true
-    - name: "preprocess"
-      description: "processing utilities"
-      use_env: false
-      use_config: true
-      use_tests: true
-    - name: "proprocess"
-      description: "proprocess utilities"
-      use_env: true
-      use_config: false
-      use_tests: false
+
