@@ -1,27 +1,57 @@
-# 🚀 PyPro: The Professional Python Project Initializer
+# 🐍 ViperX
 
-**PyPro** is a modern CLI tool designed to bootstrap robust, sharing-friendly Python projects.
-Built exclusively on **`uv`**, it enforces professional standards and workflows for generic Packages, Machine Learning, and Deep Learning projects.
+> **Professional Python Project Initializer**
+> *The modern, snake-fast way to bootstrap Python projects.*
 
-## ✨ Philosophy
+**ViperX** is a CLI tool designed to generate production-ready Python projects instantly. It leverages **[uv](https://github.com/astral-sh/uv)** for blazing fast dependency management and offers specialized templates for **Machine Learning** (`ml`) and **Deep Learning** (`dl`).
 
-- **Use `uv` everywhere**: No implicit pip, no hatch/poetry command mixing. The tool itself is built with `uv`, and it generates `uv`-native projects.
-- **Config-in-Package**: Solves the "Colab/Kaggle doesn't see my config" problem by embedding `config.yaml` as a package resource.
-- **Platform Agnostic**: Generated notebooks and code work seamlessly on Local, VSCode, Colab, and Kaggle environments without manual file copying.
+## ✨ Features
 
-## 🛠️ Installation
+- **Blazing Fast**: Built on top of `uv`.
+- **Pre-configured**: `pyproject.toml`, proper `src` layout, `ruff` ready.
+- **ML/DL First**: Templates with `torch`, `tensorflow`, `kagglehub` and **Smart Caching**.
+- **Smart Caching**: Auto-downloads and caches datasets to `~/.cache/viperx/data` (or local `data/`).
+- **Strict Isolation**: Environment variables (`.env`) isolated in `src/<pkg>/` for better security.
+- **Config-in-Package**: Solves the "Colab/Kaggle doesn't see my config" problem.
+- **Platform Agnostic**: Works on Local, VSCode, Colab, and Kaggle.
 
-You can install `pypro` globally using `uv tool`:
+## 📦 Installation
 
+**Recommended (Global Tool)**
 ```bash
-# From source (assuming you are in the repo)
-uv tool install .
+pipx install viperx
 ```
 
-Or run it ephemerally:
+**Alternative (uv)**
+```bash
+uv tool install viperx
+```
+
+## 🚀 Usage
+
+### `init`
+Initialize a new project (Classic, ML, or DL).
 
 ```bash
-uv run --project /path/to/pypro pypro init --help
+# Classic Lib (Standard Layout)
+viperx init -n my-lib
+
+# Machine Learning ( + Notebooks, Pandas, Scikit-learn, Smart Loader)
+viperx init -n churn-pred -t ml
+
+# Deep Learning ( + PyTorch/TensorFlow, CUDA checks)
+viperx init -n deep-vision -t dl --framework pytorch
+```
+
+### `package`
+Manage workspace packages (Monorepo style).
+
+```bash
+# Add a new package to the current workspace
+viperx package add -n my-api -t classic
+
+# Remove a package
+viperx package delete -n my-api
 ```
 
 ## 🚀 Quick Start

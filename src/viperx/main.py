@@ -5,21 +5,28 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 
-from .core import ProjectGenerator
+from viperx.core import ProjectGenerator, TYPE_CLASSIC, TYPE_ML, TYPE_DL, DEFAULT_LICENSE, DEFAULT_BUILDER
+from viperx.utils import validate_project_name, check_uv_installed
 from .constants import (
-    DEFAULT_LICENSE,
-    DEFAULT_BUILDER,
-    TYPE_CLASSIC,
     PROJECT_TYPES,
     DL_FRAMEWORKS,
     FRAMEWORK_PYTORCH,
 )
 
+HELP_TEXT = """
+[bold green]ViperX[/bold green]: Professional Python Project Initializer
+.
+    
+    Automates the creation of professional-grade Python projects using `uv`.
+    Supports Standard Libraries, Machine Learning, and Deep Learning templates.
+    """
+
 app = typer.Typer(
-    help="pypro: Professional Python Project Initializer",
+    help=HELP_TEXT,
     add_completion=False,
     no_args_is_help=True,
-    rich_markup_mode="markdown"
+    rich_markup_mode="markdown",
+    epilog="Made with ❤️ by Ivann KAMDEM (ViperX)"
 )
 
 # Global state for verbose flag
@@ -34,7 +41,7 @@ def cli_callback(
     )
 ):
     """
-    **pypro**: Professional Python Project Initializer.
+    **ViperX**: Professional Python Project Initializer.
     
     Automates the creation of professional-grade Python projects using `uv`.
     Supports Standard Libraries, Machine Learning, and Deep Learning templates.
@@ -129,7 +136,7 @@ def package_add(
     Detects if the current directory is a workspace. If so, adds the new package.
     If it's a standalone project, upgrades it to a workspace first.
     """
-    console.print(Panel(f"Adding package [bold blue]{name}[/bold blue]", border_style="green"))
+    console.print(Panel.fit("🚀 [bold yellow]ViperX[/bold yellow] - Initialize a new project", border_style="green"))
 
     generator = ProjectGenerator(
         name=name, 

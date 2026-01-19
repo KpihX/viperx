@@ -1,8 +1,13 @@
 import re
-import git
+import shutil
+import subprocess
 from rich.console import Console
 
 console = Console()
+
+def check_uv_installed() -> bool:
+    """Check if 'uv' is installed and accessible."""
+    return shutil.which("uv") is not None
 
 def sanitize_project_name(name: str) -> str:
     """
@@ -17,6 +22,15 @@ def sanitize_project_name(name: str) -> str:
     if not re.match(r"^[a-zA-Z_]", name):
         name = f"_{name}"
     return name.lower()
+
+def validate_project_name(ctx, param, value):
+    """
+    Typer callback to validate project name.
+    """
+    if not re.match(r"^[a-zA-Z0-9_-]+$", value):
+        from typer import BadParameter
+        raise BadParameter("Project name must contain only letters, numbers, underscores, and hyphens.")
+    return value
 
 def get_author_from_git() -> tuple[str, str]:
     """

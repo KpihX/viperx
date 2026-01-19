@@ -8,8 +8,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 from rich.console import Console
 
-from .constants import (
-    DEFAULT_VERSION,
+from viperx.constants import (
+    TEMPLATES_DIR, 
+    DEFAULT_VERSION, 
     DEFAULT_PYTHON_VERSION,
     DEFAULT_LICENSE,
     DEFAULT_BUILDER,
@@ -207,7 +208,7 @@ class ProjectGenerator:
         # .gitignore
         with open(root / ".gitignore", "a") as f:
             # Add data/ to gitignore but allow .gitkeep
-            f.write("\n# PyPro specific\n.ipynb_checkpoints/\n# Isolated Env\nsrc/**/.env\n# Data (Local)\ndata/*\n!data/.gitkeep\n")
+            f.write("\n# ViperX specific\n.ipynb_checkpoints/\n# Isolated Env\nsrc/**/.env\n# Data (Local)\ndata/*\n!data/.gitkeep\n")
         self.log("Updated .gitignore")
 
     def _render(self, template_name: str, target_path: Path, context: dict):

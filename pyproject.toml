@@ -1,6 +1,6 @@
 [project]
-name = "pypro"
-version = "0.1.0"
+name = "viperx"
+version = "0.7.0"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-pypro = "pypro.main:app"
+viperx = "viperx.main:app"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]

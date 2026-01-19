@@ -9,6 +9,7 @@ DEFAULT_BUILDER = "uv"
 # File Names
 CONFIG_FILENAME = "config.yaml"
 PYPROJECT_FILENAME = "pyproject.toml"
+PACKAGE_NAME = "viperx"
 README_FILENAME = "README.md"
 INIT_FILENAME = "__init__.py"
 MAIN_FILENAME = "main.py"
@@ -20,6 +21,7 @@ TESTS_DIR = "tests"
 
 # Templates
 TEMPLATE_DIR_NAME = "templates"
+TEMPLATES_DIR = Path(__file__).parent / TEMPLATE_DIR_NAME
 
 # Types
 TYPE_CLASSIC = "classic"
