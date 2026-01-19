@@ -36,14 +36,9 @@ workspace:
   # Define workspace members (Monorepo / Utility Packages).
   # These are minimal packages created at the workspace root (Flat Layout).
   packages:
-    # --- Example 1: Shared Utilities ---
-    # - name: "shared-utils"
-    #   description: "Common tools"
-    #   # Defaults: use_env=false, use_config=true, use_tests=true
-      
-    # --- Example 2: AI Submodule ---
-    # - name: "vision-core"
-    #   type: "dl"
-    #   framework: "pytorch"
-    #   use_env: true  # Override default
+    - name: "preprocess"
+      description: "Data preprocessing utilities"
+      # use_env: false
+      # use_config: true
+      # use_tests: true
 
