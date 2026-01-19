@@ -112,20 +112,23 @@ class ProjectGenerator:
              return
 
         # 2. Restructure / Clean up
-        # If is_subpackage, convert to Flat Layout
+        # If is_subpackage, convert to Ultra-Flat Layout (Code at Root)
+        # Target: root/__init__.py (and siblings) 
+        # Source: root/src/pkg/__init__.py (from uv init --lib)
         if is_subpackage:
-            src_path = project_dir / "src" / self.project_name
-            flat_path = project_dir / self.project_name
-            if src_path.exists():
-                if flat_path.exists():
-                     import shutil
-                     shutil.rmtree(flat_path)
-                src_path.rename(flat_path)
-                # Remove empty src
-                import shutil
-                if (project_dir / "src").exists():
-                    shutil.rmtree(project_dir / "src")
-                self.log("Converted to Flat Layout (Subpackage)")
+            src_pkg_path = project_dir / "src" / self.project_name
+            import shutil
+            
+            if src_pkg_path.exists():
+                # Move children of src/pkg to root
+                for item in src_pkg_path.iterdir():
+                    shutil.move(str(item), str(project_dir))
+                
+                # Cleanup src/pkg and src
+                shutil.rmtree(src_pkg_path)
+                if (project_dir / "src").exists() and not any((project_dir / "src").iterdir()):
+                     shutil.rmtree(project_dir / "src")
+                self.log("Converted to Ultra-Flat Layout (Code at Root)")
 
         # 3. Create extra directories (First, so templates have target dirs)
         self._create_extra_dirs(project_dir, is_subpackage)
@@ -184,8 +187,8 @@ class ProjectGenerator:
         
         # Determine Package Root
         if is_subpackage:
-            # Flat Layout: root / package_name
-            pkg_root = root / self.project_name
+            # Ultra-Flat Layout: root IS the package root
+            pkg_root = root
         else:
             # Standard Layout: root / src / package_name
             pkg_root = root / SRC_DIR / self.project_name
