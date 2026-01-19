@@ -109,7 +109,8 @@ class ConfigEngine:
                     pkg_name = pkg.get("name")
                     from viperx.utils import sanitize_project_name
                     pkg_name_clean = sanitize_project_name(pkg_name)
-                    project_scripts[pkg_name_clean] = f"{pkg_name_clean}.main:main"
+                    # CLI Command = Raw Name (e.g. test-classic) -> sanitized module path (test_classic.main:main)
+                    project_scripts[pkg_name] = f"{pkg_name_clean}.main:main"
                     
                     # Dependency Aggregation
                     # Inherit defaults if not defined in pkg

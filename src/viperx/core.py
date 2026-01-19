@@ -53,8 +53,12 @@ class ProjectGenerator:
         }
         
         # Default script for the main package if none provided (and it's a root project mostly)
+        self.scripts = scripts or {}
+        # Default script for the main package if none provided (and it's a root project mostly)
         if not self.scripts:
-             self.scripts = {self.project_name: f"{self.project_name}.main:main"}
+             # Key = Raw Name (CLI command, e.g. test-classic)
+             # Value = Sanitized Path (Module, e.g. test_classic.main:main)
+             self.scripts = {self.raw_name: f"{self.project_name}.main:main"}
              
         self.author = author
         if not self.author or self.author == "Your Name":
