@@ -129,7 +129,7 @@ class ConfigEngine:
                     author=project_conf.get("author", "Your Name"), # Inherit author
                     use_env=pkg.get("use_env", settings_conf.get("use_env", False)),     # Inherit settings or default False
                     use_config=pkg.get("use_config", settings_conf.get("use_config", True)), # Inherit or default True
-                    use_readme=pkg.get("use_readme", True),
+                    use_readme=pkg.get("use_readme", False),
                     use_tests=pkg.get("use_tests", settings_conf.get("use_tests", True)),
                     framework=pkg.get("framework", FRAMEWORK_PYTORCH),
                     verbose=self.verbose

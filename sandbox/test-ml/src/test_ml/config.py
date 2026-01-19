@@ -7,7 +7,7 @@ from typing import Any, Dict
 # Load configuration safely whether installed or local
 try:
     # Modern Way (Python 3.9+) - works when installed as a package
-    _config_path = importlib.resources.files("test_classic").joinpath("config.yaml")
+    _config_path = importlib.resources.files("test_ml").joinpath("config.yaml")
     with _config_path.open("r") as f:
         SETTINGS: Dict[str, Any] = yaml.safe_load(f)
 except Exception:

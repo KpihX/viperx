@@ -220,7 +220,7 @@ def package_add(
     ),
     use_env: bool = typer.Option(True, "--env/--no-env", help="Generate .env file"),
     use_config: bool = typer.Option(True, "--embed-config/--no-embed-config", help="Generate embedded config"),
-    use_readme: bool = typer.Option(True, "--readme/--no-readme", help="Generate README.md"),
+    use_readme: bool = typer.Option(False, "--readme/--no-readme", help="Generate README.md"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose logging"),
 ):
     """

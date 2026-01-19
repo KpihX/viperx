@@ -1,6 +1,6 @@
-# preprocess
+# test-ml
 
-processing utilities
+test-ml
 
 ---
 
@@ -18,9 +18,9 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 
 ### ⚙️ Configuration
 
-- **Config**: `src/preprocess/config.yaml` (Loaded automatically)
+- **Config**: `src/test_ml/config.yaml` (Loaded automatically)
 
-- **Environment**: `src/preprocess/.env` (Isolated variables)
+- **Environment**: `src/test_ml/.env` (Isolated variables)
 
 
 Edit `config.yaml` to change parameters. The project uses a **Config-in-Package** architecture:
@@ -41,8 +41,8 @@ No need to install Python or create venvs manually.
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourname/preprocess.git
-cd preprocess
+git clone https://github.com/yourname/test-ml.git
+cd test-ml
 
 # Sync dependencies (creates .venv and installs python if needed)
 uv sync
@@ -58,12 +58,23 @@ To run the package entry point or scripts:
 
 ```bash
 # Run the main package
-uv run preprocess
+uv run test_ml
 
 # Or run a specific script
-uv run python src/preprocess/main.py
+uv run python src/test_ml/main.py
 ```
 
+
+### For Data Scientists (Notebooks)
+
+We use `uv` to launch Jupyter, ensuring it sees the local package and config.
+
+```bash
+uv run jupyter notebook
+```
+
+- Open `notebooks/Base.ipynb`.
+- Note how it imports `config` from the package.
 
 
 ### ☁️ Cloud (Colab / Kaggle)
@@ -72,12 +83,12 @@ You can use the code and config from this repository directly in cloud environme
 
 **Step 1: Install directly from GitHub**
 ```python
-!pip install git+https://github.com/yourname/preprocess.git
+!pip install git+https://github.com/yourname/test-ml.git
 ```
 
 **Step 2: Use the unified config**
 ```python
-from preprocess import get_dataset_path, SETTINGS
+from test_ml import get_dataset_path, SETTINGS
 import kagglehub as kh
 
 # Transparency: You can inspect what was loaded
@@ -91,16 +102,18 @@ path = kh.dataset_download(SETTINGS['datasets']['titanic'])
 ## 🔧 Internal Structure
 
 ```text
-preprocess/
+test-ml/
 ├── pyproject.toml      # The Single Source of Truth (Dependencies, Metadata)
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
-│   └── preprocess/
+│   └── test_ml/
 │       ├── __init__.py
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
 │       └── tests/      # Unit tests
+
+└── notebooks/          # Experimentation (Jupyter)
 
 ```
 

@@ -1,6 +1,6 @@
-from test_classic import hello
+from test_ml import hello
 
-from test_classic import SETTINGS
+from test_ml import SETTINGS
 
 
 def main():

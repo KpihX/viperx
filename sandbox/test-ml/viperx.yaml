@@ -6,7 +6,7 @@
 
 project:
   # [Required] Root project name
-  name: "test-classic"
+  name: "test-ml"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
   # description: "My robust project"
@@ -27,7 +27,7 @@ settings:
   use_tests: true
 
   # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
-  type: "classic"
+  type: "ml"
 
   # DL Framework: pytorch | tensorflow (Only if type is dl)
   # framework: "pytorch"
@@ -44,7 +44,7 @@ workspace:
     #   use_tests: true
     - name: "preprocess"
       description: "processing utilities"
-      use_env: true
+      use_env: false
       use_config: true
       use_tests: true
     - name: "proprocess"

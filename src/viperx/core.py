@@ -223,19 +223,22 @@ class ProjectGenerator:
         self._render("__init__.py.j2", pkg_root / "__init__.py", context)
         
         # README.md
+        # README.md
         if not is_subpackage:
+            # Root Project: Respect use_readme
             if self.use_readme:
                  self._render("README.md.j2", root / "README.md", context)
             else:
                  if (root / "README.md").exists():
                      (root / "README.md").unlink()
                      self.log("Removed default README.md (requested --no-readme)")
-        elif (root / "README.md").exists() and is_subpackage:
-               # Remove default README for subpackage if user wants purely code?
-               # User said "p1/p1 on met directement le code", didn't explicitly forbid README.
-               # But usually modules don't have READMEs.
-               # Let's clean it.
-               (root / "README.md").unlink()
+        else:
+             # Subpackage: Default False, but if True, generate it
+             if self.use_readme:
+                  self._render("README.md.j2", root / "README.md", context)
+             elif (root / "README.md").exists():
+                 # Cleanup default README from uv init if we didn't request one
+                 (root / "README.md").unlink()
 
         
         # LICENSE

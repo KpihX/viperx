@@ -28,6 +28,7 @@ def get_config(key: str, default: Any = None) -> Any:
     """Retrieve a value from the globally loaded settings."""
     return SETTINGS.get(key, default)
 
+{% if project_type != 'classic' %}
 def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str = ".csv") -> str | None:
     """
     Helper for notebook data loading.
@@ -38,3 +39,4 @@ def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str =
     if not dataset_name:
         return None
     return f"{dataset_name}{extension}"
+{% endif %}
