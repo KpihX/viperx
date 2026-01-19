@@ -1,7 +1,7 @@
 [project]
-name = "test-ml"
+name = "test-classic"
 version = "0.1.0"
-description = "test-ml"
+description = "test-classic"
 
 readme = "README.md"
 
@@ -38,4 +38,4 @@ managed = true
 
 
 [tool.uv.workspace]
-members = ["src/preprocess", "src/proprocess", "src/preprocess", "src/proprocess"]
+members = ["src/preprocess", "src/proprocess"]

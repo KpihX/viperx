@@ -1,6 +1,5 @@
 import re
 import shutil
-import subprocess
 from rich.console import Console
 
 console = Console()
@@ -32,16 +31,36 @@ def validate_project_name(ctx, param, value):
         raise BadParameter("Project name must contain only letters, numbers, underscores, and hyphens.")
     return value
 
+def check_builder_installed(builder: str) -> bool:
+    """Check if the specified builder (uv, hatch, flit, etc.) is installed."""
+    if builder == "uv":
+         return shutil.which("uv") is not None
+    elif builder == "hatch":
+         return shutil.which("hatch") is not None
+    elif builder == "flit":
+         return shutil.which("flit") is not None
+    # For others, assume pass or check generic executable
+    return shutil.which(builder) is not None
+
 def get_author_from_git() -> tuple[str, str]:
     """
     Attempt to get author name and email from git config.
     Returns (name, email) or defaults.
     """
     try:
+        # Check if git is installed first
+        if not shutil.which("git"):
+             return "Nameless", "nameless@example.com"
+             
         import git
-        config = git.GitConfigParser(git.GitConfigParser.get_global_config(), read_only=True)
-        name = config.get("user", "name", fallback="Your Name")
-        email = config.get("user", "email", fallback="your.email@example.com")
-        return name, email
+        # Robust way using git command wrapper
+        reader = git.Git().config
+        name = reader("--global", "--get", "user.name")
+        email = reader("--global", "--get", "user.email")
+        
+        # strip newlines if any
+        return (name.strip() if name else "Nameless", 
+                email.strip() if email else "nameless@example.com")
     except Exception:
-        return "Your Name", "your.email@example.com"
+        # Fallback if git call fails
+        return "Nameless", "nameless@example.com"

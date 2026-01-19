@@ -62,6 +62,13 @@ class ProjectGenerator:
             loader=PackageLoader("viperx", "templates"),
             autoescape=select_autoescape()
         )
+        
+        # Validate Builder
+        from viperx.utils import check_builder_installed
+        if not check_builder_installed(self.builder):
+             console.print(f"[bold red]Error:[/bold red] The requested builder '[bold]{self.builder}[/bold]' is not installed or not in PATH.")
+             console.print(f"Please install it (e.g., `pip install {self.builder}` or `curl -LsSf https://astral.sh/uv/install.sh | sh` for uv).")
+             sys.exit(1)
 
     def log(self, message: str, style: str = "dim"):
         if self.verbose:

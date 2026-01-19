@@ -42,6 +42,8 @@ workspace:
     #   use_env: false
     #   use_config: true
     #   use_tests: true
+    #   use_readme: false
+
     - name: "preprocess"
       description: "processing utilities"
       use_env: false
@@ -52,3 +54,4 @@ workspace:
       use_env: true
       use_config: false
       use_tests: false
+      use_readme: true
