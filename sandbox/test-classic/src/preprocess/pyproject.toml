@@ -16,9 +16,7 @@ dependencies = [
 preprocess = "preprocess.main:main"
 
 [build-system]
-
 # Default: uv native build backend
 requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
-
 

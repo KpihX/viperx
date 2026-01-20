@@ -1,8 +1,8 @@
-from proprocess import hello
 
 
 def main():
-    hello()
+    
+    print("Hi from viperx!")
     
 
 if __name__ == "__main__":
