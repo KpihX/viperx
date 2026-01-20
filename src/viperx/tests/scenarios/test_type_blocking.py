@@ -3,9 +3,7 @@ Tests for type change blocking and config scanning features.
 """
 
 import os
-import re
 import pytest
-from pathlib import Path
 from typer.testing import CliRunner
 from viperx.main import app
 
@@ -18,7 +16,6 @@ class TestTypeChangeBlocking:
     
     def test_type_change_blocked(self, temp_project, mock_git_config, mock_builder_check):
         """Changing type from classic to ml should be blocked."""
-        import os
         
         # Create initial classic project
         config1 = """
@@ -53,7 +50,6 @@ settings:
     
     def test_type_same_allowed(self, temp_project, mock_git_config, mock_builder_check):
         """Keeping same type should be allowed."""
-        import os
         
         # Create initial classic project
         config1 = """
@@ -93,7 +89,6 @@ class TestReadmeActualFiles:
     
     def test_readme_detects_actual_config(self, temp_project, mock_git_config, mock_builder_check):
         """README should show config section if config.py exists, regardless of flag."""
-        import os
         
         # Create project with config
         config1 = """
@@ -154,7 +149,6 @@ class TestConfigScanner:
     
     def test_scanner_detects_packages(self, temp_project, mock_git_config, mock_builder_check):
         """Scanner should detect packages in src/ directory."""
-        import os
         from viperx.config_scanner import ConfigScanner
         
         # Create a project
@@ -190,7 +184,6 @@ workspace:
     
     def test_scanner_detects_features(self, temp_project, mock_git_config, mock_builder_check):
         """Scanner should detect use_config, use_tests based on actual files."""
-        import os
         from viperx.config_scanner import ConfigScanner
         
         # Create a project with mixed features
@@ -226,9 +219,9 @@ workspace:
         pkgs = {p["name"]: p for p in scanned.get("workspace", {}).get("packages", [])}
         
         # with-config should have use_config=True
-        assert pkgs.get("with_config", {}).get("use_config") == True
+        assert pkgs.get("with_config", {}).get("use_config")
         # no-config should have use_config=False
-        assert pkgs.get("no_config", {}).get("use_config") == False
+        assert not pkgs.get("no_config", {}).get("use_config")
 
 
 @pytest.fixture
@@ -244,7 +237,6 @@ class TestInlineConflictAnnotation:
     
     def test_conflict_annotated_in_config(self, temp_project, mock_git_config, mock_builder_check):
         """When a conflict occurs, viperx.yaml should have NOT_APPLIED comment."""
-        import os
         
         # Create project with config
         config1 = """
@@ -291,7 +283,7 @@ workspace:
         result = runner.invoke(app, ["config", "-c", "viperx.yaml"])
         
         # Check if viperx.yaml was annotated
-        viperx_content = (project_root / "viperx.yaml").read_text()
+        (project_root / "viperx.yaml").read_text()
         # Note: The annotation only happens if a conflict is recorded
         # In this case, conflict is "config.py exists but use_config: false"
         # The current logic may or may not annotate depending on implementation

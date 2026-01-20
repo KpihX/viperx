@@ -1,4 +1,3 @@
-import pytest
 from viperx.main import app
 
 # This test verifies that the 'hatch' builder works correctly (alternative to default 'uv')

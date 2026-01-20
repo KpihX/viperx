@@ -6,7 +6,6 @@ Tests for config engine update features:
 - use_* flag toggles creating files
 """
 
-import shutil
 from pathlib import Path
 import pytest
 from typer.testing import CliRunner
@@ -422,7 +421,7 @@ workspace:
         
         # README.md should not exist at package level (only at root)
         # Note: Package-level README is optional
-        pkg_readme_existed = (pkg_path / "README.md").exists()
+        (pkg_path / "README.md").exists()
         
         # Enable use_readme
         config2 = """

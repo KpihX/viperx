@@ -1,9 +1,6 @@
 import pytest
 import os
-import shutil
-from pathlib import Path
 from typer.testing import CliRunner
-from viperx.main import app
 
 @pytest.fixture
 def runner():

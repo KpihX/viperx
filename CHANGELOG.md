@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3] - 2026-01-20 🧹
+### Changed
+- **Codebase Cleanup**: 48 ruff auto-fixes + 6 manual fixes
+  - Removed 40+ unused imports
+  - Fixed ambiguous variable names (E741)
+  - Split multi-statement lines (E701)
+  - Fixed import order (E402)
+- **Linting**: Added `ruff` as dev dependency
+
 ## [1.3.2] - 2026-01-20 📚
 ### Added
 - **Test for Inline Conflict Annotation**: Verifies `# NOT_APPLIED` comments are added

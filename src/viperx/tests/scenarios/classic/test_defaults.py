@@ -1,5 +1,3 @@
-import pytest
-from pathlib import Path
 from viperx.main import app
 
 MINIMAL_CONFIG = """

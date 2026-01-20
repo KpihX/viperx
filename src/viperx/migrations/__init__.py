@@ -58,7 +58,6 @@ def get_project_version(project_root: Path) -> Optional[str]:
 
 def set_project_version(project_root: Path, version: str):
     """Set ViperX version in viperx.yaml."""
-    import yaml
     
     config_path = project_root / "viperx.yaml"
     if not config_path.exists():

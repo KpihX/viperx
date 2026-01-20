@@ -1,15 +1,12 @@
 import typer
-from typing_extensions import Annotated
 from pathlib import Path
-from rich import print
 from rich.panel import Panel
 from rich.console import Console
-import shutil
 
-from viperx.core import ProjectGenerator, TYPE_CLASSIC, TYPE_ML, TYPE_DL, DEFAULT_LICENSE, DEFAULT_BUILDER
-from viperx.utils import validate_project_name, check_uv_installed
+from viperx.core import ProjectGenerator, DEFAULT_LICENSE, DEFAULT_BUILDER
 from viperx.config_engine import ConfigEngine
 from viperx.constants import (
+    TYPE_CLASSIC,
     PROJECT_TYPES,
     DL_FRAMEWORKS,
     FRAMEWORK_PYTORCH,
@@ -185,7 +182,6 @@ def config_get(
     Use this to start a 'Project as Code' workflow.
     """
     from viperx.constants import TEMPLATES_DIR
-    import jinja2
     
     template_path = TEMPLATES_DIR / "viperx_config.yaml.j2"
     if not template_path.exists():

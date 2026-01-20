@@ -1,4 +1,3 @@
-import pytest
 from viperx.main import app
 
 INITIAL_CONFIG = """

@@ -1,4 +1,3 @@
-import pytest
 from viperx.main import app
 
 ML_CONFIG = """

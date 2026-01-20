@@ -1,6 +1,7 @@
 import re
 import shutil
 from rich.console import Console
+from viperx.constants import SUPPORTED_BUILDERS
 
 console = Console()
 
@@ -31,7 +32,6 @@ def validate_project_name(ctx, param, value):
         raise BadParameter("Project name must contain only letters, numbers, underscores, and hyphens.")
     return value
 
-from viperx.constants import SUPPORTED_BUILDERS
 
 def validate_choice(value: str, choices: list[str], name: str):
     """

@@ -1,6 +1,5 @@
 import pytest
 import subprocess
-import os
 from viperx.main import app
 
 def run_command(cmd, cwd):

@@ -1,6 +1,4 @@
-import pytest
 from viperx.main import app
-import yaml
 
 # Test Constants
 VALID_CONFIG = """

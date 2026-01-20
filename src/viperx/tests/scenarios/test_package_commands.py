@@ -1,4 +1,3 @@
-import pytest
 from viperx.main import app
 
 WORKSPACE_INIT_CONFIG = """

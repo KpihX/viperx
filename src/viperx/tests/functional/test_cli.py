@@ -1,4 +1,3 @@
-import pytest
 from viperx.main import app
 
 def test_cli_direct_classic(runner, temp_workspace, mock_git_config, mock_builder_check):

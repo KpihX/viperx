@@ -7,7 +7,7 @@ from viperx.core import ProjectGenerator
 from viperx.constants import (
     DEFAULT_LICENSE, DEFAULT_BUILDER,
     TYPE_CLASSIC, TYPE_ML, TYPE_DL, PROJECT_TYPES,
-    FRAMEWORK_PYTORCH, FRAMEWORK_TENSORFLOW, DL_FRAMEWORKS,
+    FRAMEWORK_PYTORCH, DL_FRAMEWORKS,
     SUPPORTED_BUILDERS, SUPPORTED_LICENSES
 )
 
@@ -58,10 +58,10 @@ class ConfigEngine:
                 raise ValueError(f"Invalid Builder '{b}'")
         
         if "license" in proj:
-           l = proj["license"]
-           if l not in SUPPORTED_LICENSES:
-               console.print(f"[bold red]Error:[/bold red] Invalid License '{l}'. Supported: {SUPPORTED_LICENSES}")
-               raise ValueError(f"Invalid License '{l}'")
+           lic = proj["license"]
+           if lic not in SUPPORTED_LICENSES:
+               console.print(f"[bold red]Error:[/bold red] Invalid License '{lic}'. Supported: {SUPPORTED_LICENSES}")
+               raise ValueError(f"Invalid License '{lic}'")
                
         # 2. Settings Options
         if "type" in sets:
@@ -145,12 +145,15 @@ class ConfigEngine:
             p_type = pkg.get("type", TYPE_CLASSIC)
             p_framework = pkg.get("framework", FRAMEWORK_PYTORCH)
 
-            if p_config: glob_has_config = True
-            if p_env: glob_has_env = True
-            if p_type in [TYPE_ML, TYPE_DL]: glob_is_ml_dl = True
-            if p_type == TYPE_DL: 
-                 glob_is_dl = True
-                 glob_frameworks.add(p_framework)
+            if p_config:
+                glob_has_config = True
+            if p_env:
+                glob_has_env = True
+            if p_type in [TYPE_ML, TYPE_DL]:
+                glob_is_ml_dl = True
+            if p_type == TYPE_DL:
+                glob_is_dl = True
+                glob_frameworks.add(p_framework)
                  
             packages_list.append({
                 "raw_name": pkg_name,
@@ -637,7 +640,7 @@ class ConfigEngine:
             else:
                 # No pytest section, append one
                 content += f'\n[tool.pytest.ini_options]\ntestpaths = [\n    {new_testpath},\n]\n'
-                report.updated.append(f"Created [tool.pytest.ini_options] with testpaths")
+                report.updated.append("Created [tool.pytest.ini_options] with testpaths")
             pyproject_path.write_text(content)
 
     def _update_root_scripts(self, root: Path, scripts: dict, report):
@@ -668,11 +671,10 @@ class ConfigEngine:
         # Parse existing scripts (simple line scanning after header)
         # Stop at next section [Section]
         insert_idx = scripts_header_index + 1
-        section_end_idx = len(lines)
+        len(lines)
         for i in range(scripts_header_index + 1, len(lines)):
             line = lines[i].strip()
             if line.startswith("["):
-                section_end_idx = i
                 break  # Next section
             if "=" in line:
                 key, val = line.split("=", 1)
