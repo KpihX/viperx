@@ -75,35 +75,18 @@ test-classic/
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
-
-
 │   └── test_classic/
 │       ├── __init__.py
-
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
-
-
-
-
+│       └── tests/      # Unit tests
 │   └── preprocess/
 │       ├── __init__.py
-
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
-
-
-
-
+│       └── tests/      # Unit tests
 │   └── proprocess/
 │       ├── __init__.py
-
-│       ├── config.yaml # EDIT THIS for project settings
-│       ├── config.py   # Code that loads the yaml above
-
-
-
-
 ```
 
 

@@ -26,6 +26,7 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 {% endif %}
 {% if use_env %}
 - **Environment**: `src/{{ package_name }}/.env` (Isolated variables)
+- **Template**: `src/{{ package_name }}/.env.example` (Copy this to `.env`)
 {% endif %}
 
 The project uses a **Config-in-Package** architecture:
@@ -35,6 +36,7 @@ The project uses a **Config-in-Package** architecture:
 {% endif %}
 {% if use_env %}
 3. `.env` is isolated within the package source.
+4. `.env.example` serves as a template for new developers.
 {% endif %}
 {% endif %}
 
@@ -85,16 +87,10 @@ uv run jupyter notebook
 
 ### ☁️ Cloud (Colab / Kaggle)
 
-You can use the code and config from this repository directly in cloud environments without cloning.
-
-**Step 1: Install directly from Git**
-```python
-!pip install git+https://your-git-provider.com/username/repo.git
+!pip install url_to_repo.git
 ```
 
 **Step 2: Use the unified config**
-```python
-{% if project_type == 'classic' %}
 from {{ package_name }} import SETTINGS
 {% else %}
 from {{ package_name }} import get_dataset_path, SETTINGS
@@ -129,6 +125,10 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
 {%- endif %}
+{%- if pkg.use_env %}
+│       ├── .env        # Secrets (Ignored by git)
+│       ├── .env.example # Template for secrets
+{%- endif %}
 {%- if pkg.use_tests %}
 │       └── tests/      # Unit tests
 {%- endif %}
@@ -139,6 +139,10 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 {%- if has_config %}
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
+{%- endif %}
+{%- if use_env %}
+│       ├── .env        # Secrets (Ignored by git)
+│       ├── .env.example # Template for secrets
 {%- endif %}
 {%- if use_tests %}
 │       └── tests/      # Unit tests
