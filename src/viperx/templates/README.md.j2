@@ -2,24 +2,48 @@
 
 {{ description }}
 
+> 🎓 **Educational Note:** This project was generated with [ViperX](https://github.com/kpihx/viperx), an educational Python project scaffolding tool. The structure and files are designed to teach you best practices in Python packaging.
+
 ---
 
 ## 🧐 Philosophy & Architecture
 
-Values transparency and standard tooling over "black box" magic.
-This project was generated with [ViperX](https://github.com/kpihx/viperx), using **[uv](https://docs.astral.sh/uv/)**, the extremely fast Python package and project manager written in Rust.
+This project values transparency and standard tooling over "black box" magic.
 
-### Why `uv`?
+### 🎓 Why This Structure?
+
+This project uses the **src/ layout**, which is the recommended structure for modern Python packages.
+
+**Benefits:**
+- ✅ **Import Safety**: Can't accidentally import uninstalled code
+- ✅ **Testing Clarity**: Tests run against the INSTALLED package
+- ✅ **Packaging Safety**: Catches packaging bugs before release
+- ✅ **Industry Standard**: Used by pytest, pip, and most modern tools
+
+📚 [Learn more about src/ layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/)
+
+### 🎓 Why `uv`?
+
+This project uses **[uv](https://docs.astral.sh/uv/)**, a modern Python package manager written in Rust.
+
 Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **entire lifecycle**:
-- **Python Version**: It installs and manages the correct Python version for this project automatically.
-- **Dependencies**: Locking is instant.
+- **Python Version**: Installs and manages the correct Python version automatically
+- **Dependencies**: Lightning-fast dependency resolution and locking
 {%- if project_type == 'dl' %}
-- **Stack**: {{ framework|title }}
+- **Stack**: {{ framework|title }} with optimized installation
 {%- endif %}
-- **Environment**: Virtual environments are managed internally, you just run `uv run`.
+- **Environment**: Virtual environments managed internally
+- **Speed**: 10-100x faster than pip
+
+**Why it matters:**
+- ⚡ Faster development (no waiting for pip)
+- 🔒 Reproducible builds (lock files)
+- 🎯 Single tool for everything
+
+📚 [Learn more about uv](https://docs.astral.sh/uv/)
 
 {%- if use_config or use_env %}
-### ⚙️ Configuration
+### 🎓 Why Config-in-Package?
 
 {%- if use_config %}
 - **Config**: `src/{{ package_name }}/config.yaml` (Loaded automatically)
@@ -29,16 +53,42 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 - **Template**: `src/{{ package_name }}/.env.example` (Copy this to `.env`)
 {%- endif %}
 
-The project uses a **Config-in-Package** architecture:
+**The Problem:**
+Traditional approach puts config files at the project root. This breaks when:
+- Installing the package via pip (root files aren't packaged!)
+- Running on Colab/Kaggle (path resolution issues)
+- Working in monorepos (which config gets loaded?)
+
+**The Solution: Config-in-Package**
 {%- if use_config %}
-1. `config.yaml` is inside the package.
-1. `config.py` loads it safely (even in production wheels).
+1. `config.yaml` lives INSIDE the package (`src/{{ package_name }}/`)
+2. `config.py` uses `importlib.resources` to load it reliably
+3. Works everywhere: local, pip-installed, Colab, Kaggle, Docker
 {%- endif %}
 {%- if use_env %}
-1. `.env` is isolated within the package source.
-1. `.env.example` serves as a template for new developers.
+4. `.env` is isolated per package (security!)
+5. Each package has its own secrets (no cross-contamination)
 {%- endif %}
+
+📚 [Why config-in-package works better](https://docs.python.org/3/library/importlib.resources.html)
 {%- endif %}
+
+### 🎓 Why pyproject.toml?
+
+Before `pyproject.toml` (PEP 518, 2016), Python had setup.py, setup.cfg, requirements.txt, MANIFEST.in... a mess!
+
+**Now:** One file, `pyproject.toml`, is the single source of truth for:
+- Project metadata (name, version, author)
+- Dependencies
+- Build system configuration
+- Tool configurations (pytest, ruff, mypy)
+
+**Benefits:**
+- ✅ Declarative (not executable like setup.py)
+- ✅ Standard format (TOML)
+- ✅ All-in-one (no more scattered config files)
+
+📚 [Learn more about pyproject.toml](https://peps.python.org/pep-0518/)
 
 ---
 
@@ -176,3 +226,49 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 {%- endif %}
 {%- endif %}
 ```
+
+---
+
+## 📚 Learning Resources
+
+This project was created with educational comments throughout the code. Here are resources to deepen your understanding:
+
+### Understanding the Structure
+- [Python Packaging Guide](https://packaging.python.org/) - Official packaging documentation
+- [PEP 518: pyproject.toml](https://peps.python.org/pep-0518/) - Why pyproject.toml exists
+- [PEP 621: Project Metadata](https://peps.python.org/pep-0621/) - What goes in pyproject.toml
+- [src/ vs flat layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/) - Project structure explained
+
+### Tools Used
+- [uv Documentation](https://docs.astral.sh/uv/) - Modern Python package manager
+- [pytest Documentation](https://docs.pytest.org/) - Testing framework
+- [importlib.resources](https://docs.python.org/3/library/importlib.resources.html) - Why config-in-package works
+
+### Best Practices
+- [The Hitchhiker's Guide to Python](https://docs.python-guide.org/) - Python best practices
+- [12-Factor App](https://12factor.net/) - Application development methodology
+- [Semantic Versioning](https://semver.org/) - Version number conventions
+
+### Generated by ViperX
+If you want to create projects like this yourself, check out:
+- [ViperX Documentation](https://kpihx.github.io/viperx/) - Learn about the tool
+- [ViperX Philosophy](https://github.com/KpihX/viperx/blob/main/PHILOSOPHY.md) - Why it exists
+- `viperx learn` command - Curated learning resources
+
+---
+
+## 🎓 Educational Notes
+
+This project includes extensive comments in the generated files:
+- `pyproject.toml` - Every section explained
+- `src/{{ package_name }}/config.py` - Config pattern explained
+- `src/{{ package_name }}/main.py` - Entry points explained
+- `.gitignore` - Every pattern explained
+
+**Read the comments!** They're there to teach you, not just document.
+
+---
+
+## 📝 License
+
+{{ license }}
