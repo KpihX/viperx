@@ -4,6 +4,8 @@ from rich.table import Table
 from rich.panel import Panel
 from viperx.constants import TEMPLATES_DIR, USER_TEMPLATES_DIR
 import shutil
+import tempfile
+import subprocess
 
 console = Console()
 
@@ -72,9 +74,6 @@ class TemplateManager:
         2. Find all .j2 files.
         3. Copy them to USER_TEMPLATES_DIR (flattened).
         """
-        import tempfile
-        import subprocess
-        
         console.print(f"[blue]Fetching templates from {url}...[/blue]")
         
         with tempfile.TemporaryDirectory() as temp_dir:

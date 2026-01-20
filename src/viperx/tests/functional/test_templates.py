@@ -114,3 +114,54 @@ def test_partial_override(tmp_path):
         )
         # Just check it looks like a toml file
         assert "[project]" in rendered
+
+def test_full_override(tmp_path):
+    """Verify that we can override ALL templates."""
+    fake_user_dir = tmp_path / "templates"
+    fake_user_dir.mkdir()
+    (fake_user_dir / "README.md.j2").write_text("# USER README")
+    (fake_user_dir / "pyproject.toml.j2").write_text("# USER PYPROJECT")
+    
+    with patch("viperx.constants.USER_TEMPLATES_DIR", fake_user_dir):
+        gen = ProjectGenerator("test-full", "", "classic", "Me")
+        
+        readme = gen.env.get_template("README.md.j2").render()
+        pyproject = gen.env.get_template("pyproject.toml.j2").render()
+        
+        assert readme == "# USER README"
+        assert pyproject == "# USER PYPROJECT"
+
+def test_add_template_pack_mocked(manager, tmp_path):
+    """Test the add_template_pack logic with mocked git clone."""
+    manager.user_dir = tmp_path / "user_tmpl"
+    
+    # Simulate a downloaded repo in a temp dir
+    with patch("viperx.templates.tempfile.TemporaryDirectory") as mock_temp:
+        # We need the context manager to return a path that actually has files
+        # So we create a real temp dir for the 'mock' to return
+        real_temp_clone = tmp_path / "clone_source"
+        real_temp_clone.mkdir()
+        
+        # Create some j2 files in subfolders to test flattening
+        (real_temp_clone / "subdir").mkdir()
+        (real_temp_clone / "subdir" / "new.j2").write_text("NEW")
+        (real_temp_clone / "root.j2").write_text("ROOT")
+        
+        # Mock the __enter__ return value
+        mock_temp.return_value.__enter__.return_value = str(real_temp_clone)
+        
+        with patch("viperx.templates.subprocess.run") as mock_run:
+            manager.add_template_pack("https://git.fake/repo.git")
+            
+            # Verify git clone was called
+            mock_run.assert_called_with(
+                ["git", "clone", "--depth", "1", "https://git.fake/repo.git", str(real_temp_clone)],
+                check=True,
+                capture_output=True
+            )
+            
+            # Verify files were copied to user_dir
+            assert (manager.user_dir / "new.j2").exists()
+            assert (manager.user_dir / "root.j2").exists()
+            assert (manager.user_dir / "new.j2").read_text() == "NEW"
+
