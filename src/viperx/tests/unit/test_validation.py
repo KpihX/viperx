@@ -75,3 +75,21 @@ def test_invalid_project_type(runner, temp_workspace):
     result = runner.invoke(app, ["config", "-c", "viperx.yaml"])
     assert result.exit_code != 0
     assert "Invalid Project Type" in result.stdout or "type" in result.stdout.lower()
+
+def test_update_config_none_packages(tmp_path):
+    """Regression test: Ensure update_config handles 'packages: None' gracefully (V1.5.1 Hotfix)."""
+    from viperx.config_scanner import ConfigScanner
+    scanner = ConfigScanner(tmp_path)
+    
+    # Existing config with None packages (simulating the bug)
+    existing_config = {
+        "project": {"name": "test"},
+        "settings": {"type": "classic"},
+        "workspace": {"packages": None} # This caused the crash
+    }
+    
+    # Run update (should not crash)
+    new_config, annotations = scanner.update_config(existing_config)
+    
+    # Verify normalization
+    assert new_config["workspace"]["packages"] == []

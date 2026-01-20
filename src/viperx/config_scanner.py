@@ -159,8 +159,19 @@ class ConfigScanner:
                 annotations.append(f"settings.type: MISMATCH - config says '{existing_type}', codebase suggests '{scanned_type}'")
         
         # Merge packages
-        existing_pkgs = {p.get("name"): p for p in existing_config.get("workspace", {}).get("packages", [])}
-        scanned_pkgs = {p.get("name"): p for p in scanned.get("workspace", {}).get("packages", [])}
+        # Fix: Ensure it's a list if None (User Config could have 'packages: null')
+        if existing_config.get("workspace") is None:
+            existing_config["workspace"] = {}
+        if existing_config["workspace"].get("packages") is None:
+            existing_config["workspace"]["packages"] = []
+
+        workspace_section = existing_config.get("workspace", {})
+        packages_list = workspace_section.get("packages", [])
+        existing_pkgs = {p.get("name"): p for p in packages_list}
+        
+        scanned_workspace = scanned.get("workspace", {}) or {}
+        scanned_packages_list = scanned_workspace.get("packages") or []
+        scanned_pkgs = {p.get("name"): p for p in scanned_packages_list}
         
         # Add new packages
         for pkg_name, pkg_config in scanned_pkgs.items():

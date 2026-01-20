@@ -4,6 +4,9 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.5.1] - 2026-01-20 🚑
+- **Hotfix**: Crash in `config update` (NoneType error) fixed.
+
 ### [1.5.0] - 2026-01-20 🦅
 - **Template Freedom**: Custom user templates in `~/.config/viperx/templates/`
 - **Plugins**: `viperx template add <url>` to download packs

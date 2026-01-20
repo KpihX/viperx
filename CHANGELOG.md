@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-01-20
+
+### 🐛 Fixed
+- **Config Update Crash**: Fixed `TypeError` when `workspace.packages` is null in `viperx.yaml`. Now gracefully handles missing or null package lists.
+
 ## [1.5.0] - 2026-01-20
 
 ### 🚀 Added
