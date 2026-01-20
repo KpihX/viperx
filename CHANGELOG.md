@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.5] - 2026-01-20 🌟
+### Added
+- **Commented Config Generation**: `viperx config update` now produces a fully commented `viperx.yaml` by hydrating the template instead of dumping raw YAML.
+- **Robust Author Parsing**: Now supports PEP 621 `authors` table in `pyproject.toml` (e.g., `authors = [{ name = ... }]`).
+
+### Changed
+- **Git Cleanup**: `sandbox/` is now properly ignored and untracked.
+- **Philosophy**: Documentation updated to reflect core values (Transparency, Verbosity, Efficiency).
+
 ## [1.3.4] - 2026-01-20 📖
 ### Changed
 - **Module Docstrings**: Added comprehensive docstrings to `main.py`, `core.py`, `utils.py`

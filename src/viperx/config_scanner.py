@@ -61,13 +61,27 @@ class ConfigScanner:
         if lic_match:
             project["license"] = lic_match.group(1)
         
-        # Author
-        author_match = re.search(r'name\s*=\s*["\']([^"\']+)["\'].*?email', content, re.DOTALL)
-        if author_match:
-            project["author"] = author_match.group(1)
+        # Author - Robust parsing for string or table array
+        # 1. Try standard string: authors = ["Name <email>"] (Not standard PEP 621 but possible)
+        # 2. Try PEP 621 table: authors = [{ name = "Name", email = "..." }]
         
+        # Try table format first (most specific)
+        # authors = [ { name = "Ivann" ... } ]
+        author_table_match = re.search(r'authors\s*=\s*\[\s*\{.*?name\s*=\s*["\']([^"\']+)["\']', content, re.DOTALL)
+        if author_table_match:
+            project["author"] = author_table_match.group(1)
+        else:
+            # Fallback to simple name match if present in a standard way
+            # This regex looks for 'name = "..."' anywhere after authors = ... which is risky but flexible
+            legacy_author = re.search(r'authors\s*=\s*\[.*?["\']([^"\'\{]+)["\']', content, re.DOTALL)
+            if legacy_author:
+                 # Clean up potential <email>
+                 raw = legacy_author.group(1).split('<')[0].strip()
+                 if raw:
+                     project["author"] = raw
+
         return project
-    
+
     def _detect_type(self) -> str:
         """Detect project type from structure and dependencies."""
         from viperx.constants import TYPE_CLASSIC, TYPE_ML, TYPE_DL
@@ -163,25 +177,100 @@ class ConfigScanner:
                         annotations.append(f"packages.{pkg_name}.{key}: MISMATCH - config says {config_val}, actual is {actual_val}")
         
         return existing_config, annotations
-    
+
     def write_config(self, config: dict, annotations: list[str], output_path: Path):
-        """Write config to viperx.yaml with annotations."""
+        """Write config to viperx.yaml using template hydration (preserves comments)."""
+        from viperx.constants import TEMPLATES_DIR
         import yaml
         
-        # Generate YAML
-        yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        # 1. Load Template
+        template_path = TEMPLATES_DIR / "viperx_config.yaml.j2"
+        if not template_path.exists():
+            # Fallback if template missing (should vary rarely happen)
+            return self._write_raw_yaml(config, annotations, output_path)
+
+        content = template_path.read_text()
+
+        # 2. Hydrate Project Section
+        proj = config.get("project", {})
+        if "name" in proj:
+            content = re.sub(r'name: "my-project"', f'name: "{proj["name"]}"', content)
+        if "description" in proj:
+            # Uncomment description if present
+            desc = proj["description"]
+            # Look for commented out line
+            content = re.sub(r'# description: ".*?"', f'description: "{desc}"', content)
+            # Or existing line
+            content = re.sub(r'description: ".*?"', f'description: "{desc}"', content)
+        if "author" in proj:
+            auth = proj["author"]
+            content = re.sub(r'# author: ".*?"', f'author: "{auth}"', content)
+            content = re.sub(r'author: ".*?"', f'author: "{auth}"', content)
+        if "license" in proj:
+            lic = proj["license"]
+            content = re.sub(r'# license: ".*?"', f'license: "{lic}"', content)
+            content = re.sub(r'license: ".*?"', f'license: "{lic}"', content)
         
-        # Add header with annotations if any
-        header = "# 🐍 ViperX Project Configuration\n"
-        header += "# Generated/Updated by 'viperx config update'\n"
+        # 3. Hydrate Settings Section
+        settings = config.get("settings", {})
+        for key, val in settings.items():
+            # Handle boolean lowercasing for YAML
+            val_str = str(val).lower() if isinstance(val, bool) else f'"{val}"'
+            
+            # Regex to find key: value whether commented or not
+            # We look for '  key: current_val' or '#   key: current_val'
+            pattern = fr'^\s*{key}:\s*.*$'
+            replacement = f'  {key}: {val_str}'
+            
+            # We use a specific replacement logic to preserve indentation
+            content = re.sub(fr'^\s*{key}:.*$', replacement, content, flags=re.MULTILINE)
+
+        # 4. Hydrate Workspace Packages
+        packages = config.get("workspace", {}).get("packages", [])
+        if packages:
+            # Generate YAML block for packages
+            pkg_yaml = yaml.dump(packages, default_flow_style=False, sort_keys=False)
+            # Indent it
+            pkg_yaml_indented = "\n".join(f"    - {line[2:]}" if line.startswith("- ") else f"      {line}" for line in pkg_yaml.splitlines())
+            
+            # Find packages: line and append
+            # We assume the template ends with packages: or has example comments
+            if "packages:" in content:
+                # Remove any existing example under packages if it looks like empty list []
+                content = re.sub(r'packages: \[\]', 'packages:', content)
+                
+                # Append to end of file if it ends with packages:
+                # Or insert after 'packages:' line
+                pattern = r'(packages:.*)'
+                content = re.sub(pattern, f'\\1\n{pkg_yaml_indented}', content, count=1)
         
+        # 5. Add Annotations Header
+        header = ""
         if annotations:
-            header += "#\n# === SCAN ANNOTATIONS ===\n"
+            header += "# =============================================================================\n"
+            header += "# ⚠️  SCAN ANNOTATIONS (Review Required)\n"
+            for ann in annotations:
+                header += f"#   - {ann}\n"
+            header += "# =============================================================================\n\n"
+        
+        # Prepend header (after the main title block)
+        # Find first blank line after header block
+        split_idx = content.find("\n\n")
+        if split_idx != -1:
+            final_content = content[:split_idx+2] + header + content[split_idx+2:]
+        else:
+            final_content = header + content
+
+        output_path.write_text(final_content)
+        return len(annotations)
+
+    def _write_raw_yaml(self, config: dict, annotations: list[str], output_path: Path):
+        """Fallback: Write raw YAML if template is missing."""
+        import yaml
+        yaml_content = yaml.dump(config, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        header = "# 🐍 ViperX Project Configuration\n# Generated by 'viperx config update'\n\n"
+        if annotations:
             for ann in annotations:
                 header += f"# {ann}\n"
-            header += "# ========================\n"
-        
-        header += "\n"
-        
         output_path.write_text(header + yaml_content)
         return len(annotations)
