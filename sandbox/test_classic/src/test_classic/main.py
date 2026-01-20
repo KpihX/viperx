@@ -1,5 +1,5 @@
 
-from test_ml import SETTINGS
+from test_classic import SETTINGS
 
 def main():
     print(f"Hi from {SETTINGS['project_name']}!")

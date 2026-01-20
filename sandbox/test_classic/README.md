@@ -1,6 +1,6 @@
-# test-ml
+# test-classic
 
-ML project
+test-classic
 
 ---
 
@@ -15,9 +15,9 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 - **Dependencies**: Locking is instant.
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
 ### ⚙️ Configuration
-- **Config**: `src/test_ml/config.yaml` (Loaded automatically)
-- **Environment**: `src/test_ml/.env` (Isolated variables)
-- **Template**: `src/test_ml/.env.example` (Copy this to `.env`)
+- **Config**: `src/test_classic/config.yaml` (Loaded automatically)
+- **Environment**: `src/test_classic/.env` (Isolated variables)
+- **Template**: `src/test_classic/.env.example` (Copy this to `.env`)
 
 The project uses a **Config-in-Package** architecture:
 1. `config.yaml` is inside the package.
@@ -37,7 +37,7 @@ No need to install Python or create venvs manually.
 
 ```bash
 # Ensure you are in the project directory
-cd test-ml
+cd test-classic
 
 # Sync dependencies (creates .venv and installs python if needed)
 uv sync
@@ -51,53 +51,21 @@ To run the package entry point or scripts:
 
 ```bash
 # Run the main package
-uv run test-ml
+uv run test-classic
 
 # Or run a specific script
-uv run python src/test_ml/main.py
-```
-### For Data Scientists (Notebooks)
-
-We use `uv` to launch Jupyter, ensuring it sees the local package and config.
-
-```bash
-uv run jupyter notebook
-```
-
-- Open `notebooks/Base.ipynb`.
-- Note how it imports `config` from the package.
-
-### ☁️ Cloud (Colab / Kaggle)
-
-You can use the code and config from this repository directly in cloud environments without cloning.
-
-**Step 1: Install directly from Git**
-```python
-!pip install url_to_repo.git
-```
-
-**Step 2: Use the unified config**
-```python
-from test_ml import get_dataset_path, SETTINGS
-import kagglehub as kh
-
-# Transparency: You can inspect what was loaded
-print(f"Loaded config for: {SETTINGS.get('project_name', 'Unknown')}")
-# Download datasets defined in config.yaml
-# The key 'titanic' maps to 'heptapod/titanic' in the yaml
-if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
-    path = kh.dataset_download(SETTINGS['datasets']['titanic'])
+uv run python src/test_classic/main.py
 ```
 
 ## 🔧 Internal Structure
 
 ```text
-test-ml/
+test-classic/
 ├── pyproject.toml      # The Single Source of Truth (Dependencies, Metadata)
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
-│   └── test_ml/
+│   └── test_classic/
 │       ├── __init__.py
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
@@ -113,5 +81,4 @@ test-ml/
 │       ├── __init__.py
 │       ├── .env        # Secrets (Ignored by git)
 │       ├── .env.example # Template for secrets
-└── notebooks/          # Experimentation (Jupyter)
 ```

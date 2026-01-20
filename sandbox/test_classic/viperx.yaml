@@ -6,10 +6,10 @@
 
 project:
   # [Required] Root project name
-  name: "test-ml"
+  name: "test-classic"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
-  description: "Verified Clean Output"
+  # description: "ML project"
   # author: "KpihX"
   # license: "MIT"
   builder: "uv"
@@ -27,7 +27,7 @@ settings:
   use_tests: true
 
   # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
-  type: "ml"
+  type: "classic"
 
   # DL Framework: pytorch | tensorflow (Only if type is dl)
   # framework: "pytorch"
@@ -39,14 +39,14 @@ workspace:
     # --- Example 1: Preprocess Package ---
     # - name: "preprocess"
     #   description: "reprocessing utilities"
-    #   use_env: true
+    #   use_env: false
     #   use_config: true
     #   use_tests: true
     #   use_readme: false
 
     - name: "preprocess"
       description: "processing utilities"
-      use_env: true
+      use_env: false
       use_config: true
       use_tests: true
     - name: "proprocess"

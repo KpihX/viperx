@@ -221,10 +221,10 @@ class ConfigEngine:
              existing_pkgs = {p.name for p in (current_root / "src").iterdir() if p.is_dir()}
         
         # We need to map config names to folder names to check existence
-        config_folder_names = {p["clean_name"] for p in packages_list if p["raw_name"] != project_name}
+        config_folder_names = {p["clean_name"] for p in packages_list}
         
         # Also include raw names if they exist on disk (classic case)
-        config_raw_names = {p["raw_name"] for p in packages_list if p["raw_name"] != project_name}
+        config_raw_names = {p["raw_name"] for p in packages_list}
         
         for ep in existing_pkgs:
             if ep not in config_folder_names and ep not in config_raw_names:
@@ -239,7 +239,8 @@ class ConfigEngine:
             import shutil
             shutil.copy2(self.config_path, system_config_path)
             
-        if report.added or report.updated:
+        is_fresh_init = any("Project Scaffolding" in item for item in report.added)
+        if (report.added or report.updated) and not is_fresh_init:
              report.manual_checks.append("Review README.md for any necessary updates (e.g. Project Name, Description).")
 
         self._print_report(report)

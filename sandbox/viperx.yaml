@@ -6,10 +6,10 @@
 
 project:
   # [Required] Root project name
-  name: "test-ml"
+  name: "test-classic"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
-  description: "ML project"
+  # description: "ML project"
   # author: "KpihX"
   # license: "MIT"
   builder: "uv"
@@ -27,7 +27,7 @@ settings:
   use_tests: true
 
   # Project Type: classic | ml | dl (Default: classic, affects ROOT only)
-  type: "ml"
+  type: "classic"
 
   # DL Framework: pytorch | tensorflow (Only if type is dl)
   # framework: "pytorch"
