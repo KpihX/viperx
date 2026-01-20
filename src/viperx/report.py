@@ -13,3 +13,11 @@ class UpdateReport:
     @property
     def has_events(self) -> bool:
         return any([self.added, self.updated, self.conflicts, self.deletions, self.manual_checks])
+    
+    def deduplicate(self):
+        """Remove duplicate entries from all lists while preserving order."""
+        self.added = list(dict.fromkeys(self.added))
+        self.updated = list(dict.fromkeys(self.updated))
+        self.conflicts = list(dict.fromkeys(self.conflicts))
+        self.deletions = list(dict.fromkeys(self.deletions))
+        self.manual_checks = list(dict.fromkeys(self.manual_checks))

@@ -216,6 +216,10 @@ workspace:
         assert tests_path.exists(), "tests/ should exist after enabling use_tests"
         assert (tests_path / "__init__.py").exists(), "tests/__init__.py should exist"
         assert (tests_path / "test_core.py").exists(), "tests/test_core.py should exist"
+        
+        # Verify test placeholder content
+        test_content = (tests_path / "test_core.py").read_text()
+        assert "def test_dummy" in test_content, "Test should use test_dummy placeholder"
 
 
 class TestLicenseFileUpdate:
@@ -433,3 +437,7 @@ workspace:
         assert result.exit_code == 0
         
         assert (pkg_path / "README.md").exists(), "README.md should exist after enabling use_readme"
+        
+        # Verify README uses template (contains ViperX signature)
+        readme_content = (pkg_path / "README.md").read_text()
+        assert "ViperX" in readme_content, "README should mention ViperX (template signature)"

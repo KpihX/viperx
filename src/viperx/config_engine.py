@@ -353,15 +353,27 @@ class ConfigEngine:
                                with open(feature_path / "__init__.py", "w") as f: 
                                    pass
                                with open(feature_path / "test_core.py", "w") as f:
-                                   f.write("def test_placeholder():\n    \"\"\"Placeholder test.\"\"\"\n    assert True\n")
+                                   f.write("def test_dummy():\n    assert True\n")
                                # Update testpaths in pyproject.toml
                                if pkg_clean_name:
                                    self._update_testpaths(current_root, pkg_clean_name, report)
                           
                           elif feature_name == "use_readme":
-                               # Create minimal README for package
-                               pkg_title = pkg_name_in_label.replace("-", " ").replace("_", " ").title()
-                               readme_content = f"# {pkg_title}\n\nPackage description.\n"
+                               # Render README using template for consistency
+                               from jinja2 import Environment, PackageLoader
+                               env = Environment(loader=PackageLoader("viperx", "templates"))
+                               template = env.get_template("README.md.j2")
+                               readme_content = template.render(
+                                   project_name=pkg_name_in_label,
+                                   package_name=pkg_clean_name,
+                                   description=f"{pkg_name_in_label} package.",
+                                   project_type="classic",
+                                   use_config=False,
+                                   use_env=False,
+                                   use_tests=False,
+                                   is_subpackage=True,
+                                   packages=[]
+                               )
                                with open(feature_path, "w") as f:
                                    f.write(readme_content)
             else:
@@ -522,20 +534,25 @@ class ConfigEngine:
         match = testpaths_pattern.search(content)
         
         if match:
-            # Section exists, check if path already included
-            existing_paths = match.group(1)
-            if new_testpath in existing_paths:
+            # Section exists, extract and deduplicate paths
+            existing_paths_str = match.group(1)
+            
+            # Parse existing paths
+            path_pattern = re.compile(r'"([^"]+)"')
+            existing_paths = path_pattern.findall(existing_paths_str)
+            
+            # Check if already present
+            new_path_value = f"src/{pkg_clean_name}/tests"
+            if new_path_value in existing_paths:
                 return  # Already present
             
-            # Add to existing list
-            # Find last entry and add after it
-            if existing_paths.strip():
-                # There are existing entries
-                new_paths = existing_paths.rstrip() + f',\n    {new_testpath},'
-            else:
-                new_paths = f'\n    {new_testpath},'
+            # Add new path and deduplicate
+            existing_paths.append(new_path_value)
+            unique_paths = list(dict.fromkeys(existing_paths))  # Preserve order, remove dupes
             
-            new_section = f'testpaths = [{new_paths}\n]'
+            # Rebuild section
+            paths_formatted = ',\n    '.join(f'"{p}"' for p in unique_paths)
+            new_section = f'testpaths = [\n    {paths_formatted},\n]'
             content = testpaths_pattern.sub(new_section, content)
             report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
         else:
@@ -552,9 +569,9 @@ class ConfigEngine:
                 content += f'\n[tool.pytest.ini_options]\ntestpaths = [\n    {new_testpath},\n]\n'
                 report.updated.append(f"Created [tool.pytest.ini_options] with testpaths")
         
-        # Clean up duplicate commas and format
+        # Clean up formatting
         content = re.sub(r',\s*,', ',', content)
-        content = re.sub(r',\s*\]', '\n]', content)
+        content = re.sub(r',\s*\]', ',\n]', content)
         
         pyproject_path.write_text(content)
 
@@ -630,6 +647,9 @@ class ConfigEngine:
                 
     def _print_report(self, report):
         from rich.tree import Tree
+        
+        # Deduplicate all lists before printing
+        report.deduplicate()
         
         if not report.has_events:
             console.print(Panel("✨ [bold green]Start[/bold green]\nNothing to change. Project is in sync.", border_style="green"))

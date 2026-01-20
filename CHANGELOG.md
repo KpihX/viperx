@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-01-20 🧹
+### Fixed
+- **testpaths Deduplication**: No more duplicate entries in `testpaths`
+- **Conflict Log Deduplication**: Same conflict not shown multiple times
+- **Test Placeholder Consistency**: Toggle uses `test_dummy()` (same as init)
+- **use_readme Template**: Toggle now uses Jinja2 `README.md.j2` template (like init)
+
+### Changed
+- **License Documentation**: `viperx_config.yaml.j2` now explains MIT vs Apache vs GPLv3
+
 ## [1.2.0] - 2026-01-20 🔧
 ### Fixed
 - **No Blank Lines in pyproject.toml**: Consecutive blank lines are now cleaned when adding scripts
