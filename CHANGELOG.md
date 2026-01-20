@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-01-20 🔧
+### Fixed
+- **No Blank Lines in pyproject.toml**: Consecutive blank lines are now cleaned when adding scripts
+- **testpaths Sync**: Adding packages with `use_tests=true` now updates `[tool.pytest.ini_options].testpaths`
+- **LICENSE Auto-Update**: Changing license between known types (MIT, Apache-2.0, GPLv3) now updates LICENSE file content
+
+### Added
+- **use_readme Toggle**: Enabling `use_readme` in config now creates README.md for packages
+- **Feature Toggle Creation**: Enabling `use_env`, `use_config`, `use_tests` on existing packages now creates the corresponding files
+- **7 New Tests**: Comprehensive tests for all update features
+
+### Changed
+- **Test Coverage**: 78% (up from 77%)
+- **Total Tests**: 41 (up from 34)
+
 ## [1.1.0] - 2026-01-20 🚀
 ### Added
 - **MkDocs Documentation Site**: Full documentation at https://kpihx.github.io/viperx/

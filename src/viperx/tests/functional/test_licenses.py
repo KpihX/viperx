@@ -65,12 +65,12 @@ project:
   license: "Apache-2.0"
 """
 
-def test_license_change_warning(runner, temp_workspace, mock_git_config, mock_builder_check):
+def test_license_change_updates_file(runner, temp_workspace, mock_git_config, mock_builder_check):
     """
-    Test License Change Detection:
+    Test License Change Auto-Update:
     1. Init with MIT
     2. Update config to Apache-2.0
-    3. Verify: License file NOT overwritten, manual check reported
+    3. Verify: License file IS updated (known license -> known license)
     """
     # 1. Init with MIT
     with open("viperx.yaml", "w") as f:
@@ -90,10 +90,9 @@ def test_license_change_warning(runner, temp_workspace, mock_git_config, mock_bu
     result = runner.invoke(app, ["config", "-c", "viperx.yaml"])
     assert result.exit_code == 0
     
-    # 3. Verify: LICENSE file should STILL be MIT (Safe Mode)
+    # 3. Verify: LICENSE file IS updated to Apache (new behavior)
     license_text_after = (root / "LICENSE").read_text()
-    assert "MIT License" in license_text_after
+    assert "Apache License" in license_text_after
     
-    # 4. Verify: Manual check reported
-    # The update report should mention license change
+    # 4. Verify: Update report mentions license change
     assert "license" in result.stdout.lower() or "License" in result.stdout

@@ -241,6 +241,8 @@ class ConfigEngine:
                 # --- NEW PACKAGE ---
                 report.added.append(f"Package '{pkg_name}'")
                 
+                p_use_tests = pkg.get("use_tests", settings_conf.get("use_tests", True))
+                
                 pkg_gen = ProjectGenerator(
                     name=pkg_name,
                     description=pkg.get("description", ""),
@@ -249,13 +251,18 @@ class ConfigEngine:
                     use_env=pkg.get("use_env", settings_conf.get("use_env", False)),
                     use_config=pkg.get("use_config", settings_conf.get("use_config", True)),
                     use_readme=pkg.get("use_readme", False),
-                    use_tests=pkg.get("use_tests", settings_conf.get("use_tests", True)),
+                    use_tests=p_use_tests,
                     framework=pkg.get("framework", FRAMEWORK_PYTORCH),
                     scripts=project_scripts, 
                     dependency_context=dep_context,
                     verbose=self.verbose
                 )
                 pkg_gen.add_to_workspace(current_root)
+                
+                # Update testpaths if package has tests enabled
+                if p_use_tests:
+                    pkg_name_clean = sanitize_project_name(pkg_name)
+                    self._update_testpaths(current_root, pkg_name_clean, report)
 
         # Check for Deletions (Packages on disk not in config)
         existing_pkgs = set()
@@ -289,19 +296,27 @@ class ConfigEngine:
         # Phase 4: Smart Feature Toggle (Hydration & Cleanup Nags)
         # ---------------------------------------------------------
         # Helper to check toggles
-        def check_feature(path_check: Path, use_flag: bool, feature_name: str, pkg_label: str):
-            feature_path = path_check / ".env" if feature_name == "use_env" \
-                          else path_check / "config.py" if feature_name == "use_config" \
-                          else path_check / "tests"
+        def check_feature(path_check: Path, use_flag: bool, feature_name: str, pkg_label: str, pkg_clean_name: str = ""):
+            if feature_name == "use_env":
+                feature_path = path_check / ".env"
+            elif feature_name == "use_config":
+                feature_path = path_check / "config.py"
+            elif feature_name == "use_tests":
+                feature_path = path_check / "tests"
+            elif feature_name == "use_readme":
+                feature_path = path_check / "README.md"
+            else:
+                return
 
             if use_flag:
                 # ENABLED: Check if missing -> Create
                 
                 # Heuristic: Is this package/project new?
                 is_pkg_new = False
+                pkg_name_in_label = pkg_label.replace("Package '", "").rstrip("'")
                 for added_msg in report.added:
                     # Check for Package addition
-                    if f"Package '{pkg_label.replace('Package ', '').strip("'")}'" in added_msg:
+                    if f"Package '{pkg_name_in_label}'" in added_msg:
                          is_pkg_new = True
                     # Check for Root addition (Scaffolding of ANY kind)
                     if "(Scaffolding)" in added_msg and pkg_label == "Root":
@@ -313,7 +328,7 @@ class ConfigEngine:
                           pass
                      else:
                           # Generate it!
-                          report.updated.append(f"{pkg_label}: Enabled {feature_name} (Created {feature_path.name})")
+                          report.added.append(f"{pkg_label}: Enabled {feature_name} (Created {feature_path.name})")
                           if feature_name == "use_env":
                                with open(feature_path, "w") as f:
                                    f.write("# Environment Variables (Hydrated)\n")
@@ -335,11 +350,22 @@ class ConfigEngine:
 
                           elif feature_name == "use_tests":
                                feature_path.mkdir(exist_ok=True)
-                               with open(feature_path / "__init__.py", "w") as f: pass
+                               with open(feature_path / "__init__.py", "w") as f: 
+                                   pass
                                with open(feature_path / "test_core.py", "w") as f:
-                                   f.write("def test_dummy(): assert True\n")
+                                   f.write("def test_placeholder():\n    \"\"\"Placeholder test.\"\"\"\n    assert True\n")
+                               # Update testpaths in pyproject.toml
+                               if pkg_clean_name:
+                                   self._update_testpaths(current_root, pkg_clean_name, report)
+                          
+                          elif feature_name == "use_readme":
+                               # Create minimal README for package
+                               pkg_title = pkg_name_in_label.replace("-", " ").replace("_", " ").title()
+                               readme_content = f"# {pkg_title}\n\nPackage description.\n"
+                               with open(feature_path, "w") as f:
+                                   f.write(readme_content)
             else:
-                # DISABLED: Check if exists -> Warn/Confict
+                # DISABLED: Check if exists -> Warn/Conflict
                 if feature_path.exists():
                     report.conflicts.append(f"{pkg_label}: {feature_name}=False but {feature_path.name} exists")
 
@@ -365,9 +391,9 @@ class ConfigEngine:
              main_pkg_path = current_root / "src" / project_name
              
         if main_pkg_path.exists():
-             check_feature(main_pkg_path, root_use_env, "use_env", f"Package '{project_name}'")
-             check_feature(main_pkg_path, root_use_config, "use_config", f"Package '{project_name}'")
-             check_feature(main_pkg_path, root_use_tests, "use_tests", f"Package '{project_name}'")
+             check_feature(main_pkg_path, root_use_env, "use_env", f"Package '{project_name}'", clean_name)
+             check_feature(main_pkg_path, root_use_config, "use_config", f"Package '{project_name}'", clean_name)
+             check_feature(main_pkg_path, root_use_tests, "use_tests", f"Package '{project_name}'", clean_name)
 
         # Now check additional packages
         for pkg in packages:
@@ -381,10 +407,12 @@ class ConfigEngine:
                   p_env = pkg.get("use_env", settings_conf.get("use_env", False))
                   p_config = pkg.get("use_config", settings_conf.get("use_config", True))
                   p_tests = pkg.get("use_tests", settings_conf.get("use_tests", True))
+                  p_readme = pkg.get("use_readme", False)
                   
-                  check_feature(p_path, p_env, "use_env", f"Package '{pkg_name}'")
-                  check_feature(p_path, p_config, "use_config", f"Package '{pkg_name}'")
-                  check_feature(p_path, p_tests, "use_tests", f"Package '{pkg_name}'")
+                  check_feature(p_path, p_env, "use_env", f"Package '{pkg_name}'", pkg_clean)
+                  check_feature(p_path, p_config, "use_config", f"Package '{pkg_name}'", pkg_clean)
+                  check_feature(p_path, p_tests, "use_tests", f"Package '{pkg_name}'", pkg_clean)
+                  check_feature(p_path, p_readme, "use_readme", f"Package '{pkg_name}'", pkg_clean)
 
         is_fresh_init = any("Scaffolding" in item for item in report.added)
         if (report.added or report.updated) and not is_fresh_init:
@@ -438,12 +466,97 @@ class ConfigEngine:
                  if current_line != new_line:
                      content = pattern.sub(new_line, content)
                      report.updated.append(f"Root license -> '{new_license}'")
-                     report.manual_checks.append("License type changed. Verify LICENSE file content.")
+                     
+                     # Try to update LICENSE file if it matches a known template
+                     self._update_license_file(root, new_license, report)
                      changed = True
 
         if changed:
             with open(pyproject_path, "w") as f:
                 f.write(content)
+
+    def _update_license_file(self, root: Path, new_license: str, report):
+        """Update LICENSE file content if old license is a recognized template."""
+        from viperx.licenses import LICENSE_TEMPLATES
+        
+        license_path = root / "LICENSE"
+        if not license_path.exists():
+            return
+        
+        current_content = license_path.read_text()
+        
+        # Check if current content matches any known license by signature phrases
+        is_known_license = False
+        license_signatures = {
+            "MIT": "MIT License",
+            "Apache-2.0": "Apache License",
+            "GPLv3": "GNU GENERAL PUBLIC LICENSE"
+        }
+        
+        for lic_type, signature in license_signatures.items():
+            if signature in current_content:
+                is_known_license = True
+                break
+        
+        if is_known_license and new_license in LICENSE_TEMPLATES:
+            # Safe to update
+            new_content = LICENSE_TEMPLATES[new_license]
+            license_path.write_text(new_content)
+            report.updated.append(f"LICENSE file updated to {new_license}")
+        else:
+            # Not safe, just warn
+            report.manual_checks.append("License type changed. Verify LICENSE file content.")
+
+    def _update_testpaths(self, root: Path, pkg_clean_name: str, report):
+        """Add package tests path to testpaths in pyproject.toml."""
+        import re
+        pyproject_path = root / "pyproject.toml"
+        if not pyproject_path.exists():
+            return
+        
+        content = pyproject_path.read_text()
+        new_testpath = f'"src/{pkg_clean_name}/tests"'
+        
+        # Check if testpaths section exists
+        testpaths_pattern = re.compile(r'testpaths\s*=\s*\[([^\]]*)\]', re.MULTILINE | re.DOTALL)
+        match = testpaths_pattern.search(content)
+        
+        if match:
+            # Section exists, check if path already included
+            existing_paths = match.group(1)
+            if new_testpath in existing_paths:
+                return  # Already present
+            
+            # Add to existing list
+            # Find last entry and add after it
+            if existing_paths.strip():
+                # There are existing entries
+                new_paths = existing_paths.rstrip() + f',\n    {new_testpath},'
+            else:
+                new_paths = f'\n    {new_testpath},'
+            
+            new_section = f'testpaths = [{new_paths}\n]'
+            content = testpaths_pattern.sub(new_section, content)
+            report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
+        else:
+            # Section doesn't exist, check for [tool.pytest.ini_options]
+            pytest_section = re.search(r'\[tool\.pytest\.ini_options\]', content)
+            if pytest_section:
+                # Insert testpaths after section header
+                insert_pos = pytest_section.end()
+                insert_text = f'\ntestpaths = [\n    {new_testpath},\n]'
+                content = content[:insert_pos] + insert_text + content[insert_pos:]
+                report.updated.append(f"Created testpaths with {pkg_clean_name}/tests")
+            else:
+                # No pytest section, append one
+                content += f'\n[tool.pytest.ini_options]\ntestpaths = [\n    {new_testpath},\n]\n'
+                report.updated.append(f"Created [tool.pytest.ini_options] with testpaths")
+        
+        # Clean up duplicate commas and format
+        content = re.sub(r',\s*,', ',', content)
+        content = re.sub(r',\s*\]', '\n]', content)
+        
+        pyproject_path.write_text(content)
 
     def _update_root_scripts(self, root: Path, scripts: dict, report):
         """Safely update [project.scripts] in pyproject.toml using text injection."""
@@ -473,10 +586,12 @@ class ConfigEngine:
         # Parse existing scripts (simple line scanning after header)
         # Stop at next section [Section]
         insert_idx = scripts_header_index + 1
+        section_end_idx = len(lines)
         for i in range(scripts_header_index + 1, len(lines)):
             line = lines[i].strip()
             if line.startswith("["):
-                break # Next section
+                section_end_idx = i
+                break  # Next section
             if "=" in line:
                 key, val = line.split("=", 1)
                 existing_scripts[key.strip()] = val.strip().strip('"').strip("'")
@@ -495,13 +610,23 @@ class ConfigEngine:
                 pass 
         
         if changed:
-            # Insert at end of script block
+            # Insert at end of script block (before next section)
             for s in scripts_to_add:
                 lines.insert(insert_idx, s)
                 insert_idx += 1
             
+            # Clean up consecutive blank lines in entire file
+            cleaned_lines = []
+            prev_blank = False
+            for line in lines:
+                is_blank = line.strip() == ""
+                if is_blank and prev_blank:
+                    continue  # Skip consecutive blank lines
+                cleaned_lines.append(line)
+                prev_blank = is_blank
+            
             with open(pyproject_path, "w") as f:
-                f.write("\n".join(lines) + "\n")
+                f.write("\n".join(cleaned_lines) + "\n")
                 
     def _print_report(self, report):
         from rich.tree import Tree

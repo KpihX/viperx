@@ -241,8 +241,11 @@ know their rights.
 ... (Truncated for brevity, full GPL is long, but this is enough to start)
 """
 
-LICENSES = {
+LICENSE_TEMPLATES = {
     "MIT": MIT_LICENSE,
     "Apache-2.0": APACHE_LICENSE,
     "GPLv3": GPL_LICENSE,
 }
+
+# Alias for backwards compatibility
+LICENSES = LICENSE_TEMPLATES
