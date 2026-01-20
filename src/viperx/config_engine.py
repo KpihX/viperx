@@ -42,178 +42,281 @@ class ConfigEngine:
 
     def apply(self):
         """Apply the configuration to the current directory."""
+        from viperx.report import UpdateReport
+        from viperx.utils import sanitize_project_name
+        
+        report = UpdateReport()
         project_conf = self.config.get("project", {})
         settings_conf = self.config.get("settings", {})
         workspace_conf = self.config.get("workspace", {})
         
         project_name = project_conf.get("name")
-        
-        # STRICT NAMING: Always calculate the expected root path using sanitized name
-        from viperx.utils import sanitize_project_name
         clean_name = sanitize_project_name(project_name)
         
-        # Default assumption: current_root is the target directory (folder with underscores)
+        # Determine Root
         current_root = self.root_path / clean_name
-        target_dir = current_root
-
-        # 1. Root Project Handling
-        # Heuristic: Are we already in a folder matching the raw name OR sanitized name?
-        # e.g. inside test_classic/
+        # Heuristic: Are we already inside?
         if self.root_path.name == project_name or self.root_path.name == clean_name:
-            # We are inside the project folder
             current_root = self.root_path
+
+        # ---------------------------------------------------------
+        # Phase 0: Context Aggregation (PRESERVED LOGIC)
+        # ---------------------------------------------------------
+        # We assume dependencies logic is required for both generation and validation.
+        
+        root_use_config = settings_conf.get("use_config", True)
+        root_use_env = settings_conf.get("use_env", False)
+        root_use_tests = settings_conf.get("use_tests", True)
+        root_type = settings_conf.get("type", TYPE_CLASSIC)
+        root_framework = settings_conf.get("framework", FRAMEWORK_PYTORCH)
+        
+        glob_has_config = root_use_config
+        glob_has_env = root_use_env
+        glob_is_ml_dl = root_type in [TYPE_ML, TYPE_DL]
+        glob_is_dl = root_type == TYPE_DL
+        glob_frameworks = {root_framework} if glob_is_dl else set()
+
+        project_scripts = {project_name: f"{clean_name}.main:main"} # Use clean mapping
+        
+        # List for README generation (Order: Root, then packages)
+        packages_list = [{
+            "raw_name": project_name,
+            "clean_name": clean_name,
+            "use_config": root_use_config,
+            "use_tests": root_use_tests,
+            "use_env": root_use_env
+        }]
+        
+        packages = workspace_conf.get("packages", [])
+        for pkg in packages:
+            # Scripts
+            pkg_name = pkg.get("name")
+            pkg_name_clean = sanitize_project_name(pkg_name)
+            project_scripts[pkg_name] = f"{pkg_name_clean}.main:main"
             
-            if not (self.root_path / "pyproject.toml").exists():
-                 console.print(Panel(f"⚠️  [bold yellow]Current directory matches name but is not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
-                 gen = ProjectGenerator(
-                    name=project_name,
-                    description=project_conf.get("description", ""),
-                    type=settings_conf.get("type", TYPE_CLASSIC),
-                    author=project_conf.get("author", None),
-                    license=project_conf.get("license", DEFAULT_LICENSE),
-                    builder=project_conf.get("builder", DEFAULT_BUILDER),
-                    use_env=settings_conf.get("use_env", False),
-                    use_config=settings_conf.get("use_config", True),
-                    use_tests=settings_conf.get("use_tests", True),
-                    framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
-                    scripts={project_name: f"{clean_name}.main:main"}, 
-                    verbose=self.verbose
-                )
-                 gen.generate(self.root_path.parent)
+            # Dependency Aggregation
+            p_config = pkg.get("use_config", settings_conf.get("use_config", True))
+            p_env = pkg.get("use_env", settings_conf.get("use_env", False))
+            p_tests = pkg.get("use_tests", settings_conf.get("use_tests", True))
+            p_type = pkg.get("type", TYPE_CLASSIC)
+            p_framework = pkg.get("framework", FRAMEWORK_PYTORCH)
+
+            if p_config: glob_has_config = True
+            if p_env: glob_has_env = True
+            if p_type in [TYPE_ML, TYPE_DL]: glob_is_ml_dl = True
+            if p_type == TYPE_DL: 
+                 glob_is_dl = True
+                 glob_frameworks.add(p_framework)
+                 
+            packages_list.append({
+                "raw_name": pkg_name,
+                "clean_name": pkg_name_clean,
+                "use_config": p_config,
+                "use_tests": p_tests,
+                "use_env": p_env
+            })
+
+        dep_context = {
+            "has_config": glob_has_config,
+            "has_env": glob_has_env,
+            "is_ml_dl": glob_is_ml_dl,
+            "is_dl": glob_is_dl,
+            "frameworks": list(glob_frameworks),
+            "packages": packages_list
+        }
+
+        # ---------------------------------------------------------
+        # Phase 1: Root Project (Hydration vs Update)
+        # ---------------------------------------------------------
+        if not (current_root / "pyproject.toml").exists():
+            # CASE A: New Project (Hydration)
+            if not current_root.exists() and current_root != self.root_path:
+                report.added.append(f"Project '{project_name}' (Scaffolding)")
             else:
-                console.print(Panel(f"♻️  [bold blue]Syncing Project:[/bold blue] {project_name}", border_style="blue"))
+                report.added.append(f"Project Scaffolding in existing '{current_root.name}'")
                 
-        else:
-            # We are outside
-            # target_dir (clean) is already set as current_root default
+            gen = ProjectGenerator(
+                name=project_name, # Raw name
+                description=project_conf.get("description", ""),
+                type=settings_conf.get("type", TYPE_CLASSIC),
+                author=project_conf.get("author", None),
+                license=project_conf.get("license", DEFAULT_LICENSE),
+                builder=project_conf.get("builder", DEFAULT_BUILDER),
+                use_env=settings_conf.get("use_env", False),
+                use_config=settings_conf.get("use_config", True),
+                use_tests=settings_conf.get("use_tests", True),
+                framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
+                scripts=project_scripts,
+                dependency_context=dep_context,
+                verbose=self.verbose
+            )
+            # We generate at parent if we are creating subfolder, or current if inside
+            target_gen_path = current_root.parent if current_root != self.root_path else self.root_path
+            gen.generate(target_gen_path)
             
-            if target_dir.exists() and (target_dir / "pyproject.toml").exists():
-                console.print(Panel(f"♻️  [bold blue]Updating Existing Project:[/bold blue] {project_name} ({target_dir.name})", border_style="blue"))
-            else:
-                if target_dir.exists():
-                     console.print(Panel(f"⚠️  [bold yellow]Directory exists but not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
-                
-                # Prepare Scripts & Dependency Context
-                packages = workspace_conf.get("packages", [])
-                
-                # --- Aggregate Global Dependencies ---
-                root_use_config = settings_conf.get("use_config", True)
-                root_use_env = settings_conf.get("use_env", False)
-                root_use_tests = settings_conf.get("use_tests", True)
-                root_type = settings_conf.get("type", TYPE_CLASSIC)
-                root_framework = settings_conf.get("framework", FRAMEWORK_PYTORCH)
-                
-                glob_has_config = root_use_config
-                glob_has_env = root_use_env
-                glob_is_ml_dl = root_type in [TYPE_ML, TYPE_DL]
-                glob_is_dl = root_type == TYPE_DL
-                glob_frameworks = {root_framework} if glob_is_dl else set()
-
-                project_scripts = {project_name: f"{clean_name}.main:main"} # Use clean mapping
-                
-                # List for README generation (Order: Root, then packages)
-                packages_list = [{
-                    "raw_name": project_name,
-                    "clean_name": clean_name,
-                    "use_config": root_use_config,
-                    "use_tests": root_use_tests,
-                    "use_env": root_use_env
-                }]
-                
-                for pkg in packages:
-                    # Scripts
-                    pkg_name = pkg.get("name")
-                    pkg_name_clean = sanitize_project_name(pkg_name)
-                    project_scripts[pkg_name] = f"{pkg_name_clean}.main:main"
-                    
-                    # Dependency Aggregation
-                    p_config = pkg.get("use_config", settings_conf.get("use_config", True))
-                    p_env = pkg.get("use_env", settings_conf.get("use_env", False))
-                    p_tests = pkg.get("use_tests", settings_conf.get("use_tests", True))
-                    p_type = pkg.get("type", TYPE_CLASSIC)
-                    p_framework = pkg.get("framework", FRAMEWORK_PYTORCH)
-
-                    if p_config: glob_has_config = True
-                    if p_env: glob_has_env = True
-                    if p_type in [TYPE_ML, TYPE_DL]: glob_is_ml_dl = True
-                    if p_type == TYPE_DL: 
-                         glob_is_dl = True
-                         glob_frameworks.add(p_framework)
-                         
-                    packages_list.append({
-                        "raw_name": pkg_name,
-                        "clean_name": pkg_name_clean,
-                        "use_config": p_config,
-                        "use_tests": p_tests,
-                        "use_env": p_env
-                    })
-
-                dep_context = {
-                    "has_config": glob_has_config,
-                    "has_env": glob_has_env,
-                    "is_ml_dl": glob_is_ml_dl,
-                    "is_dl": glob_is_dl,
-                    "frameworks": list(glob_frameworks),
-                    "packages": packages_list
-                }
-
-                gen = ProjectGenerator(
-                    name=project_name, # Raw name
-                    description=project_conf.get("description", ""),
-                    type=settings_conf.get("type", TYPE_CLASSIC),
-                    author=project_conf.get("author", None),
-                    license=project_conf.get("license", DEFAULT_LICENSE),
-                    builder=project_conf.get("builder", DEFAULT_BUILDER),
-                    use_env=settings_conf.get("use_env", False),
-                    use_config=settings_conf.get("use_config", True),
-                    use_tests=settings_conf.get("use_tests", True),
-                    framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
-                    scripts=project_scripts,
-                    dependency_context=dep_context,
-                    verbose=self.verbose
-                )
-                gen.generate(self.root_path)
-                
-                # Verify creation
-                if not current_root.exists():
+            # Verify creation reference for packages
+            if not current_root.exists():
                      if (self.root_path / project_name).exists():
                          current_root = self.root_path / project_name
-                     
-                if self.verbose:
-                     console.print(f"[debug] Project Root resolves to: {current_root}")
-        
-        # 2. Copy Config to Root (Source of Truth)
-        # Only if we aren't reading the one already there
-        system_config_path = current_root / "viperx.yaml"
-        if self.config_path.absolute() != system_config_path.absolute():
-            import shutil
-            shutil.copy2(self.config_path, system_config_path)
-            console.print(f"[dim]Saved configuration to {system_config_path.name}[/dim]")
 
-        # 3. Handle Workspace Packages
-        packages = workspace_conf.get("packages", [])
-        if packages:
-            console.print(f"\\n📦 [bold]Processing {len(packages)} workspace packages...[/bold]")
+        else:
+            # CASE B: Update Existing Project
+            self._update_root_metadata(current_root, project_conf, report)
             
-            for pkg in packages:
-                pkg_name = pkg.get("name")
-                pkg_path = current_root / "src" / pkg_name.replace("-", "_") # Approximate check
+            # Conflict Checks (Root)
+            # Check use_env
+            if not root_use_env and (current_root / ".env").exists():
+                 report.conflicts.append("Root: use_env=False but .env exists")
+            pass
+
+        # ---------------------------------------------------------
+        # Phase 2: Workspace Packages (Iterative Sync)
+        # ---------------------------------------------------------
+        
+        for pkg in packages:
+            pkg_name = pkg.get("name")
+            pkg_name_clean = sanitize_project_name(pkg_name)
+            
+            # Approximate check for existing package src directory
+            pkg_path = current_root / "src" / pkg_name_clean
+            # Also check if user used hyphens in folder name (classic behavior)
+            if not pkg_path.exists():
+                 pkg_path_hyphen = current_root / "src" / pkg_name
+                 if pkg_path_hyphen.exists():
+                      pkg_path = pkg_path_hyphen
+
+            if pkg_path.exists():
+                # --- UPDATE CHECK ---
+                # Check for REMOVAL of features (Conflict Reporting)
+                p_use_env = pkg.get("use_env", settings_conf.get("use_env", False))
+                if not p_use_env and (pkg_path / ".env").exists():
+                    report.conflicts.append(f"Package '{pkg_name}': use_env=False but .env exists")
                 
-                # We instantiate a generator for this package
+                # Check for Metadata updates (Assuming we don't sub-update dependencies often)
+                # We skip regeneration to be SAFE.
+                pass
+            else:
+                # --- NEW PACKAGE ---
+                report.added.append(f"Package '{pkg_name}'")
+                
                 pkg_gen = ProjectGenerator(
                     name=pkg_name,
                     description=pkg.get("description", ""),
                     type=pkg.get("type", TYPE_CLASSIC),
-                    author=project_conf.get("author", "Your Name"), # Inherit author
-                    use_env=pkg.get("use_env", settings_conf.get("use_env", False)),     # Inherit settings or default False
-                    use_config=pkg.get("use_config", settings_conf.get("use_config", True)), # Inherit or default True
+                    author=project_conf.get("author", "Your Name"),
+                    use_env=pkg.get("use_env", settings_conf.get("use_env", False)),
+                    use_config=pkg.get("use_config", settings_conf.get("use_config", True)),
                     use_readme=pkg.get("use_readme", False),
                     use_tests=pkg.get("use_tests", settings_conf.get("use_tests", True)),
                     framework=pkg.get("framework", FRAMEWORK_PYTORCH),
+                    scripts=project_scripts, 
+                    dependency_context=dep_context,
                     verbose=self.verbose
                 )
-                
-                # Check if package seems to exist (ProjectGenerator handles upgrade logic too)
                 pkg_gen.add_to_workspace(current_root)
 
-        console.print(Panel(f"✨ [bold green]Configuration Applied Successfully![/bold green]\\nProject is up to date with {self.config_path.name}", border_style="green"))
+        # Check for Deletions (Packages on disk not in config)
+        existing_pkgs = set()
+        if (current_root / "src").exists():
+             existing_pkgs = {p.name for p in (current_root / "src").iterdir() if p.is_dir()}
+        
+        # We need to map config names to folder names to check existence
+        config_folder_names = {p["clean_name"] for p in packages_list if p["raw_name"] != project_name}
+        
+        # Also include raw names if they exist on disk (classic case)
+        config_raw_names = {p["raw_name"] for p in packages_list if p["raw_name"] != project_name}
+        
+        for ep in existing_pkgs:
+            if ep not in config_folder_names and ep not in config_raw_names:
+                report.deletions.append(f"Package '{ep}' found on disk but missing from config.")
+
+        # ---------------------------------------------------------
+        # Phase 3: Config Sync & Reporting
+        # ---------------------------------------------------------
+        # Sync viperx.yaml
+        system_config_path = current_root / "viperx.yaml"
+        if self.config_path.absolute() != system_config_path.absolute():
+            import shutil
+            shutil.copy2(self.config_path, system_config_path)
+            
+        self._print_report(report)
+
+    def _update_root_metadata(self, root: Path, project_conf: dict, report):
+        """Safely update pyproject.toml metadata."""
+        import toml
+        pyproject_path = root / "pyproject.toml"
+        if not pyproject_path.exists():
+            return
+
+        with open(pyproject_path, "r") as f:
+            data = toml.load(f)
+
+        changed = False
+        proj = data.get("project", {})
+        
+        # 1. Description
+        new_desc = project_conf.get("description")
+        if new_desc and proj.get("description") != new_desc:
+            proj["description"] = new_desc
+            report.updated.append(f"Root description -> '{new_desc}'")
+            changed = True
+            
+        # 2. Author (simplified, assumes list of dicts)
+        new_author = project_conf.get("author")
+        if new_author:
+             authors = proj.get("authors", [])
+             if authors and authors[0].get("name") != new_author:
+                 authors[0]["name"] = new_author
+                 report.updated.append(f"Root author -> '{new_author}'")
+                 changed = True
+                 
+        # 3. License
+        new_license = project_conf.get("license")
+        current_lic = proj.get("license", {}).get("text")
+        if new_license and current_lic != new_license:
+            proj["license"] = {"text": new_license}
+            report.updated.append(f"Root license -> '{new_license}'")
+            changed = True
+            report.manual_checks.append("License type changed. Verify LICENSE file content.")
+
+        if changed:
+            data["project"] = proj
+            with open(pyproject_path, "w") as f:
+                toml.dump(data, f)
+                
+    def _print_report(self, report):
+        from rich.tree import Tree
+        
+        if not report.has_events:
+            console.print(Panel("✨ [bold green]Start[/bold green]\\nNothing to change. Project is in sync.", border_style="green"))
+            return
+
+        tree = Tree("📝 [bold]Update Report[/bold]")
+        
+        if report.added:
+            added_node = tree.add("[green]Added[/green]")
+            for item in report.added:
+                added_node.add(f"[green]+ {item}[/green]")
+                
+        if report.updated:
+            updated_node = tree.add("[blue]Updated (Safe)[/blue]")
+            for item in report.updated:
+                updated_node.add(f"[blue]~ {item}[/blue]")
+                
+        if report.conflicts:
+            con_node = tree.add("[yellow]Conflicts (No Action Taken)[/yellow]")
+            for item in report.conflicts:
+                con_node.add(f"[yellow]! {item}[/yellow]")
+
+        if report.deletions:
+            del_node = tree.add("[red]Deletions Detected (No Action Taken)[/red]")
+            for item in report.deletions:
+                del_node.add(f"[red]- {item}[/red]")
+                
+        if report.manual_checks:
+            check_node = tree.add("[magenta]Manual Checks Required[/magenta]")
+            for item in report.manual_checks:
+                check_node.add(f"[magenta]? {item}[/magenta]")
+
+        console.print(tree)
+        console.print("\\n[dim]Run completed.[/dim]")
