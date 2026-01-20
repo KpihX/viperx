@@ -1,6 +1,6 @@
 # test-classic
 
-test-classic
+Classic project
 
 ---
 

@@ -9,7 +9,7 @@ project:
   name: "test-classic"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
-  # description: "My robust project"
+  description: "Classic project"
   # author: "KpihX"
   # license: "MIT"
   builder: "uv"

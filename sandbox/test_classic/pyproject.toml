@@ -1,7 +1,7 @@
 [project]
 name = "test-classic"
 version = "0.1.0"
-description = "test-classic"
+description = "Classic project"
 
 readme = "README.md"
 
