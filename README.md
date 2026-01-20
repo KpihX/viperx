@@ -14,6 +14,7 @@
 - **Strict Isolation**: Environment variables (`.env`) isolated in `src/<pkg>/` for better security.
 - **Config-in-Package**: Solves the "Colab/Kaggle doesn't see my config" problem.
 - **Platform Agnostic**: Works on Local, VSCode, Colab, and Kaggle.
+- **Safe Mode**: Never overwrites or deletes files automatically—reports changes for manual action.
 
 ## 📦 Installation
 
@@ -27,194 +28,159 @@ pipx install viperx
 uv tool install viperx
 ```
 
-## 🚀 Usage
-
-### `init`
-Initialize a new project (Classic, ML, or DL).
-
-```bash
-# Classic Lib (Standard Layout)
-viperx init -n my-lib
-
-# Machine Learning ( + Notebooks, Pandas, Scikit-learn, Smart Loader)
-viperx init -n churn-pred -t ml
-
-# Deep Learning ( + PyTorch/TensorFlow, CUDA checks)
-viperx init -n deep-vision -t dl --framework pytorch
-# Deep Learning ( + PyTorch/TensorFlow, CUDA checks)
-viperx init -n deep-vision -t dl --framework pytorch
-
-# ✨ Declarative Config (Infrastructure as Code)
-viperx config get                   # Generate template
-viperx init -c viperx.yaml          # Apply config
-```
-
-### `package`
-Manage workspace packages (Monorepo style).
-
-```bash
-# Add a new package to the current workspace
-viperx package add -n my-api -t classic
-
-# Remove a package
-viperx package delete -n my-api
-```
-
 ## 🚀 Quick Start
-
-Initialize a new project with a single command:
 
 ```bash
 # Classic Package
-viperx init -n my-lib -d "My awesome library"
+viperx config -n my-lib
 
-# Deep Learning Project (PyTorch ready)
-viperx init -n deep-vision -t dl --description "Vision Transformer implementation"
+# Machine Learning Project
+viperx config -n churn-prediction -t ml --env
 
-# Machine Learning Project (Scikit-learn ready)
-viperx init -n churn-prediction -t ml
+# Deep Learning Project (PyTorch)
+viperx config -n deep-vision -t dl -f pytorch
+
+# Declarative Config (Infrastructure as Code)
+viperx config get                   # Generate template
+viperx config -c viperx.yaml        # Apply config
 ```
 
-## 🧱 Structure
+## 🧱 Project Structure
 
-📂 **Standard Layout**
+### Standard Layout
 ```text
 my-lib/
 ├── pyproject.toml      # Managed by uv
 ├── README.md
-├── README.md
 ├── .gitignore
+├── viperx.yaml         # Config file
 └── src/
     └── my_lib/
         ├── __init__.py
-        ├── main.py     # Entry point
-        ├── config.yaml # Data URLs & Params
-        ├── config.py   # Loader
-        ├── .env        # Secrets (Isolated)
-        └── utils/
-            └── data_loader.py # Generic URL/CSV Loader
+        ├── main.py         # Entry point
+        ├── config.yaml     # Data URLs & Params
+        ├── config.py       # Loader
+        ├── .env            # Secrets (ISOLATED)
+        └── tests/
+            └── test_core.py
 ```
 
-### 🧠 Machine Learning & Deep Learning
-For type `ml` or `dl`, you get:
-- **Notebooks**:
-  - `Base_Kaggle.ipynb`: Loads data via `kagglehub`.
-  - `Base_General.ipynb`: Loads data via `data_loader.py` (URL/Local).
-- **Data Loader**: `src/<pkg>/data_loader.py` handles caching downloads to `data/`.
-- **Config**: Pre-filled with "Hello World" datasets (Iris, Titanic).
-
-### ⚙️ Configurationstalls dependencies (`torch`, `pandas`...).
-
+### ML/DL Layout
 ```text
 deep-vision/
 ├── pyproject.toml
 ├── notebooks/
-│   └── Base.ipynb
+│   ├── Base_Kaggle.ipynb
+│   └── Base_General.ipynb
+├── data/               # Cached datasets
 └── src/
     └── deep_vision/
         ├── main.py
-        ├── config.py    # <--- ISOLATED
-        ├── .env         # <--- ISOLATED
-        └── ...
+        ├── config.py       # <--- ISOLATED
+        ├── .env            # <--- ISOLATED
+        ├── data_loader.py  # Smart caching
+        └── tests/
 ```
 
-## 💻 CLI Usage
+## 💻 CLI Reference
 
-### `init` - Create a new project
+### `config` - Main Command
 
 ```bash
-viperx init [OPTIONS]
+viperx config [OPTIONS]
 ```
 
 **Options:**
-- `-n, --name TEXT`: Project name **(Required)**.
-- `-t, --type TEXT`: Project type (`classic`, `ml`, `dl`). Default: `classic`.
-- `-d, --description TEXT`: Project description.
-- `-a, --author TEXT`: Author name (defaults to git user).
-- `-l, --license TEXT`: License type (`MIT`, `Apache-2.0`, `GPLv3`). Default: `MIT`.
-- `-f, --framework TEXT`: DL Framework (`pytorch`, `tensorflow`). Default: `pytorch` (only for `-t dl`).
-- `-v, --verbose`: Enable verbose logging for transparent output.
+| Flag                | Description                       | Default    |
+| ------------------- | --------------------------------- | ---------- |
+| `-n, --name`        | Project name **(Required)**       | -          |
+| `-t, --type`        | `classic`, `ml`, `dl`             | `classic`  |
+| `-d, --description` | Project description               | -          |
+| `-a, --author`      | Author name                       | git user   |
+| `-l, --license`     | `MIT`, `Apache-2.0`, `GPLv3`      | `MIT`      |
+| `-b, --builder`     | `uv`, `hatch`                     | `uv`       |
+| `-f, --framework`   | `pytorch`, `tensorflow` (DL only) | `pytorch`  |
+| `--env / --no-env`  | Generate `.env` file              | `--no-env` |
+| `-c, --config`      | Path to `viperx.yaml`             | -          |
 
-**Examples:**
-
-```bash
-# Classic Library
-viperx init -n my-lib
-
-# Deep Learning (PyTorch Default)
-viperx init -n vision-ai -t dl
-
-# Deep Learning (TensorFlow)
-viperx init -n tf-legacy -t dl -f tensorflow
-# Deep Learning (TensorFlow)
-viperx init -n tf-legacy -t dl -f tensorflow
-
-# From Config File
-viperx init -c viperx.yaml
-```
-
-### `config` - Declarative Mode
-
-Manage your project infrastructure using a YAML file.
+### `config get` - Generate Template
 
 ```bash
 viperx config get
 ```
-Generates a `viperx.yaml` template in the current directory.
+
+Creates a `viperx.yaml` template in current directory.
+
+### `package` - Workspace Management
 
 ```bash
-viperx init --config viperx.yaml
+# Add package
+viperx package add -n worker-api -t classic
+
+# Delete package
+viperx package delete -n worker-api
+
+# Update dependencies
+viperx package update -n worker-api
 ```
-Applies the configuration. This is **idempotent**:
-- Creates the project if it doesn't exist.
-- **Hydrates** the directory if it exists but is empty (e.g., git init).
-- **Updates** the workspace if the project exists (adds missing packages defined in YAML).
 
-### `package` - Manage Workspace
+## 📝 Declarative Config (`viperx.yaml`)
 
-Manage packages in your workspace hierarchy (add, update, delete).
+```yaml
+project:
+  name: "my-project"
+  description: "A cool project"
+  author: "Your Name"
+  license: "MIT"
+  builder: "uv"
 
-#### `add`
-Add a new package to your project. Upgrades standalone projects to workspaces automatically.
+settings:
+  type: "classic"          # classic | ml | dl
+  use_env: false
+  use_config: true
+  use_tests: true
+
+workspace:
+  packages:
+    - name: "api"
+      type: "classic"
+    - name: "ml-core"
+      type: "ml"
+      use_env: true
+```
+
+## 🔒 Safe Mode Philosophy
+
+ViperX follows a **non-destructive** approach:
+
+| Action        | Behavior                          |
+| ------------- | --------------------------------- |
+| **Add**       | ✅ Creates new files/packages      |
+| **Update**    | ⚠️ Reports changes, user decides   |
+| **Delete**    | ❌ Never deletes—warns user        |
+| **Overwrite** | ❌ Never overwrites existing files |
+
+## 🧪 Test Coverage
+
 ```bash
-```bash
-viperx package add -n worker-node -t classic --no-readme
-```
-**Options:**
-- `--readme / --no-readme`: Generate a local `README.md` for the package. Default: `True`.
-- `--env / --no-env`: Generate isolated `.env` and `.env.example` in `src/<pkg>/`.
-
-#### `delete`
-Remove a package from the workspace (deletes folder & updates `pyproject.toml`).
-```bash
-viperx package delete -n worker-node
+uv run pytest src/viperx/tests
+# 34 tests | 77% coverage
 ```
 
-#### `update`
-Update a package's dependencies (runs `uv lock --upgrade`).
-```bash
-viperx package update -n worker-node
-```
-
----## 📦 "Magical" Configuration
-
-Every project comes with a robust `config.py` using `importlib.resources`.
-
-**In your code / notebooks:**
-```python
-from my_package import SETTINGS, get_dataset_path
-
-# Works everywhere: Local, Installed, Colab, Kaggle
-print(SETTINGS['project_name'])
-```
+**Test Structure:**
+- `unit/` - Validation (5 tests)
+- `functional/` - CLI, licenses, project types (16 tests)
+- `scenarios/` - Classic, workspace, updates (11 tests)
+- `integration/` - E2E lifecycle (2 tests)
 
 ## 🤝 Contributing
 
-This project is built 100% with `uv`.
-
-1. Clone the repo
-2. Sync dependencies: `uv sync`
-3. Run the CLI: `uv run viperx`
+```bash
+git clone https://github.com/KpihX/viperx.git
+cd viperx
+uv sync
+uv run viperx --help
+```
 
 ---
 *Built with ❤️ by KpihX*
