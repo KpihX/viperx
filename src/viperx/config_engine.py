@@ -250,6 +250,21 @@ class ConfigEngine:
         def check_feature(path_check: Path, use_flag: bool, feature_name: str, pkg_label: str):
             if use_flag:
                 # ENABLED: Check if missing -> Create
+                
+                # Heuristic: Is this package/project new?
+                # If so, Generator already created files. Don't report "Using/Enabling".
+                is_pkg_new = False
+                for added_msg in report.added:
+                    # Check for Package addition
+                    if f"Package '{pkg_label.replace('Package ', '').strip("'")}'" in added_msg:
+                        is_pkg_new = True
+                    # Check for Root addition (Scaffolding of ANY kind)
+                    if "(Scaffolding)" in added_msg and pkg_label == "Root":
+                         is_pkg_new = True
+                
+                if is_pkg_new:
+                    return
+
                 if not path_check.exists():
                     report.updated.append(f"{pkg_label}: Enabling {feature_name} (Creating {path_check.name})")
                     if feature_name == "env":
