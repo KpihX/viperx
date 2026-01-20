@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-01-20 🎉
+### Added
+- **34 Comprehensive Tests**: Full coverage of all usage scenarios.
+  - Imperative mode tests (`viperx config -n name -t type`)
+  - License change detection (safe mode, no overwrite)
+  - Deletion warning for removed packages
+  - Feature disable warning for tests/config/env
+- **77% Code Coverage**: Up from 74%.
+
+### Philosophy
+- ViperX **only adds** new things safely.
+- Deletions and updates are **reported** for manual user action.
+- Safe Mode: Files are never overwritten or deleted automatically.
+
 ## [0.9.99] - 2026-01-20
 ### Added
 - **Comprehensive Test Suite Expansion**: 28 tests covering all usage scenarios.
