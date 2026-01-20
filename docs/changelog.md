@@ -4,6 +4,11 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.5.0] - 2026-01-20 🦅
+- **Template Freedom**: Custom user templates in `~/.config/viperx/templates/`
+- **Plugins**: `viperx template add <url>` to download packs
+- **Publishing Guide**: Docs for Homebrew/Conda release
+
 ### [1.3.5] - 2026-01-20 🌟
 - **Commented Config Generation**: `config update` produces hydrated template
 - **Robust Author Parsing**: Support for PEP 621 `authors` table

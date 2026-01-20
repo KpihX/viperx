@@ -117,9 +117,18 @@ class ProjectGenerator:
             console.print(f"[bold red]Configuration Error:[/bold red] {e}")
             sys.exit(1)
 
-        # Jinja Setup
+        # Jinja Setup - Template Freedom 🦅
+        # Priority: 
+        # 1. User Templates (~/.config/viperx/templates)
+        # 2. Internal Templates (viperx/templates)
+        from jinja2 import FileSystemLoader, ChoiceLoader
+        from viperx.constants import USER_TEMPLATES_DIR
+        
         self.env = Environment(
-            loader=PackageLoader("viperx", "templates"),
+            loader=ChoiceLoader([
+                FileSystemLoader(USER_TEMPLATES_DIR),
+                PackageLoader("viperx", "templates")
+            ]),
             autoescape=select_autoescape()
         )
 

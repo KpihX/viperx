@@ -420,6 +420,46 @@ def package_update(
 
 
 # =============================================================================
+# Template Management (V1.5.0 Freedom)
+# =============================================================================
+
+template_app = typer.Typer(
+    help="Manage templates (eject, add, list).",
+    no_args_is_help=True
+)
+app.add_typer(template_app, name="template")
+
+@template_app.command("list")
+def template_list():
+    """List available templates and their source (System vs User)."""
+    from viperx.templates import TemplateManager
+    TemplateManager().list_templates()
+
+@template_app.command("eject")
+def template_eject(
+    force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing user templates")
+):
+    """
+    Copy internal templates to ~/.config/viperx/templates/ for customization.
+    """
+    from viperx.templates import TemplateManager
+    TemplateManager().eject_templates(force=force)
+
+@template_app.command("add")
+def template_add(
+    url: str = typer.Argument(..., help="Git URL of the template pack")
+):
+    """
+    Download templates from a Git repository (Plugin system).
+    
+    Flattens all .j2 files from the repo into your user template dir.
+    """
+    from viperx.templates import TemplateManager
+    TemplateManager().add_template_pack(url)
+
+
+
+# =============================================================================
 # Migrate Command
 # =============================================================================
 

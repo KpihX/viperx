@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-01-20
+
+### 🚀 Added
+- **Template Freedom**: Support for user-defined templates in `~/.config/viperx/templates/`.
+    - `viperx template eject`: Copy internal templates to user config for customization.
+    - `viperx template add <url>`: Download external template packs (Plugins).
+    - `viperx template list`: View available templates and overrides.
+- **Publishing Guide**: Added `docs/publishing.md` (Homebrew Tap, Conda Forge strategies).
+
 ## [1.3.5] - 2026-01-20 🌟
 ### Added
 - **Commented Config Generation**: `viperx config update` now produces a fully commented `viperx.yaml` by hydrating the template instead of dumping raw YAML.
