@@ -288,7 +288,7 @@ class ConfigEngine:
         from rich.tree import Tree
         
         if not report.has_events:
-            console.print(Panel("✨ [bold green]Start[/bold green]\\nNothing to change. Project is in sync.", border_style="green"))
+            console.print(Panel("✨ [bold green]Start[/bold green]\nNothing to change. Project is in sync.", border_style="green"))
             return
 
         tree = Tree("📝 [bold]Update Report[/bold]")
@@ -319,4 +319,4 @@ class ConfigEngine:
                 check_node.add(f"[magenta]? {item}[/magenta]")
 
         console.print(tree)
-        console.print("\\n[dim]Run completed.[/dim]")
+        console.print("\n[dim]Run completed.[/dim]")
