@@ -140,6 +140,7 @@ class ConfigEngine:
                 }
 
                 # Create Root (or Hydrate)
+                # Pass raw 'project_name' to generator for metadata
                 gen = ProjectGenerator(
                     name=project_name,
                     description=project_conf.get("description", ""),
@@ -156,7 +157,19 @@ class ConfigEngine:
                     verbose=self.verbose
                 )
                 gen.generate(self.root_path)
-                current_root = target_dir
+                
+                # Check actual created directory (sanitized) to be sure
+                # Because core.py sanitizes it.
+                from viperx.utils import sanitize_project_name
+                clean_name = sanitize_project_name(project_name)
+                current_root = self.root_path / clean_name
+                
+                if not current_root.exists():
+                    # Fallback if somehow it didn't create underscored dir (unlikely with 0.9.42 logic)
+                     current_root = self.root_path / project_name
+                     
+                if self.verbose:
+                     console.print(f"[debug] Project Root resolves to: {current_root}")
         
         # 2. Copy Config to Root (Source of Truth)
         # Only if we aren't reading the one already there
