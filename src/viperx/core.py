@@ -153,8 +153,13 @@ class ProjectGenerator:
                 )
             else:
                 # Create new
+                # STRICT DIR NAMING: Use self.project_name (underscores) for directory
+                # But use self.raw_name (hyphens) for the package Name metadata if possible?
+                # uv init [NAME] creates directory NAME.
+                # If we want dir=test_classic but name=test-classic:
+                # uv init test_classic --name test-classic
                 subprocess.run(
-                    ["uv", "init", "--package", "--no-workspace", self.raw_name], 
+                    ["uv", "init", "--package", "--no-workspace", self.project_name, "--name", self.raw_name], 
                     check=True, cwd=target_dir, capture_output=True
                 )
             console.print("  [blue]✓ Scaffolding created with uv init[/blue]")
@@ -197,7 +202,7 @@ class ProjectGenerator:
         # 5. Git & Final Steps
         console.print(f"\n[bold green]✓ Project {self.raw_name} created successfully![/bold green]")
         if not is_subpackage:
-            console.print(f"  [dim]cd {self.raw_name} && uv sync[/dim]")
+            console.print(f"  [dim]cd {self.project_name} && uv sync[/dim]")
 
     def _create_extra_dirs(self, root: Path, is_subpackage: bool = False):
         if is_subpackage:
