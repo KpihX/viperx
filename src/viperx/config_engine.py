@@ -144,8 +144,6 @@ class ConfigEngine:
                 gen = ProjectGenerator(
                     name=project_name,
                     description=project_conf.get("description", ""),
-                    type=settings_conf.get("type", TYPE_CLASSIC),
-                    author=project_conf.get("author", None),
                     license=project_conf.get("license", DEFAULT_LICENSE),
                     builder=project_conf.get("builder", DEFAULT_BUILDER),
                     use_env=settings_conf.get("use_env", False),
@@ -159,14 +157,10 @@ class ConfigEngine:
                 gen.generate(self.root_path)
                 
                 # Check actual created directory (sanitized) to be sure
-                # Because core.py sanitizes it.
-                from viperx.utils import sanitize_project_name
-                clean_name = sanitize_project_name(project_name)
-                current_root = self.root_path / clean_name
-                
                 if not current_root.exists():
-                    # Fallback if somehow it didn't create underscored dir (unlikely with 0.9.42 logic)
-                     current_root = self.root_path / project_name
+                     # Fallback if somehow it didn't create underscored dir
+                     if (self.root_path / project_name).exists():
+                         current_root = self.root_path / project_name
                      
                 if self.verbose:
                      console.print(f"[debug] Project Root resolves to: {current_root}")
