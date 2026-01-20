@@ -1,3 +1,17 @@
+"""
+ViperX Core - Project Generation Engine
+
+This module contains the ProjectGenerator class, responsible for:
+- Creating new Python projects using `uv init`
+- Rendering Jinja2 templates (pyproject.toml, README.md, etc.)
+- Setting up ML/DL project structures (notebooks, data_loader)
+- Managing workspace packages (add, delete, update)
+
+The generator follows a non-destructive approach:
+- Never overwrites existing files
+- Reports conflicts for user review
+- Uses template-driven file generation
+"""
 import sys
 import subprocess
 from pathlib import Path

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.4] - 2026-01-20 📖
+### Changed
+- **Module Docstrings**: Added comprehensive docstrings to `main.py`, `core.py`, `utils.py`
+- **Architecture Review**: Verified no hardcoding, external configs in `constants.py`
+
 ## [1.3.3] - 2026-01-20 🧹
 ### Changed
 - **Codebase Cleanup**: 48 ruff auto-fixes + 6 manual fixes

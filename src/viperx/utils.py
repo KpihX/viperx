@@ -1,3 +1,14 @@
+"""
+ViperX Utilities - Helper Functions
+
+Pure utility functions for:
+- Project name sanitization (hyphens to underscores, valid Python identifiers)
+- Input validation (project names, choices)
+- Builder detection (uv, hatch)
+- Git configuration reading (author name/email)
+
+All functions are stateless and side-effect free (except git reading).
+"""
 import re
 import shutil
 from rich.console import Console

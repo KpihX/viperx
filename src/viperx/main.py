@@ -1,3 +1,20 @@
+"""
+ViperX CLI - Professional Python Project Initializer
+
+This module provides the command-line interface for ViperX, supporting:
+- Project creation (viperx config -n name)
+- Declarative configuration (viperx config -c viperx.yaml)
+- Workspace management (viperx package add/delete/update)
+- Config synchronization (viperx config update)
+- Version migrations (viperx migrate)
+
+CLI Structure:
+    viperx config [OPTIONS]     Apply configuration or create project
+    viperx config get           Generate viperx.yaml template
+    viperx config update        Sync viperx.yaml with codebase
+    viperx package add/delete   Manage workspace packages
+    viperx migrate              Upgrade to newer ViperX versions
+"""
 import typer
 from pathlib import Path
 from rich.panel import Panel
