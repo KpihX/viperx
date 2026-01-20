@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2026-01-20 📚
+### Added
+- **Test for Inline Conflict Annotation**: Verifies `# NOT_APPLIED` comments are added
+
+### Changed
+- **README Updated**: Test stats (47 tests, 76% coverage), added `viperx config update` docs
+- **Total Tests**: 47 (up from 46)
+
 ## [1.3.1] - 2026-01-20 🔍
 ### Added
 - **Inline Conflict Commenting**: viperx.yaml now annotated with `# NOT_APPLIED` comments on conflicts

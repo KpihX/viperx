@@ -111,6 +111,17 @@ viperx config get
 
 Creates a `viperx.yaml` template in current directory.
 
+### `config update` - Rebuild from Codebase
+
+```bash
+viperx config update
+```
+
+Scans the existing project and updates `viperx.yaml` to match reality:
+- Detects packages in `src/`
+- Detects `use_config`, `use_env`, `use_tests` from actual files
+- Adds annotations for any mismatches
+
 ### `package` - Workspace Management
 
 ```bash
@@ -164,14 +175,14 @@ ViperX follows a **non-destructive** approach:
 
 ```bash
 uv run pytest src/viperx/tests
-# 34 tests | 77% coverage
+# 46 tests | 76% coverage
 ```
 
 **Test Structure:**
 - `unit/` - Validation (5 tests)
-- `functional/` - CLI, licenses, project types (16 tests)
-- `scenarios/` - Classic, workspace, updates (11 tests)
-- `integration/` - E2E lifecycle (2 tests)
+- `functional/` - CLI, licenses, project types, updates (18 tests)
+- `scenarios/` - Classic, workspace, type blocking, config scanner (18 tests)
+- `integration/` - E2E lifecycle (5 tests)
 
 ## 🤝 Contributing
 
