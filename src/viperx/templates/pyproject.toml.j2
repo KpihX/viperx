@@ -1,57 +1,133 @@
+# =============================================================================
+# 📦 PYPROJECT.TOML - The Heart of Modern Python Projects
+# =============================================================================
+# 
+# 🎓 WHY THIS FILE EXISTS:
+# Before pyproject.toml (PEP 518, 2016), Python had setup.py, setup.cfg,
+# requirements.txt, MANIFEST.in... a confusing mess!
+# 
+# pyproject.toml is the SINGLE SOURCE OF TRUTH for:
+# - Project metadata (name, version, author)
+# - Dependencies
+# - Build system configuration
+# - Tool configurations (pytest, ruff, mypy, etc.)
+#
+# 📚 Learn more: https://peps.python.org/pep-0518/
+# =============================================================================
+
 [project]
+# 🎓 The [project] table follows PEP 621 - the standard for project metadata
+# https://peps.python.org/pep-0621/
+
 name = "{{ project_name }}"
+# 🎓 WHY: This is your package's identity on PyPI. Use lowercase with hyphens.
+# Convention: Repository name = package name (but underscores in import)
+# Example: "my-cool-lib" on PyPI → `import my_cool_lib` in code
+
 version = "{{ version }}"
+# 🎓 WHY: Semantic Versioning (SemVer) - MAJOR.MINOR.PATCH
+# - MAJOR: Breaking changes (users must update their code)
+# - MINOR: New features (backward compatible)
+# - PATCH: Bug fixes
+# Start at 0.1.0 for development, 1.0.0 for production-ready
+# 📚 Learn more: https://semver.org/
+
 description = "{{ description }}"
+# 🎓 WHY: Shows on PyPI search results. Keep it SHORT (<100 chars)
+
 {%- if use_readme %}
 readme = "README.md"
+# 🎓 WHY: Your README is shown on PyPI. Write it for users, not just developers!
 {%- endif %}
+
 requires-python = ">={{ python_version }}"
+# 🎓 WHY: Tells pip/uv the minimum Python version your code needs.
+# Be conservative - don't require Python 3.12 if 3.9 works fine.
+# This prevents "why doesn't it install?" frustrations.
+
 authors = [
     { name = "{{ author_name }}", email = "{{ author_email }}" }
 ]
+# 🎓 WHY: PEP 621 format. Old setup.py used strings, this uses structured data.
+# Benefits: Tools can parse it, PyPI displays it nicely.
+
 license = { text = "{{ license }}" }
+# 🎓 WHY LICENSES MATTER:
+# - MIT: "Do whatever you want, just credit me" (most permissive)
+# - Apache-2.0: Like MIT but with patent protection (enterprise-friendly)  
+# - GPLv3: "Keep it open source forever" (copyleft)
+# 📚 Choose: https://choosealicense.com/
+
 dependencies = [
+    # 🎓 WHY VERSION PINNING MATTERS:
+    # - "package>=1.0" = minimum version (flexible, recommended for libraries)
+    # - "package==1.0.0" = exact version (reproducible, for applications)
+    # - "package~=1.0" = compatible release (>=1.0, <2.0)
+    # 
+    # Rule of thumb:
+    # - Libraries: Use >= (let users choose)
+    # - Applications: Use == or lock files (reproducibility)
     {%- if use_config %}
-    "pyyaml>=6.0",
+    "pyyaml>=6.0",  # 🎓 For config.yaml parsing. Industry standard for configuration.
     {%- endif %}
     {%- if has_env %}
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.0.0",  # 🎓 Loads .env files. Keeps secrets out of code!
     {%- endif %}
     {%- if is_ml_dl %}
-    "kagglehub>=0.2.0",
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-    "scikit-learn>=1.3.0",
-    "matplotlib>=3.7.0",
-    "seaborn>=0.12.0",
-    "requests>=2.30.0",
-    "tqdm>=4.65.0",
+    # 🎓 ML/Data Science Stack - Core Libraries
+    "kagglehub>=0.2.0",  # 🎓 Download datasets from Kaggle
+    "numpy>=1.24.0",  # 🎓 Numerical computing foundation
+    "pandas>=2.0.0",  # 🎓 Data manipulation and analysis
+    "scikit-learn>=1.3.0",  # 🎓 Machine learning algorithms
+    "matplotlib>=3.7.0",  # 🎓 Plotting and visualization
+    "seaborn>=0.12.0",  # 🎓 Statistical data visualization
+    "requests>=2.30.0",  # 🎓 HTTP library for API calls
+    "tqdm>=4.65.0",  # 🎓 Progress bars for long-running operations
     {%- endif %}
     {%- if is_dl %}
+    # 🎓 Deep Learning Frameworks
     {%- if 'pytorch' in frameworks %}
-    "torch>=2.0.0",
-    "torchvision>=0.15.0",
+    "torch>=2.0.0",  # 🎓 PyTorch - flexible deep learning framework
+    "torchvision>=0.15.0",  # 🎓 Computer vision utilities for PyTorch
     {%- endif %}
     {%- if 'tensorflow' in frameworks %}
-    "tensorflow>=2.13.0",
-    # "keras>=3.0.0", # Optional, included in tf usually
+    "tensorflow>=2.13.0",  # 🎓 TensorFlow - production-ready deep learning
+    # "keras>=3.0.0",  # Optional, usually included in TensorFlow
     {%- endif %}
     {%- endif %}
 ]
 
 [project.scripts]
+# 🎓 WHY SCRIPTS/ENTRY POINTS:
+# This creates a CLI command when your package is installed!
+# After `pip install your-package`, users can run `your-package` directly.
+# 
+# Format: "command-name" = "module.path:function"
+# The function must exist and take no required arguments.
+# Example: After install, `{{ project_name }}` runs the main() function.
 {%- for name, entry in scripts.items() %}
 {{ name }} = "{{ entry }}"
 {%- endfor %}
 
 [build-system]
+# 🎓 WHY BUILD SYSTEM:
+# Tells pip/uv HOW to build your package (create .whl files).
+# Different backends have different features:
+# - setuptools: Old standard, feature-rich but complex
+# - hatch: Modern, good for applications
+# - uv: Blazing fast, Rust-based (what ViperX uses by default!)
+# 
+# This section is required by PEP 517.
+# 📚 Learn more: https://peps.python.org/pep-0517/
 {%- if builder == 'hatch' %}
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+# 🎓 Hatch is a modern alternative with good defaults
 {%- else %}
 # Default: uv native build backend
 requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
+# 🎓 uv's build backend is fast and simple
 {%- endif %}
 
 {%- set ns = namespace(any_tests=use_tests) %}
@@ -64,13 +140,18 @@ build-backend = "uv_build"
 {%- endif %}
 
 {%- if ns.any_tests %}
+# 🎓 DEVELOPMENT DEPENDENCIES
+# These are NOT installed by default. Install with: `uv sync --dev`
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
-    "pytest-mock>=3.15.1",
+    "pytest>=9.0.2",  # 🎓 Testing framework
+    "pytest-mock>=3.15.1",  # 🎓 Mocking support for pytest
 ]
 
 [tool.pytest.ini_options]
+# 🎓 WHY CONFIGURE PYTEST HERE:
+# Keep all configuration in one place (pyproject.toml).
+# No need for pytest.ini or setup.cfg anymore!
 {# Collect unique test paths to avoid duplicates #}
 {%- set test_paths = [] %}
 {%- if use_tests %}
@@ -82,11 +163,15 @@ dev = [
 {%- endif %}
 {%- endfor %}
 testpaths = [
+    # 🎓 Where pytest looks for tests
 {%- for path in test_paths %}
     "{{ path }}",
 {%- endfor %}
 ]
 markers = [
+    # 🎓 Custom test markers for categorization
+    # Use: @pytest.mark.slow to mark slow tests
+    # Run: pytest -m "not slow" to skip slow tests
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 {%- endif %}

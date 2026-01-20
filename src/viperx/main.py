@@ -50,8 +50,8 @@ app = typer.Typer(
     epilog="Made with ❤️  by KpihX"
 )
 
-# Global state for verbose flag
-state = {"verbose": False}
+# Global state for verbose flag and explain mode
+state = {"verbose": False, "explain": False}
 console = Console(force_terminal=True)
 
 def version_callback(value: bool):
@@ -67,6 +67,10 @@ def cli_callback(
         callback=version_callback,
         is_eager=True,
         help="Show version and exit."
+    ),
+    explain: bool = typer.Option(
+        False, "--explain", "-e",
+        help="🎓 Educational mode: Show detailed explanations for every action"
     )
 ):
     """
@@ -77,6 +81,7 @@ def cli_callback(
     """
     # Always verbose by default for transparency
     state["verbose"] = True
+    state["explain"] = explain
         
 
 
@@ -505,6 +510,34 @@ def migrate(
     
     if not dry_run and changes:
         console.print(f"\n[green]✓[/green] Migrated to version {target}")
+
+
+@app.command()
+def learn(
+    topic: str = typer.Argument(
+        None, 
+        help="Specific topic to learn about (packaging, uv, testing, config, git, licenses, project-structure, best-practices, ml-dl)"
+    )
+):
+    """
+    📚 Show curated learning resources for Python project development.
+    
+    Use without arguments to see all available topics, or specify a topic
+    to see detailed resources for that area.
+    
+    Examples:
+        viperx learn              # Show all topics
+        viperx learn packaging    # Learn about Python packaging
+        viperx learn uv           # Learn about uv
+    """
+    from viperx.resources import display_resources, get_all_topics
+    
+    if topic and topic not in get_all_topics():
+        console.print(f"[red]Unknown topic: {topic}[/red]")
+        console.print(f"\nAvailable topics: [cyan]{', '.join(get_all_topics())}[/cyan]")
+        raise typer.Exit(1)
+    
+    display_resources(topic, console)
 
 
 if __name__ == "__main__":
