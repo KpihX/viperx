@@ -16,10 +16,13 @@ Do not consider a task "Done" until you have performed this check.
 
 After completing any code modification or feature addition, you MUST check if updates are needed for:
 
-1.  **`README.md`**:
-    - Does `CLI Usage` need a new flag?
-    - Is the file structure diagram still accurate?
-    - Are the installation instructions still valid?
+4.  **`pyproject.toml`**:
+    - Did you add a dependency? (e.g., `typer`, `rich`).
+    - Did you change build scripts?
+
+5. **`docs/` & Meta-Files**:
+   - **CRITICAL**: Before any release, verify `docs/changelog.md` and other documentation files match the new version.
+   - Users rely on the site; it must not lag behind the code.
 
 2.  **`CHANGELOG.md`**:
     - Add a new entry under `[Unreleased]` or bump the version.
@@ -46,7 +49,10 @@ After completing any code modification or feature addition, you MUST check if up
 
 **After verifying the code and updating documentation (The "Update Loop"), you MUST execute the following Release Cycle:**
 
-1.  **Git Sync**:
+1.  **Meta-Sync Check**:
+    - Confirm `docs/` site files match `CHANGELOG.md` and current features.
+
+2.  **Git Sync**:
     ```bash
     git add .
     git commit -m "feat: <Summary of changes>"
