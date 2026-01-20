@@ -1,39 +1,57 @@
 # Installation
 
-## Requirements
+> **Time to install**: 30 seconds
 
-- Python 3.11+
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+---
 
-## Recommended: pipx (Isolated Global Tool)
+## The Problem
+
+You want ViperX available globally, without polluting your project's dependencies.
+
+---
+
+## The Solution
+
+### Option 1: pipx (Recommended)
 
 ```bash
 pipx install viperx
 ```
 
-This installs ViperX in an isolated environment, available globally.
+**Why pipx?**
+- Isolated environment (no conflicts)
+- Available everywhere
+- Easy to upgrade
 
-## Alternative: uv tool
+### Option 2: uv tool
 
 ```bash
 uv tool install viperx
 ```
 
-## Development Installation
+**Why uv?**
+- If you're already using uv (you should!)
+- Same isolation benefits
 
-```bash
-git clone https://github.com/KpihX/viperx.git
-cd viperx
-uv sync
-uv run viperx --help
-```
+---
 
-## Verify Installation
+## Verify It Works
 
 ```bash
 viperx --version
-# ViperX CLI Version: 1.0.2
+# ViperX CLI Version: 1.1.0
 ```
+
+---
+
+## Generate Your First Config
+
+```bash
+viperx config get
+# Creates viperx.yaml template
+```
+
+---
 
 ## Updating
 
@@ -44,3 +62,20 @@ pipx upgrade viperx
 # uv
 uv tool upgrade viperx
 ```
+
+---
+
+## For Contributors
+
+```bash
+git clone https://github.com/KpihX/viperx.git
+cd viperx
+uv sync
+uv run viperx --help
+```
+
+---
+
+## Next Steps
+
+→ [Quick Start](quickstart.md) - Real-world examples

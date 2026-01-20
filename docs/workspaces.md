@@ -1,129 +1,163 @@
 # Workspaces
 
-ViperX supports monorepo-style workspaces with multiple packages.
+> **The Problem**: You have multiple related packages (API, ML model, worker).  
+> **The Solution**: One project, multiple packages, shared config.
 
-## What is a Workspace?
+---
 
-A workspace is a single project containing multiple sub-packages, each with its own:
-- Source code in `src/<package>/`
-- Entry point (CLI command)
-- Optional `.env`, `config.py`, `tests/`
+## When Do You Need a Workspace?
+
+| Situation                 | Workspace? |
+| ------------------------- | ---------- |
+| Single library or app     | ❌ No       |
+| ML model + API together   | ✅ Yes      |
+| Monorepo with shared code | ✅ Yes      |
+| Microservices in one repo | ✅ Yes      |
+
+---
 
 ## Creating a Workspace
 
-### Option 1: Declarative (viperx.yaml)
+### Step 1: Define Your Structure
 
 ```yaml
+# viperx.yaml
 project:
-  name: "my-platform"
+  name: "ml-platform"
+  description: "ML Platform with API"
 
 workspace:
   packages:
     - name: "api"
       type: "classic"
-    - name: "ml-core"
+      description: "REST API"
+      
+    - name: "model"
       type: "ml"
       use_env: true
+      description: "ML prediction model"
+      
     - name: "worker"
       type: "classic"
+      description: "Background jobs"
 ```
+
+### Step 2: Apply
 
 ```bash
 viperx config -c viperx.yaml
 ```
 
-### Option 2: Imperative (Step by Step)
-
-```bash
-# Create root project
-viperx init -n my-platform
-
-# Add packages
-cd my_platform
-viperx package add -n api -t classic
-viperx package add -n ml-core -t ml --env
-viperx package add -n worker -t classic
-```
-
-## Resulting Structure
+### Step 3: What You Get
 
 ```
-my_platform/
-├── pyproject.toml          # Root with all scripts
-├── viperx.yaml
-├── notebooks/              # If any package is ML/DL
+ml_platform/
+├── pyproject.toml        # All packages registered
+├── viperx.yaml           # Your config
+├── notebooks/            # From ML package
+├── data/                 # Shared data folder
 └── src/
-    ├── my_platform/        # Root package
-    │   ├── main.py
-    │   └── ...
+    ├── ml_platform/      # Root package
+    │   └── main.py
     ├── api/
+    │   └── main.py
+    ├── model/
     │   ├── main.py
-    │   └── ...
-    ├── ml_core/
-    │   ├── main.py
-    │   ├── .env            # Only here (use_env: true)
-    │   └── ...
+    │   └── .env          # Only here (isolated!)
     └── worker/
-        ├── main.py
-        └── ...
+        └── main.py
 ```
 
-## Running Packages
+---
+
+## Running Your Packages
 
 Each package gets its own CLI command:
 
 ```bash
 uv sync
-uv run my-platform    # Root
-uv run api            # API package
-uv run ml-core        # ML package
-uv run worker         # Worker package
+
+# Run any package
+uv run ml-platform    # Root
+uv run api            # API service
+uv run model          # ML model
+uv run worker         # Worker
 ```
 
-## Package Isolation
+---
 
-### Strict `.env` Isolation
+## Why `.env` is Isolated
 
-`.env` files are always in `src/<package>/`, never at root.
+**The Problem**: In a multi-package setup, you might have:
+- `model/` needs OPENAI_KEY
+- `api/` needs DB_PASSWORD
+- `worker/` needs REDIS_URL
+
+**If `.env` was at root**: All packages see all secrets (security risk).
+
+**With ViperX**: Each `.env` lives in its own package:
 
 ```
 src/
-├── api/              # No .env (use_env: false)
-└── ml_core/
-    └── .env          # Only here (use_env: true)
+├── api/.env         # DB_PASSWORD only
+├── model/.env       # OPENAI_KEY only
+└── worker/.env      # REDIS_URL only
 ```
 
-### Config Inheritance
+---
 
-Packages inherit from root `settings` unless overridden:
+## Package Inheritance
+
+Packages inherit settings from root unless overridden:
 
 ```yaml
 settings:
-  use_config: true    # Default for all
-  use_tests: true
+  use_tests: true      # Default for all
 
 workspace:
   packages:
     - name: "api"
+      # Inherits use_tests: true
+      
+    - name: "scripts"
       use_tests: false  # Override: no tests
 ```
 
-## Managing Packages
+---
 
-### Add
+## Adding Packages Later
 
-```bash
-viperx package add -n new-service -t classic
-```
-
-### Delete
+Project evolves? Add packages anytime:
 
 ```bash
-viperx package delete -n old-service
+viperx package add -n analytics -t ml --env
 ```
 
-### Update Dependencies
+Or update `viperx.yaml` and re-apply:
+
+```yaml
+workspace:
+  packages:
+    - name: "api"
+    - name: "model"
+    - name: "analytics"    # New!
+```
 
 ```bash
-viperx package update -n api
+viperx config -c viperx.yaml
+# Only creates analytics/, doesn't touch others
 ```
+
+---
+
+## Removing Packages
+
+**ViperX won't delete your code.** If you remove a package from yaml:
+
+```bash
+viperx config -c viperx.yaml
+# Warning: src/old-package/ exists but is not in config
+# You need to delete it manually if you want
+```
+
+This is **Safe Mode** in action.

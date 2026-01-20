@@ -1,45 +1,72 @@
 # 🐍 ViperX
 
-> **Professional Python Project Initializer**  
-> *The modern, snake-fast way to bootstrap Python projects.*
+> **Stop wasting time on project setup.**  
+> **Start coding in 30 seconds.**
 
-**ViperX** is a CLI tool designed to generate production-ready Python projects instantly. It leverages **[uv](https://github.com/astral-sh/uv)** for blazing fast dependency management and offers specialized templates for **Machine Learning** (`ml`) and **Deep Learning** (`dl`).
+## The Problem
 
-## ✨ Features
+Every time you start a new Python project, you face the same tedious questions:
 
-- **Blazing Fast**: Built on top of `uv`
-- **Pre-configured**: `pyproject.toml`, proper `src` layout, `ruff` ready
-- **ML/DL First**: Templates with `torch`, `tensorflow`, `kagglehub`
-- **Smart Caching**: Auto-downloads and caches datasets
-- **Strict Isolation**: `.env` files isolated in `src/<pkg>/`
-- **Config-in-Package**: Works on Local, Colab, and Kaggle
-- **Safe Mode**: Never overwrites or deletes files automatically
+- *"How do I structure this properly?"*
+- *"What goes in `pyproject.toml`?"*
+- *"Where should I put my config files so Colab can find them?"*
+- *"Do I need `.env` at root or in the package?"*
 
-## Quick Example
+**ViperX solves this.** One command, one config file, done.
 
-```bash
-# Classic Package
-viperx init -n my-lib
+---
 
-# Machine Learning Project
-viperx init -n churn-prediction -t ml --env
+## The Solution: `viperx.yaml`
 
-# Deep Learning (PyTorch)
-viperx init -n deep-vision -t dl -f pytorch
+Instead of memorizing CLI flags, just describe what you want:
+
+```yaml
+# viperx.yaml
+project:
+  name: "churn-predictor"
+  description: "Customer churn prediction model"
+
+settings:
+  type: "ml"          # ML project with notebooks
+  use_env: true       # I need secrets
 ```
 
-## Installation
+Then run:
 
 ```bash
-# Recommended
-pipx install viperx
-
-# Alternative
-uv tool install viperx
+viperx config get     # Generate template (optional)
+viperx config -c viperx.yaml
 ```
 
-## Next Steps
+**That's it.** You get:
 
-- [Installation](installation.md) - Detailed installation guide
-- [Quick Start](quickstart.md) - 5-minute tutorial
-- [CLI Reference](cli-reference.md) - All commands and options
+```
+churn_predictor/
+├── pyproject.toml    # Ready to go
+├── notebooks/        # Jupyter ready
+├── data/             # For datasets
+└── src/churn_predictor/
+    ├── main.py       # Entry point
+    ├── config.py     # Works on Colab!
+    └── .env          # Isolated, safe
+```
+
+---
+
+## Why ViperX?
+
+| Problem                       | ViperX Solution                                  |
+| ----------------------------- | ------------------------------------------------ |
+| "My config breaks on Colab"   | Config lives **inside** your package             |
+| ".env leaks between projects" | `.env` is **isolated** in `src/pkg/`             |
+| "I forgot what flags I used"  | `viperx.yaml` is your **single source of truth** |
+| "Updating breaks my project"  | **Safe Mode**: ViperX never deletes files        |
+
+---
+
+## Quick Links
+
+- [Installation](installation.md) - Get started in 2 minutes
+- [Quick Start](quickstart.md) - Real-world examples
+- [CLI Reference](cli-reference.md) - All commands
+- [Configuration](configuration.md) - `viperx.yaml` deep dive

@@ -1,122 +1,136 @@
 # CLI Reference
 
-## Commands Overview
+> **For those who prefer the command line.**
 
-| Command                 | Description                                   |
-| ----------------------- | --------------------------------------------- |
-| `viperx init`           | Initialize a new project (alias for `config`) |
-| `viperx config`         | Apply declarative configuration               |
-| `viperx config get`     | Generate template `viperx.yaml`               |
-| `viperx package add`    | Add package to workspace                      |
-| `viperx package delete` | Remove package from workspace                 |
-| `viperx package update` | Update package dependencies                   |
+!!! tip "We recommend `viperx.yaml`"
+    While CLI flags work great for quick projects, `viperx.yaml` is better for:
+    
+    - Reproducibility
+    - Team sharing
+    - Complex projects
 
 ---
 
-## `viperx init` / `viperx config`
+## Main Command: `viperx config`
 
-Create or update a project.
+This is the primary command. It can:
+- Create new projects
+- Update existing projects
+- Apply config files
 
 ```bash
-viperx init [OPTIONS]
-viperx config [OPTIONS]
+# Declarative (recommended)
+viperx config -c viperx.yaml
+
+# Imperative (quick & dirty)
+viperx config -n my-project -t ml --env
 ```
 
-### Options
+### All Options
 
-| Flag                | Description                           | Default    |
-| ------------------- | ------------------------------------- | ---------- |
-| `-n, --name`        | Project name **(Required unless -c)** | -          |
-| `-t, --type`        | `classic`, `ml`, `dl`                 | `classic`  |
-| `-d, --description` | Project description                   | -          |
-| `-a, --author`      | Author name                           | git user   |
-| `-l, --license`     | `MIT`, `Apache-2.0`, `GPLv3`          | `MIT`      |
-| `-b, --builder`     | `uv`, `hatch`                         | `uv`       |
-| `-f, --framework`   | `pytorch`, `tensorflow` (DL only)     | `pytorch`  |
-| `--env / --no-env`  | Generate `.env` file                  | `--no-env` |
-| `-c, --config`      | Path to `viperx.yaml`                 | -          |
+| Flag            | Short | What it does           |
+| --------------- | ----- | ---------------------- |
+| `--name`        | `-n`  | Project name           |
+| `--type`        | `-t`  | classic, ml, dl        |
+| `--description` | `-d`  | Project description    |
+| `--author`      | `-a`  | Author name            |
+| `--license`     | `-l`  | MIT, Apache-2.0, GPLv3 |
+| `--builder`     | `-b`  | uv, hatch              |
+| `--framework`   | `-f`  | pytorch, tensorflow    |
+| `--env`         |       | Generate `.env`        |
+| `--no-env`      |       | No `.env` (default)    |
+| `--config`      | `-c`  | Path to `viperx.yaml`  |
 
-### Examples
+---
+
+## Alias: `viperx init`
+
+Same as `viperx config`. Use whichever feels natural:
 
 ```bash
-# Classic library
-viperx init -n my-lib
-
-# ML project with .env
-viperx init -n churn-model -t ml --env
-
-# DL project with TensorFlow
-viperx init -n vision-ai -t dl -f tensorflow
-
-# From config file
-viperx config -c viperx.yaml
+viperx init -n my-project
+# Same as
+viperx config -n my-project
 ```
 
 ---
 
 ## `viperx config get`
 
-Generate a template `viperx.yaml` in current directory.
+Generates a template `viperx.yaml` in current directory.
 
 ```bash
 viperx config get
+# Creates viperx.yaml with all options commented
 ```
 
 ---
 
-## `viperx package add`
+## Package Management
 
-Add a new package to your workspace.
+For workspaces with multiple packages.
+
+### Add a Package
 
 ```bash
-viperx package add [OPTIONS]
+viperx package add -n worker -t classic
+viperx package add -n ml-core -t ml --env
 ```
 
-### Options
-
-| Flag                     | Description                 | Default    |
-| ------------------------ | --------------------------- | ---------- |
-| `-n, --name`             | Package name **(Required)** | -          |
-| `-t, --type`             | `classic`, `ml`, `dl`       | `classic`  |
-| `--readme / --no-readme` | Generate local README       | `--readme` |
-| `--env / --no-env`       | Generate `.env`             | `--no-env` |
-
-### Example
+### Remove a Package
 
 ```bash
-viperx package add -n worker-api -t classic --no-readme
-```
-
----
-
-## `viperx package delete`
-
-Remove a package from workspace.
-
-```bash
-viperx package delete -n <package-name>
+viperx package delete -n old-service
 ```
 
 !!! warning
-    This permanently deletes the package folder.
+    This actually deletes the folder. Use with care.
 
----
-
-## `viperx package update`
-
-Update package dependencies.
+### Update Dependencies
 
 ```bash
-viperx package update -n <package-name>
+viperx package update -n worker
+# Runs: uv lock --upgrade
 ```
-
-Runs `uv lock --upgrade` for the specified package.
 
 ---
 
-## Global Options
+## Migration
 
-| Flag            | Description  |
-| --------------- | ------------ |
-| `-v, --version` | Show version |
-| `--help`        | Show help    |
+Upgrade existing projects to newer ViperX versions.
+
+```bash
+# Preview changes
+viperx migrate --dry-run
+
+# Apply migration
+viperx migrate
+```
+
+---
+
+## Examples by Use Case
+
+### "I need a quick experiment"
+
+```bash
+viperx init -n experiment-42 -t ml --env
+cd experiment_42
+uv sync
+jupyter lab
+```
+
+### "I'm starting a serious project"
+
+```bash
+viperx config get
+# Edit viperx.yaml carefully
+viperx config -c viperx.yaml
+```
+
+### "I'm adding a service to my platform"
+
+```bash
+cd my_platform
+viperx package add -n new-api -t classic
+```
