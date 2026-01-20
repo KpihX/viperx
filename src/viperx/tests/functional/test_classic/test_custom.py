@@ -42,7 +42,7 @@ def test_classic_custom(runner, temp_workspace, mock_git_config, mock_builder_ch
     
     pkg_dir = project_root / "src" / "custom_proj"
     assert pkg_dir.exists()
-    assert (pkg_dir / ".env").exists()
+    assert (project_root / ".env").exists()
     assert not (pkg_dir / "config.py").exists()
     assert not (pkg_dir / "tests").exists()
     

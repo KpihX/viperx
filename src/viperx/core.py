@@ -195,9 +195,10 @@ class ProjectGenerator:
             # Standard Layout: root / src / package_name
             pkg_root = root / SRC_DIR / self.project_name
             
-        # Notebooks for ML/DL (Only for Root Project usually)
+        # Notebooks & Data for ML/DL (Only for Root Project usually)
         if not is_subpackage and self.type in [TYPE_ML, TYPE_DL]:
             (root / NOTEBOOKS_DIR).mkdir(exist_ok=True)
+            (root / "data").mkdir(exist_ok=True)
             self.log("Created notebooks directory")
             
         # Tests
@@ -313,13 +314,15 @@ class ProjectGenerator:
              self._render("data_loader.py.j2", pkg_root / "data_loader.py", context)
              self.log("Generated wrappers: Base_Kaggle.ipynb, Base_General.ipynb, data_loader.py")
              
-        # .env (Strict Isolation: In pkg_root)
+        # .env (Root for Project, PkgRoot for Subpackage)
+        env_target = pkg_root if is_subpackage else root
+        
         if self.use_env:
-            with open(pkg_root / ".env", "w") as f:
+            with open(env_target / ".env", "w") as f:
                 f.write("# Environment Variables (Isolated)\n")
-            with open(pkg_root / ".env.example", "w") as f:
+            with open(env_target / ".env.example", "w") as f:
                 f.write("# Environment Variables Example\n")
-            self.log(f"Created .env and .env.example in {pkg_root.relative_to(root)}")
+            self.log(f"Created .env and .env.example in {env_target.relative_to(root) if env_target != root else '.'}")
                 
         # .gitignore
         # Only for Root
