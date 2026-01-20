@@ -48,12 +48,8 @@ def version_callback(value: bool):
 @app.callback(invoke_without_command=True)
 def cli_callback(
     ctx: typer.Context,
-    verbose: bool = typer.Option(
-        False, "-v", "--verbose", 
-        help="Enable verbose logging."
-    ),
     version: bool = typer.Option(
-        None, "--version", "-V",
+        None, "--version", "-v", "-V",
         callback=version_callback,
         is_eager=True,
         help="Show version and exit."
@@ -65,9 +61,8 @@ def cli_callback(
     Automates the creation of professional-grade Python projects using `uv`.
     Supports Standard Libraries, Machine Learning, and Deep Learning templates.
     """
-    if verbose:
-        state["verbose"] = True
-        console.print("[dim]Verbose mode enabled[/dim]")
+    # Always verbose by default for transparency
+    state["verbose"] = True
         
 
 
