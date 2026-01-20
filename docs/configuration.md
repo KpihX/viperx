@@ -126,6 +126,18 @@ viperx config -c viperx.yaml
 
 **Philosophy**: ViperX will never destroy your work.
 
+### Conflict Transparency
+
+If your `viperx.yaml` disagrees with reality (e.g., config says `use_env: false` but `.env` exists), ViperX will:
+1. **NOT** delete the file
+2. **Annotate** the conflict in `viperx.yaml`:
+
+```yaml
+use_env: false  # NOT_APPLIED: file exists in codebase
+```
+
+This ensures you have **total transparency** on the state of your project.
+
 ---
 
 ## Generating a Template

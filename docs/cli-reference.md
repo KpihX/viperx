@@ -66,6 +66,20 @@ viperx config get
 
 ---
 
+## `config update` - Rebuild from Reality
+
+```bash
+viperx config update
+```
+
+Scans your existing codebase and updates `viperx.yaml`:
+- Detects packages in `src/`
+- Detects `use_config`, `use_env`, `use_tests` from actual files
+- Adds inline annotations (`# NOT_APPLIED`) for conflicts
+- **Safe**: Never deletes lines, only adds or updates
+
+---
+
 ## Package Management
 
 For workspaces with multiple packages.
