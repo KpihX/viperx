@@ -82,3 +82,35 @@ def test_choice_loader_precedence(tmp_path):
     env = Environment(loader=loader)
     tmpl = env.get_template("test.j2")
     assert tmpl.render() == "System"
+
+def test_partial_override(tmp_path):
+    """Verify that we can override one template while keeping others default."""
+    fake_user_dir = tmp_path / "templates"
+    fake_user_dir.mkdir()
+    (fake_user_dir / "README.md.j2").write_text("# CUSTOM OVERRIDE")
+    
+    with patch("viperx.constants.USER_TEMPLATES_DIR", fake_user_dir):
+        # Initialize generator
+        gen = ProjectGenerator("test-partial", "", "classic", "Me", verbose=True)
+        
+        # 1. Check Override
+        readme_tmpl = gen.env.get_template("README.md.j2")
+        assert "# CUSTOM OVERRIDE" in readme_tmpl.render(project_name="X", description="D")
+        
+        # 2. Check Fallback (Internal)
+        # We assume 'pyproject.toml.j2' exists internally
+        pyproject_tmpl = gen.env.get_template("pyproject.toml.j2")
+        rendered = pyproject_tmpl.render(
+            project_name="test-partial", 
+            version="0.1.0", 
+            description="", 
+            readme_filename="README.md",
+            requires_python=">=3.8",
+            license="MIT",
+            authors=[],
+            dependencies=[],
+            dev_dependencies=[],
+            scripts={}
+        )
+        # Just check it looks like a toml file
+        assert "[project]" in rendered
