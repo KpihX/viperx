@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "0.9.84"
+version = "0.9.90"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
@@ -29,3 +29,13 @@ viperx = "viperx.main:app"
 requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]

@@ -15,13 +15,10 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 - **Dependencies**: Locking is instant.
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
 ### ⚙️ Configuration
-- **Config**: `src/proprocess/config.yaml` (Loaded automatically)
 - **Environment**: `src/proprocess/.env` (Isolated variables)
 - **Template**: `src/proprocess/.env.example` (Copy this to `.env`)
 
 The project uses a **Config-in-Package** architecture:
-1. `config.yaml` is inside the package.
-1. `config.py` loads it safely (even in production wheels).
 1. `.env` is isolated within the package source.
 1. `.env.example` serves as a template for new developers.
 
@@ -46,8 +43,6 @@ uv run python src/proprocess/main.py
 ```text
 proprocess/
 ├── __init__.py
-├── config.yaml # EDIT THIS for project settings
-├── config.py   # Code that loads the yaml above
 ├── .env        # Secrets (Ignored by git)
 ├── .env.example # Template for secrets
 ```

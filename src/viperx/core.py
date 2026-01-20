@@ -228,6 +228,7 @@ class ProjectGenerator:
             "author_email": self.author_email,
             "license": self.license,
             "project_type": self.type,
+            "builder": self.builder,
             "use_uv": self.builder == "uv",
             "use_config": self.use_config,
             "use_readme": self.use_readme,

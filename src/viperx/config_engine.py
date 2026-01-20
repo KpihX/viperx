@@ -4,7 +4,12 @@ from rich.console import Console
 from rich.panel import Panel
 
 from viperx.core import ProjectGenerator
-from viperx.constants import DEFAULT_LICENSE, DEFAULT_BUILDER, TYPE_CLASSIC, TYPE_ML, TYPE_DL, FRAMEWORK_PYTORCH
+from viperx.constants import (
+    DEFAULT_LICENSE, DEFAULT_BUILDER,
+    TYPE_CLASSIC, TYPE_ML, TYPE_DL, PROJECT_TYPES,
+    FRAMEWORK_PYTORCH, FRAMEWORK_TENSORFLOW, DL_FRAMEWORKS,
+    SUPPORTED_BUILDERS, SUPPORTED_LICENSES
+)
 
 console = Console()
 
@@ -38,6 +43,45 @@ class ConfigEngine:
             console.print("[bold red]Error:[/bold red] Config must contain 'project.name'")
             raise ValueError("Missing project.name")
             
+        return self._validate_options(data)
+
+    def _validate_options(self, data: dict) -> dict:
+        """Strictly validate configuration options."""
+        proj = data.get("project", {})
+        sets = data.get("settings", {})
+        
+        # 1. Project Options
+        if "builder" in proj:
+            b = proj["builder"]
+            if b not in SUPPORTED_BUILDERS:
+                console.print(f"[bold red]Error:[/bold red] Invalid Builder '{b}'. Supported: {SUPPORTED_BUILDERS}")
+                raise ValueError(f"Invalid Builder '{b}'")
+        
+        if "license" in proj:
+           l = proj["license"]
+           if l not in SUPPORTED_LICENSES:
+               console.print(f"[bold red]Error:[/bold red] Invalid License '{l}'. Supported: {SUPPORTED_LICENSES}")
+               raise ValueError(f"Invalid License '{l}'")
+               
+        # 2. Settings Options
+        if "type" in sets:
+            t = sets["type"]
+            if t not in PROJECT_TYPES:
+                console.print(f"[bold red]Error:[/bold red] Invalid Project Type '{t}'. Supported: {PROJECT_TYPES}")
+                raise ValueError(f"Invalid Project Type '{t}'")
+
+        if "framework" in sets and sets.get("type") == TYPE_DL:
+             f = sets["framework"]
+             if f not in DL_FRAMEWORKS:
+                 console.print(f"[bold red]Error:[/bold red] Invalid Framework '{f}'. Supported: {DL_FRAMEWORKS}")
+                 raise ValueError(f"Invalid Framework '{f}'")
+        
+        # 3. Boolean Flags (Strict Check)
+        for key in ["use_env", "use_config", "use_tests", "use_readme"]:
+            if key in sets and not isinstance(sets[key], bool):
+                 console.print(f"[bold red]Error:[/bold red] '{key}' must be 'true' or 'false' (boolean), not '{sets[key]}'")
+                 raise ValueError(f"Invalid Boolean '{key}'")
+        
         return data
 
     def apply(self):
