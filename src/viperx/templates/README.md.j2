@@ -13,35 +13,36 @@ This project was generated with [ViperX](https://github.com/kpihx/viperx), using
 Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **entire lifecycle**:
 - **Python Version**: It installs and manages the correct Python version for this project automatically.
 - **Dependencies**: Locking is instant.
-{% if project_type == 'dl' %}
+{%- if project_type == 'dl' %}
 - **Stack**: {{ framework|title }}
-{% endif %}
+{%- endif %}
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
 
-{% if has_config or use_env %}
+{%- if has_config or use_env %}
 ### ⚙️ Configuration
 
-{% if has_config %}
+{%- if has_config %}
 - **Config**: `src/{{ package_name }}/config.yaml` (Loaded automatically)
-{% endif %}
-{% if use_env %}
+{%- endif %}
+{%- if use_env %}
 - **Environment**: `src/{{ package_name }}/.env` (Isolated variables)
 - **Template**: `src/{{ package_name }}/.env.example` (Copy this to `.env`)
-{% endif %}
+{%- endif %}
 
 The project uses a **Config-in-Package** architecture:
-{% if has_config %}
+{%- if has_config %}
 1. `config.yaml` is inside the package.
 2. `config.py` loads it safely (even in production wheels).
-{% endif %}
-{% if use_env %}
+{%- endif %}
+{%- if use_env %}
 3. `.env` is isolated within the package source.
 4. `.env.example` serves as a template for new developers.
-{% endif %}
-{% endif %}
+{%- endif %}
+{%- endif %}
 
 ---
 
+{%- if not is_subpackage %}
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -58,6 +59,7 @@ cd {{ project_name }}
 # Sync dependencies (creates .venv and installs python if needed)
 uv sync
 ```
+{%- endif %}
 
 ## 🧑‍💻 Usage
 
@@ -73,7 +75,7 @@ uv run {{ project_name }}
 uv run python src/{{ package_name }}/main.py
 ```
 
-{% if project_type in ['ml', 'dl'] %}
+{%- if project_type in ['ml', 'dl'] and not is_subpackage %}
 ### For Data Scientists (Notebooks)
 
 We use `uv` to launch Jupyter, ensuring it sees the local package and config.
@@ -87,27 +89,52 @@ uv run jupyter notebook
 
 ### ☁️ Cloud (Colab / Kaggle)
 
+You can use the code and config from this repository directly in cloud environments without cloning.
+
+**Step 1: Install directly from Git**
+```python
 !pip install url_to_repo.git
 ```
 
+**Step 2: Use the unified config**
+```python
+{%- if project_type == 'classic' %}
+from {{ package_name }} import SETTINGS
+{%- else %}
 from {{ package_name }} import get_dataset_path, SETTINGS
 import kagglehub as kh
+{%- endif %}
 
 # Transparency: You can inspect what was loaded
 print(f"Loaded config for: {SETTINGS.get('project_name', 'Unknown')}")
 
-{% if project_type != 'classic' %}
+{%- if project_type != 'classic' %}
 # Download datasets defined in config.yaml
 # The key 'titanic' maps to 'heptapod/titanic' in the yaml
 if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
     path = kh.dataset_download(SETTINGS['datasets']['titanic'])
-{% endif %}
+{%- endif %}
 ```
-{% endif %}
+{%- endif %}
 
 ## 🔧 Internal Structure
 
 ```text
+{%- if is_subpackage %}
+{{ package_name }}/
+├── __init__.py
+{%- if has_config %}
+├── config.yaml # EDIT THIS for project settings
+├── config.py   # Code that loads the yaml above
+{%- endif %}
+{%- if use_env %}
+├── .env        # Secrets (Ignored by git)
+├── .env.example # Template for secrets
+{%- endif %}
+{%- if use_tests %}
+└── tests/      # Unit tests
+{%- endif %}
+{%- else %}
 {{ project_name }}/
 ├── pyproject.toml      # The Single Source of Truth (Dependencies, Metadata)
 ├── uv.lock             # Exact versions lockfile
@@ -147,7 +174,5 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 {%- if project_type in ['ml', 'dl'] %}
 └── notebooks/          # Experimentation (Jupyter)
 {%- endif %}
+{%- endif %}
 ```
-
-
-
