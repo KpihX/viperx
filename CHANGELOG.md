@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-01-20
+### Changed
+- **Test Structure Reorganization**: Cleaner 4-directory layout:
+  - `unit/` - Validation (5 tests)
+  - `functional/` - CLI, licenses, project types, builders, content (16 tests)
+  - `scenarios/` - Classic, workspace, updates, edge cases (11 tests)
+  - `integration/` - E2E lifecycle (2 tests)
+- Merged redundant test files for maintainability.
+
 ## [1.0.0] - 2026-01-20 🎉
 ### Added
 - **34 Comprehensive Tests**: Full coverage of all usage scenarios.
