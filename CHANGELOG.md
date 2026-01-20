@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-01-20
+### Added
+- **`viperx init` Alias**: `viperx init` now works as an alias for `viperx config` (better UX).
+- **Template Documentation**: Added `TEMPLATES.md` for contributors explaining all Jinja2 variables.
+
 ## [1.0.1] - 2026-01-20
 ### Changed
 - **Test Structure Reorganization**: Cleaner 4-directory layout:

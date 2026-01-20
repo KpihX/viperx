@@ -74,6 +74,9 @@ config_app = typer.Typer(
 )
 app.add_typer(config_app, name="config")
 
+# Alias: `viperx init` -> `viperx config` (UX improvement)
+app.add_typer(config_app, name="init", help="Alias for 'config'. Initialize a new project.")
+
 
 @config_app.callback(invoke_without_command=True)
 def config_main(
