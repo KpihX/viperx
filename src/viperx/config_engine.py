@@ -239,7 +239,7 @@ class ConfigEngine:
             import shutil
             shutil.copy2(self.config_path, system_config_path)
             
-        is_fresh_init = any("Project Scaffolding" in item for item in report.added)
+        is_fresh_init = any("Scaffolding" in item for item in report.added)
         if (report.added or report.updated) and not is_fresh_init:
              report.manual_checks.append("Review README.md for any necessary updates (e.g. Project Name, Description).")
 
