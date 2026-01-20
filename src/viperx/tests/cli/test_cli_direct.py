@@ -21,6 +21,13 @@ def test_cli_direct_classic(runner, temp_workspace, mock_git_config, mock_builde
     # Expect NO .env
     assert not (root / ".env").exists()
     
+    # --- DEEP VERIFICATION: LOGS ---
+    # Actual output: "✓ Project cli_classic created in cli_classic/ successfully!"
+    assert "Project cli_classic created" in result.stdout
+    assert "successfully!" in result.stdout
+    # Verify no config commands leaked into imperative mode logs
+    assert "Syncing viperx.yaml" not in result.stdout
+    
 def test_cli_direct_ml(runner, temp_workspace, mock_git_config, mock_builder_check):
     """
     Test Creating ML Project via CLI Flags.
@@ -39,10 +46,12 @@ def test_cli_direct_ml(runner, temp_workspace, mock_git_config, mock_builder_che
     assert (root / "notebooks").exists()
     assert (root / "data").exists() # Should pass now
     
-    # Check .env (Classic/ML root behavior)
-    # import os
-    # print(f"\\nDEBUG: {root} contents:")
-    # for r, d, f in os.walk(root):
-    #     print(r, f)
-        
-    assert (root / ".env").exists()
+    # Check .env (Classic/ML root behavior? NO, strict isolation -> src/pkg)
+    pkg_dir = root / "src" / "cli_ml"
+    assert (pkg_dir / ".env").exists()
+    
+def test_cli_direct_logs(runner, temp_workspace, mock_git_config, mock_builder_check):
+   pass # Just use the existing tests to check logs
+   
+# Note: merging log checks into existing tests
+

@@ -67,7 +67,14 @@ def test_classic_defaults(runner, temp_workspace, mock_git_config):
     license_text = (project_root / "LICENSE").read_text()
     assert "MIT License" in license_text
     
-    # Check Tests Default (True)
+    # Check tests default (True)
     tests_dir = project_root / "src" / "classic_default" / "tests"
     assert tests_dir.exists()
     assert (tests_dir / "__init__.py").exists()
+
+    # --- DEEP VERIFICATION: LOGS ---
+    # Actual: "✓ Project classic-default created in classic_default/ successfully!"
+    assert "Project classic-default created" in result.stdout
+    assert "Hydrating existing directory" not in result.stdout
+    assert "Updated dependencies" not in result.stdout
+

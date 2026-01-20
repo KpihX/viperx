@@ -109,10 +109,13 @@ For type `ml` or `dl`, you get:
 deep-vision/
 ├── pyproject.toml
 ├── notebooks/
-│   └── Base.ipynb      # Pre-configured notebook (Colab/Kaggle ready)
+│   └── Base.ipynb
 └── src/
     └── deep_vision/
-        ├── ...         # Same robust package structure
+        ├── main.py
+        ├── config.py    # <--- ISOLATED
+        ├── .env         # <--- ISOLATED
+        └── ...
 ```
 
 ## 💻 CLI Usage

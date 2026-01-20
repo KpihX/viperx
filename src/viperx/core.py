@@ -314,15 +314,13 @@ class ProjectGenerator:
              self._render("data_loader.py.j2", pkg_root / "data_loader.py", context)
              self.log("Generated wrappers: Base_Kaggle.ipynb, Base_General.ipynb, data_loader.py")
              
-        # .env (Root for Project, PkgRoot for Subpackage)
-        env_target = pkg_root if is_subpackage else root
-        
+        # .env (Strict Isolation: In pkg_root)
         if self.use_env:
-            with open(env_target / ".env", "w") as f:
+            with open(pkg_root / ".env", "w") as f:
                 f.write("# Environment Variables (Isolated)\n")
-            with open(env_target / ".env.example", "w") as f:
+            with open(pkg_root / ".env.example", "w") as f:
                 f.write("# Environment Variables Example\n")
-            self.log(f"Created .env and .env.example in {env_target.relative_to(root) if env_target != root else '.'}")
+            self.log(f"Created .env and .env.example in {pkg_root.relative_to(root)}")
                 
         # .gitignore
         # Only for Root

@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "0.9.95"
+version = "0.9.99"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
@@ -32,11 +32,29 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
     "pytest-mock>=3.15.1",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["src/viperx/tests"]
+addopts = "--cov=src/viperx --cov-report=term-missing"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.coverage.run]
+omit = [
+    "src/viperx/tests/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
 ]
