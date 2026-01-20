@@ -260,8 +260,16 @@ class ConfigEngine:
                         # Create config.py and config.yaml
                         yaml_path = path_check.parent / "config.yaml"
                         with open(path_check, "w") as f:
-                            f.write("import yaml\nfrom pathlib import Path\ndef get_config():\n    return {}\n")
+                            f.write("import yaml\nfrom pathlib import Path\n\nSETTINGS = {}\n\ndef get_config():\n    return SETTINGS\n")
                         with open(yaml_path, "w") as f: f.write("app:\n  name: 'app'\n")
+                        
+                        # Fix __init__.py
+                        init_path = path_check.parent / "__init__.py"
+                        if init_path.exists():
+                             with open(init_path, "r") as f: c = f.read()
+                             if "from .config import" not in c:
+                                 with open(init_path, "w") as f:
+                                     f.write("from .config import SETTINGS, get_config\n" + c)
                     elif feature_name == "tests":
                         # Create tests directory and dummy
                         path_check.mkdir(parents=True, exist_ok=True)

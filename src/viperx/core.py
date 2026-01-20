@@ -242,7 +242,13 @@ class ProjectGenerator:
         
         # pyproject.toml (Overwrite uv's basic one to add our specific deps)
         # Even subpackages need this if they are Workspace Members (which they are in our model)
-        self._render("pyproject.toml.j2", root / "pyproject.toml", context)
+        if not is_subpackage:
+            self._render("pyproject.toml.j2", root / "pyproject.toml", context)
+        elif (root / "pyproject.toml").exists():
+            # User Requested: No pyproject.toml in subpackages.
+            # If uv generated one (which it does), remove it.
+            # Use Case: Pure "Mono-repo" module structure.
+            (root / "pyproject.toml").unlink()
         
         # Determine Package Root
         if is_subpackage:

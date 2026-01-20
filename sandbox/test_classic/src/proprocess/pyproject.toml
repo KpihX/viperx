@@ -1,0 +1,25 @@
+[project]
+name = "proprocess"
+version = "0.1.0"
+description = "proprocess utilities"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Ivann KAMDEM", email = "kapoivha@gmail.com" }
+]
+license = { text = "MIT" }
+dependencies = [
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+test-classic = "test_classic.main:main"
+preprocess = "preprocess.main:main"
+proprocess = "proprocess.main:main"
+
+[build-system]
+# Default: uv native build backend
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
