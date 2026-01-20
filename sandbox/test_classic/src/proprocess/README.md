@@ -13,44 +13,16 @@ This project was generated with [ViperX](https://github.com/kpihx/viperx), using
 Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **entire lifecycle**:
 - **Python Version**: It installs and manages the correct Python version for this project automatically.
 - **Dependencies**: Locking is instant.
-
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
-
-
 ### ⚙️ Configuration
-
-
-
 - **Environment**: `src/proprocess/.env` (Isolated variables)
 - **Template**: `src/proprocess/.env.example` (Copy this to `.env`)
 
-
 The project uses a **Config-in-Package** architecture:
-
-
 3. `.env` is isolated within the package source.
 4. `.env.example` serves as a template for new developers.
 
-
-
 ---
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-You only need **[uv](https://docs.astral.sh/uv/)**.
-No need to install Python or create venvs manually.
-
-### Installation
-
-```bash
-# Ensure you are in the project directory
-cd proprocess
-
-# Sync dependencies (creates .venv and installs python if needed)
-uv sync
-```
 
 ## 🧑‍💻 Usage
 
@@ -66,20 +38,11 @@ uv run proprocess
 uv run python src/proprocess/main.py
 ```
 
-
-
 ## 🔧 Internal Structure
 
 ```text
 proprocess/
-├── pyproject.toml      # The Single Source of Truth (Dependencies, Metadata)
-├── uv.lock             # Exact versions lockfile
-├── .python-version     # Pinned Python version
-├── src/
-│   └── proprocess/
-│       ├── __init__.py
-│       ├── .env        # Secrets (Ignored by git)
-│       ├── .env.example # Template for secrets
+├── __init__.py
+├── .env        # Secrets (Ignored by git)
+├── .env.example # Template for secrets
 ```
-
-

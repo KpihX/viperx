@@ -13,27 +13,15 @@ This project was generated with [ViperX](https://github.com/kpihx/viperx), using
 Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **entire lifecycle**:
 - **Python Version**: It installs and manages the correct Python version for this project automatically.
 - **Dependencies**: Locking is instant.
-
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
-
-
 ### ⚙️ Configuration
-
-
 - **Config**: `src/test_classic/config.yaml` (Loaded automatically)
 
-
-
 The project uses a **Config-in-Package** architecture:
-
 1. `config.yaml` is inside the package.
 2. `config.py` loads it safely (even in production wheels).
 
-
-
-
 ---
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -65,8 +53,6 @@ uv run test-classic
 uv run python src/test_classic/main.py
 ```
 
-
-
 ## 🔧 Internal Structure
 
 ```text
@@ -90,5 +76,3 @@ test-classic/
 │       ├── .env        # Secrets (Ignored by git)
 │       ├── .env.example # Template for secrets
 ```
-
-
