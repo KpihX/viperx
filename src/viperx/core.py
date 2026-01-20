@@ -117,27 +117,10 @@ class ProjectGenerator:
         if self.verbose:
             console.print(f"  [{style}]{message}[/{style}]")
 
-    def generate(self, target_dir: Optional[Path] = None):
-        """Main generation flow using uv init."""
-        if target_dir is None:
-            target_dir = Path.cwd()
-
-        project_dir = target_dir / self.raw_name
-        
-        if project_dir.exists():
-            console.print(f"[bold red]Error:[/bold red] Directory {project_dir} already exists.")
-            return
-
-        console.print(f"[bold green]Creating project {self.raw_name} ({self.type})...[/bold green]")
-        
-        self.log(f"Target directory: {project_dir}")
-        self.log(f"System Python: {self.system_python_version}")
-        self.log(f"Project Python: {self.python_version}")
-
-
     def generate(self, target_dir: Path, is_subpackage: bool = False):
         """Main generation flow using uv init."""
-        project_dir = target_dir / self.raw_name
+        # STRICT DIRECTORY NAMING: Always use sanitized name
+        project_dir = target_dir / self.project_name
         
         # 1. Scaffolding with uv init
         try:
