@@ -90,12 +90,8 @@ uv run jupyter notebook
 !pip install url_to_repo.git
 ```
 
-**Step 2: Use the unified config**
-from {{ package_name }} import SETTINGS
-{% else %}
 from {{ package_name }} import get_dataset_path, SETTINGS
 import kagglehub as kh
-{% endif %}
 
 # Transparency: You can inspect what was loaded
 print(f"Loaded config for: {SETTINGS.get('project_name', 'Unknown')}")
