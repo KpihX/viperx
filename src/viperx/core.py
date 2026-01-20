@@ -235,6 +235,7 @@ class ProjectGenerator:
             "use_env": self.use_env,
             "framework": self.framework,
             "scripts": self.scripts,
+            "is_subpackage": is_subpackage,
         }
         # Merge dependency context overrides
         context.update(self.dependency_context)

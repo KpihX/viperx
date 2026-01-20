@@ -1,6 +1,6 @@
-# test-classic
+# proprocess
 
-Classic project
+proprocess utilities
 
 ---
 
@@ -20,15 +20,16 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 ### ⚙️ Configuration
 
 
-- **Config**: `src/test_classic/config.yaml` (Loaded automatically)
 
+- **Environment**: `src/proprocess/.env` (Isolated variables)
+- **Template**: `src/proprocess/.env.example` (Copy this to `.env`)
 
 
 The project uses a **Config-in-Package** architecture:
 
-1. `config.yaml` is inside the package.
-2. `config.py` loads it safely (even in production wheels).
 
+3. `.env` is isolated within the package source.
+4. `.env.example` serves as a template for new developers.
 
 
 
@@ -45,7 +46,7 @@ No need to install Python or create venvs manually.
 
 ```bash
 # Ensure you are in the project directory
-cd test-classic
+cd proprocess
 
 # Sync dependencies (creates .venv and installs python if needed)
 uv sync
@@ -59,10 +60,10 @@ To run the package entry point or scripts:
 
 ```bash
 # Run the main package
-uv run test-classic
+uv run proprocess
 
 # Or run a specific script
-uv run python src/test_classic/main.py
+uv run python src/proprocess/main.py
 ```
 
 
@@ -70,21 +71,11 @@ uv run python src/test_classic/main.py
 ## 🔧 Internal Structure
 
 ```text
-test-classic/
+proprocess/
 ├── pyproject.toml      # The Single Source of Truth (Dependencies, Metadata)
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
-│   └── test_classic/
-│       ├── __init__.py
-│       ├── config.yaml # EDIT THIS for project settings
-│       ├── config.py   # Code that loads the yaml above
-│       └── tests/      # Unit tests
-│   └── preprocess/
-│       ├── __init__.py
-│       ├── config.yaml # EDIT THIS for project settings
-│       ├── config.py   # Code that loads the yaml above
-│       └── tests/      # Unit tests
 │   └── proprocess/
 │       ├── __init__.py
 │       ├── .env        # Secrets (Ignored by git)
