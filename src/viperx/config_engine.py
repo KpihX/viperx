@@ -238,6 +238,10 @@ class ConfigEngine:
         if self.config_path.absolute() != system_config_path.absolute():
             import shutil
             shutil.copy2(self.config_path, system_config_path)
+        
+        # Sync Scripts (Safe Update)
+        # We recalculate all expected scripts from the current config
+        self._update_root_scripts(current_root, project_scripts, report)
             
         is_fresh_init = any("Scaffolding" in item for item in report.added)
         if (report.added or report.updated) and not is_fresh_init:
@@ -284,6 +288,32 @@ class ConfigEngine:
             report.manual_checks.append("License type changed. Verify LICENSE file content.")
 
         if changed:
+            data["project"] = proj
+            with open(pyproject_path, "w") as f:
+                toml.dump(data, f)
+
+    def _update_root_scripts(self, root: Path, scripts: dict, report):
+        """Safely update [project.scripts] in pyproject.toml."""
+        import toml
+        pyproject_path = root / "pyproject.toml"
+        if not pyproject_path.exists():
+            return
+
+        with open(pyproject_path, "r") as f:
+            data = toml.load(f)
+
+        proj = data.get("project", {})
+        current_scripts = proj.get("scripts", {})
+        
+        changed = False
+        for name, entry in scripts.items():
+            if name not in current_scripts or current_scripts[name] != entry:
+                current_scripts[name] = entry
+                report.updated.append(f"Script '{name}' -> '{entry}'")
+                changed = True
+        
+        if changed:
+            proj["scripts"] = current_scripts
             data["project"] = proj
             with open(pyproject_path, "w") as f:
                 toml.dump(data, f)
