@@ -18,10 +18,10 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 {%- endif %}
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
 
-{%- if has_config or use_env %}
+{%- if use_config or use_env %}
 ### ⚙️ Configuration
 
-{%- if has_config %}
+{%- if use_config %}
 - **Config**: `src/{{ package_name }}/config.yaml` (Loaded automatically)
 {%- endif %}
 {%- if use_env %}
@@ -30,7 +30,7 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 {%- endif %}
 
 The project uses a **Config-in-Package** architecture:
-{%- if has_config %}
+{%- if use_config %}
 1. `config.yaml` is inside the package.
 1. `config.py` loads it safely (even in production wheels).
 {%- endif %}
@@ -123,7 +123,7 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 {%- if is_subpackage %}
 {{ package_name }}/
 ├── __init__.py
-{%- if has_config %}
+{%- if use_config %}
 ├── config.yaml # EDIT THIS for project settings
 ├── config.py   # Code that loads the yaml above
 {%- endif %}
@@ -159,7 +159,7 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 {%- else %}
 │   └── {{ package_name }}/
 │       ├── __init__.py
-{%- if has_config %}
+{%- if use_config %}
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
 {%- endif %}

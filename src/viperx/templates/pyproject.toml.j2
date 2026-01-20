@@ -11,7 +11,7 @@ authors = [
 ]
 license = { text = "{{ license }}" }
 dependencies = [
-    {%- if has_config %}
+    {%- if use_config %}
     "pyyaml>=6.0",
     {%- endif %}
     {%- if has_env %}
