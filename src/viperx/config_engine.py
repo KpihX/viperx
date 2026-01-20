@@ -239,6 +239,9 @@ class ConfigEngine:
             import shutil
             shutil.copy2(self.config_path, system_config_path)
             
+        if report.added or report.updated:
+             report.manual_checks.append("Review README.md for any necessary updates (e.g. Project Name, Description).")
+
         self._print_report(report)
 
     def _update_root_metadata(self, root: Path, project_conf: dict, report):

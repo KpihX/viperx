@@ -9,7 +9,7 @@ project:
   name: "test-ml"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
-  description: "Updated Safely Update"
+  description: "Verified Clean Output"
   # author: "KpihX"
   # license: "MIT"
   builder: "uv"
