@@ -42,21 +42,27 @@ class ConfigEngine:
 
     def apply(self):
         """Apply the configuration to the current directory."""
-        current_root = None
         project_conf = self.config.get("project", {})
         settings_conf = self.config.get("settings", {})
         workspace_conf = self.config.get("workspace", {})
         
         project_name = project_conf.get("name")
-        target_dir = self.root_path / project_name
         
+        # STRICT NAMING: Always calculate the expected root path using sanitized name
+        from viperx.utils import sanitize_project_name
+        clean_name = sanitize_project_name(project_name)
+        
+        # Default assumption: current_root is the target directory (folder with underscores)
+        current_root = self.root_path / clean_name
+        target_dir = current_root
+
         # 1. Root Project Handling
-        # If we are NOT already in the project dir (checking name), we might need to create it
-        # Or if we are running in the root of where `viperx init` is called.
-        
-        # Heuristic: Are we already in a folder named 'project_name'?
-        if self.root_path.name == project_name:
+        # Heuristic: Are we already in a folder matching the raw name OR sanitized name?
+        # e.g. inside test_classic/
+        if self.root_path.name == project_name or self.root_path.name == clean_name:
             # We are inside the project folder
+            current_root = self.root_path
+            
             if not (self.root_path / "pyproject.toml").exists():
                  console.print(Panel(f"⚠️  [bold yellow]Current directory matches name but is not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
                  gen = ProjectGenerator(
@@ -70,32 +76,27 @@ class ConfigEngine:
                     use_config=settings_conf.get("use_config", True),
                     use_tests=settings_conf.get("use_tests", True),
                     framework=settings_conf.get("framework", FRAMEWORK_PYTORCH),
-                    scripts={project_name: f"{project_name}.main:main"}, # Simple default for hydration 
+                    scripts={project_name: f"{clean_name}.main:main"}, 
                     verbose=self.verbose
                 )
-                 # generate() expects parent dir, and will operate on parent/name (which is self.root_path)
                  gen.generate(self.root_path.parent)
             else:
                 console.print(Panel(f"♻️  [bold blue]Syncing Project:[/bold blue] {project_name}", border_style="blue"))
-            current_root = self.root_path
-            # We are outside, check if it exists
-            # STRICT NAMING: directory is always sanitized (underscores)
-            from viperx.utils import sanitize_project_name
-            project_name_clean = sanitize_project_name(project_name)
-            target_dir = self.root_path / project_name_clean
+                
+        else:
+            # We are outside
+            # target_dir (clean) is already set as current_root default
             
             if target_dir.exists() and (target_dir / "pyproject.toml").exists():
                 console.print(Panel(f"♻️  [bold blue]Updating Existing Project:[/bold blue] {project_name} ({target_dir.name})", border_style="blue"))
-                current_root = target_dir
             else:
                 if target_dir.exists():
                      console.print(Panel(f"⚠️  [bold yellow]Directory exists but not initialized. Hydrating:[/bold yellow] {project_name}", border_style="yellow"))
+                
                 # Prepare Scripts & Dependency Context
                 packages = workspace_conf.get("packages", [])
                 
                 # --- Aggregate Global Dependencies ---
-                # Start with Root Settings
-                # Root is always present (ProjectGenerator uses these)
                 root_use_config = settings_conf.get("use_config", True)
                 root_use_env = settings_conf.get("use_env", False)
                 root_type = settings_conf.get("type", TYPE_CLASSIC)
@@ -107,22 +108,19 @@ class ConfigEngine:
                 glob_is_dl = root_type == TYPE_DL
                 glob_frameworks = {root_framework} if glob_is_dl else set()
 
-                project_scripts = {project_name: f"{project_name}.main:main"}
+                project_scripts = {project_name: f"{clean_name}.main:main"} # Use clean mapping
                 
                 for pkg in packages:
                     # Scripts
                     pkg_name = pkg.get("name")
-                    from viperx.utils import sanitize_project_name
                     pkg_name_clean = sanitize_project_name(pkg_name)
-                    # CLI Command = Raw Name (e.g. test-classic) -> sanitized module path (test_classic.main:main)
                     project_scripts[pkg_name] = f"{pkg_name_clean}.main:main"
                     
                     # Dependency Aggregation
-                    # Inherit defaults if not defined in pkg
                     p_config = pkg.get("use_config", settings_conf.get("use_config", True))
                     p_env = pkg.get("use_env", settings_conf.get("use_env", False))
                     p_type = pkg.get("type", TYPE_CLASSIC)
-                    p_framework = pkg.get("framework", FRAMEWORK_PYTORCH) # Defaults to pytorch if implicit
+                    p_framework = pkg.get("framework", FRAMEWORK_PYTORCH)
 
                     if p_config: glob_has_config = True
                     if p_env: glob_has_env = True
@@ -139,11 +137,11 @@ class ConfigEngine:
                     "frameworks": list(glob_frameworks)
                 }
 
-                # Create Root (or Hydrate)
-                # Pass raw 'project_name' to generator for metadata
                 gen = ProjectGenerator(
-                    name=project_name,
+                    name=project_name, # Raw name
                     description=project_conf.get("description", ""),
+                    type=settings_conf.get("type", TYPE_CLASSIC),
+                    author=project_conf.get("author", None),
                     license=project_conf.get("license", DEFAULT_LICENSE),
                     builder=project_conf.get("builder", DEFAULT_BUILDER),
                     use_env=settings_conf.get("use_env", False),
@@ -156,9 +154,8 @@ class ConfigEngine:
                 )
                 gen.generate(self.root_path)
                 
-                # Check actual created directory (sanitized) to be sure
+                # Verify creation
                 if not current_root.exists():
-                     # Fallback if somehow it didn't create underscored dir
                      if (self.root_path / project_name).exists():
                          current_root = self.root_path / project_name
                      
@@ -176,7 +173,7 @@ class ConfigEngine:
         # 3. Handle Workspace Packages
         packages = workspace_conf.get("packages", [])
         if packages:
-            console.print(f"\n📦 [bold]Processing {len(packages)} workspace packages...[/bold]")
+            console.print(f"\\n📦 [bold]Processing {len(packages)} workspace packages...[/bold]")
             
             for pkg in packages:
                 pkg_name = pkg.get("name")
@@ -199,4 +196,4 @@ class ConfigEngine:
                 # Check if package seems to exist (ProjectGenerator handles upgrade logic too)
                 pkg_gen.add_to_workspace(current_root)
 
-        console.print(Panel(f"✨ [bold green]Configuration Applied Successfully![/bold green]\nProject is up to date with {self.config_path.name}", border_style="green"))
+        console.print(Panel(f"✨ [bold green]Configuration Applied Successfully![/bold green]\\nProject is up to date with {self.config_path.name}", border_style="green"))

@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "0.9.45"
+version = "0.9.46"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
