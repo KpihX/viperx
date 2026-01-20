@@ -1,0 +1,16 @@
+pkgbase = viperx
+	pkgdesc = Professional Python Project Initializer with uv, ml/dl support
+	pkgver = 1.0.2
+	pkgrel = 1
+	url = https://github.com/KpihX/viperx
+	arch = any
+	license = MIT
+	makedepends = python-build
+	makedepends = python-installer
+	makedepends = python-wheel
+	depends = python
+	depends = python-pip
+	source = https://files.pythonhosted.org/packages/source/v/viperx/viperx-1.0.2.tar.gz
+	sha256sums = REPLACE_WITH_ACTUAL_SHA256
+
+pkgname = viperx

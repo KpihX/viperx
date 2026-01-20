@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-01-20 🚀
+### Added
+- **MkDocs Documentation Site**: Full documentation at https://kpihx.github.io/viperx/
+  - Installation, Quick Start, CLI Reference, Configuration, Workspaces, Templates, Contributing
+- **Migration System**: `viperx migrate` command for upgrading projects between versions
+  - Supports `--dry-run` for preview
+  - Tracks `viperx_version` in `viperx.yaml`
+- **Homebrew Formula**: Template for macOS/Linux installation via `brew`
+- **AUR Package**: Template for Arch Linux installation via `yay`
+
+### Developer
+- Added `packaging/homebrew/` and `packaging/aur/` directories
+
 ## [1.0.2] - 2026-01-20
 ### Added
 - **`viperx init` Alias**: `viperx init` now works as an alias for `viperx config` (better UX).

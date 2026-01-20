@@ -287,6 +287,55 @@ def package_update(
     generator = ProjectGenerator(name=name, description="", type="classic", author="", use_env=False, use_config=False, verbose=verbose)
     generator.update_package(Path.cwd())
 
+
+# =============================================================================
+# Migrate Command
+# =============================================================================
+
+@app.command()
+def migrate(
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview changes without applying"),
+    target_version: str = typer.Option(None, "--to", help="Target version (default: current ViperX version)"),
+):
+    """
+    Migrate an existing project to a newer ViperX version.
+    """
+    from viperx.migrations import run_migrations, get_project_version
+    # Import to register migrations
+    import viperx.migrations.v1_0_x  # noqa
+    
+    project_root = Path.cwd()
+    
+    # Check if viperx.yaml exists
+    if not (project_root / "viperx.yaml").exists():
+        console.print("[bold red]Error:[/bold red] No viperx.yaml found in current directory.")
+        raise typer.Exit(1)
+    
+    current = get_project_version(project_root)
+    target = target_version or version
+    
+    console.print(Panel(
+        f"Migrating from [bold]{current or 'unknown'}[/bold] to [bold]{target}[/bold]",
+        title="🔄 ViperX Migration",
+        border_style="blue"
+    ))
+    
+    if dry_run:
+        console.print("[dim]Dry run mode - no changes will be made[/dim]\n")
+    
+    changes = run_migrations(project_root, target, dry_run)
+    
+    if changes:
+        console.print("[green]Changes:[/green]")
+        for change in changes:
+            console.print(f"  • {change}")
+    else:
+        console.print("[green]✓[/green] Project is already up to date!")
+    
+    if not dry_run and changes:
+        console.print(f"\n[green]✓[/green] Migrated to version {target}")
+
+
 if __name__ == "__main__":
     try:
         app()
