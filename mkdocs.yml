@@ -36,6 +36,7 @@ nav:
   - Getting Started:
       - Installation: installation.md
       - Quick Start: quickstart.md
+      - Learning Path: learning-path.md
   - User Guide:
       - CLI Reference: cli-reference.md
       - Configuration: configuration.md
@@ -44,6 +45,14 @@ nav:
       - Templates: templates.md
       - Publishing: publishing.md
       - Contributing: contributing.md
+  - Why?:
+      - Overview: why/index.md
+      - Why pyproject.toml?: why/pyproject.md
+      - Why src/ Layout?: why/src-layout.md
+      - Why uv?: why/uv.md
+      - Why Config-in-Package?: why/config-in-package.md
+      - Why Env Isolation?: why/env-isolation.md
+      - Why Safe Mode?: why/safe-mode.md
   - Changelog: changelog.md
 
 markdown_extensions:
