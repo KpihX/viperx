@@ -99,6 +99,7 @@ class ConfigEngine:
                 # --- Aggregate Global Dependencies ---
                 root_use_config = settings_conf.get("use_config", True)
                 root_use_env = settings_conf.get("use_env", False)
+                root_use_tests = settings_conf.get("use_tests", True)
                 root_type = settings_conf.get("type", TYPE_CLASSIC)
                 root_framework = settings_conf.get("framework", FRAMEWORK_PYTORCH)
                 
@@ -110,6 +111,15 @@ class ConfigEngine:
 
                 project_scripts = {project_name: f"{clean_name}.main:main"} # Use clean mapping
                 
+                # List for README generation (Order: Root, then packages)
+                packages_list = [{
+                    "raw_name": project_name,
+                    "clean_name": clean_name,
+                    "use_config": root_use_config,
+                    "use_tests": root_use_tests,
+                    "use_env": root_use_env
+                }]
+                
                 for pkg in packages:
                     # Scripts
                     pkg_name = pkg.get("name")
@@ -119,6 +129,7 @@ class ConfigEngine:
                     # Dependency Aggregation
                     p_config = pkg.get("use_config", settings_conf.get("use_config", True))
                     p_env = pkg.get("use_env", settings_conf.get("use_env", False))
+                    p_tests = pkg.get("use_tests", settings_conf.get("use_tests", True))
                     p_type = pkg.get("type", TYPE_CLASSIC)
                     p_framework = pkg.get("framework", FRAMEWORK_PYTORCH)
 
@@ -128,13 +139,22 @@ class ConfigEngine:
                     if p_type == TYPE_DL: 
                          glob_is_dl = True
                          glob_frameworks.add(p_framework)
+                         
+                    packages_list.append({
+                        "raw_name": pkg_name,
+                        "clean_name": pkg_name_clean,
+                        "use_config": p_config,
+                        "use_tests": p_tests,
+                        "use_env": p_env
+                    })
 
                 dep_context = {
                     "has_config": glob_has_config,
                     "has_env": glob_has_env,
                     "is_ml_dl": glob_is_ml_dl,
                     "is_dl": glob_is_dl,
-                    "frameworks": list(glob_frameworks)
+                    "frameworks": list(glob_frameworks),
+                    "packages": packages_list
                 }
 
                 gen = ProjectGenerator(

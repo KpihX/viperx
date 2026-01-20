@@ -121,21 +121,32 @@ if 'datasets' in SETTINGS and 'titanic' in SETTINGS['datasets']:
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
-{% for name, entry in scripts.items() %}
-{% set pkg_dir = entry.split('.')[0] %}
-│   └── {{ pkg_dir }}/
+{%- if packages %}
+{%- for pkg in packages %}
+│   └── {{ pkg.clean_name }}/
 │       ├── __init__.py
-{% if has_config %}
+{%- if pkg.use_config %}
 │       ├── config.yaml # EDIT THIS for project settings
 │       ├── config.py   # Code that loads the yaml above
-{% endif %}
-{% if use_tests %}
+{%- endif %}
+{%- if pkg.use_tests %}
 │       └── tests/      # Unit tests
-{% endif %}
-{% endfor %}
-{% if project_type in ['ml', 'dl'] %}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+│   └── {{ package_name }}/
+│       ├── __init__.py
+{%- if has_config %}
+│       ├── config.yaml # EDIT THIS for project settings
+│       ├── config.py   # Code that loads the yaml above
+{%- endif %}
+{%- if use_tests %}
+│       └── tests/      # Unit tests
+{%- endif %}
+{%- endif %}
+{%- if project_type in ['ml', 'dl'] %}
 └── notebooks/          # Experimentation (Jupyter)
-{% endif %}
+{%- endif %}
 ```
 
 

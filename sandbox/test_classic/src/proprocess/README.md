@@ -7,7 +7,7 @@ proprocess utilities
 ## 🧐 Philosophy & Architecture
 
 Values transparency and standard tooling over "black box" magic.
-This project was generated with [ViperX](https://github.com/kpihx/viperx).sh/uv/)**, the extremely fast Python package and project manager written in Rust.
+This project was generated with [ViperX](https://github.com/kpihx/viperx), using **[uv](https://docs.astral.sh/uv/)**, the extremely fast Python package and project manager written in Rust.
 
 ### Why `uv`?
 Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **entire lifecycle**:
@@ -16,15 +16,20 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 
 - **Environment**: Virtual environments are managed internally, you just run `uv run`.
 
+
 ### ⚙️ Configuration
 
-- **Config**: `src/proprocess/config.yaml` (Loaded automatically)
 
 
-Edit `config.yaml` to change parameters. The project uses a **Config-in-Package** architecture:
-1. `config.yaml` is inside the package.
-2. `config.py` loads it safely (even in production wheels).
+- **Environment**: `src/proprocess/.env` (Isolated variables)
+
+
+The project uses a **Config-in-Package** architecture:
+
+
 3. `.env` is isolated within the package source.
+
+
 
 ---
 
@@ -38,8 +43,7 @@ No need to install Python or create venvs manually.
 ### Installation
 
 ```bash
-# Clone the repo
-git clone https://github.com/ivannkamdem/proprocess.git
+# Ensure you are in the project directory
 cd proprocess
 
 # Sync dependencies (creates .venv and installs python if needed)
@@ -47,8 +51,6 @@ uv sync
 ```
 
 ## 🧑‍💻 Usage
-
-The entry point depends on your project type.
 
 ### For Developers (Code)
 
@@ -64,28 +66,6 @@ uv run python src/proprocess/main.py
 
 
 
-### ☁️ Cloud (Colab / Kaggle)
-
-You can use the code and config from this repository directly in cloud environments without cloning.
-
-**Step 1: Install directly from GitHub**
-```python
-!pip install git+https://github.com/ivannkamdem/proprocess.git
-```
-
-**Step 2: Use the unified config**
-```python
-from proprocess import get_dataset_path, SETTINGS
-import kagglehub as kh
-
-# Transparency: You can inspect what was loaded
-print(f"Loaded config for: {SETTINGS['project_name']}")
-
-# Download datasets defined in config.yaml
-# The key 'titanic' maps to 'heptapod/titanic' in the yaml
-path = kh.dataset_download(SETTINGS['datasets']['titanic'])
-```
-
 ## 🔧 Internal Structure
 
 ```text
@@ -94,11 +74,14 @@ proprocess/
 ├── uv.lock             # Exact versions lockfile
 ├── .python-version     # Pinned Python version
 ├── src/
+
+
 │   └── proprocess/
 │       ├── __init__.py
-│       ├── config.yaml # EDIT THIS for project settings
-│       ├── config.py   # Code that loads the yaml above
-│       └── tests/      # Unit tests
+
+
+
 
 ```
+
 
