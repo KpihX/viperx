@@ -475,59 +475,56 @@ class ConfigEngine:
         self._print_report(report)
 
     def _update_root_metadata(self, root: Path, project_conf: dict, report):
-        """Safely update pyproject.toml metadata using text manipulation to preserve comments."""
-        import re
+        """Safely update pyproject.toml metadata using tomlkit to preserve comments."""
+        import tomlkit
         pyproject_path = root / "pyproject.toml"
         if not pyproject_path.exists():
             return
-
+            
         with open(pyproject_path, "r") as f:
             content = f.read()
-
-        changed = False
         
-        # Helper to replace Key = "Value"
-        def replace_key(key, new_val, text):
-            # Regex for 'key = "value"' or "key = 'value'"
-            # We assume standard formatting from our template
-            pattern = re.compile(f'^{key}\\s*=\\s*["\'].*["\']', re.MULTILINE)
-            if pattern.search(text):
-                # Check if value actually changed
-                match = pattern.search(text)
-                current_line = match.group(0)
-                new_line = f'{key} = "{new_val}"'
-                if current_line != new_line:
-                    return pattern.sub(new_line, text), True
-            return text, False
+        doc = tomlkit.parse(content)
+        project = doc.get("project", {})
+        changed = False
 
         # 1. Description
         new_desc = project_conf.get("description")
-        if new_desc:
-            content, mod = replace_key("description", new_desc, content)
-            if mod:
-                report.updated.append(f"Root description -> '{new_desc}'")
-                changed = True
+        if new_desc and project.get("description") != new_desc:
+            project["description"] = new_desc
+            report.updated.append(f"Root description -> '{new_desc}'")
+            changed = True
         
-        # 2. License (Complex because it's a dict inline usually: license = { text = "MIT" })
+        # 2. License
+        # We enforce PEP 621 table format: license = { text = "MIT" }
         new_license = project_conf.get("license")
         if new_license:
-             # Look for license = { text = "..." }
-             pattern = re.compile(r'^license\s*=\s*\{\s*text\s*=\s*["\'].*["\']\s*\}', re.MULTILINE)
-             if pattern.search(content):
-                 match = pattern.search(content)
-                 current_line = match.group(0)
-                 new_line = f'license = {{ text = "{new_license}" }}'
-                 if current_line != new_line:
-                     content = pattern.sub(new_line, content)
-                     report.updated.append(f"Root license -> '{new_license}'")
-                     
-                     # Try to update LICENSE file if it matches a known template
-                     self._update_license_file(root, new_license, report)
-                     changed = True
+             current_lic = project.get("license")
+             
+             # Check if we need to update
+             needs_update = False
+             if isinstance(current_lic, dict) and current_lic.get("text") != new_license:
+                 needs_update = True
+             elif isinstance(current_lic, str) and current_lic != new_license:
+                 needs_update = True # Upgrade from string to table? Or just mismatched string
+             elif current_lic is None:
+                 needs_update = True
+             
+             if needs_update:
+                 # Set as inline table to match style
+                 license_table = tomlkit.inline_table()
+                 license_table["text"] = new_license
+                 project["license"] = license_table
+                 
+                 report.updated.append(f"Root license -> '{new_license}'")
+                 self._update_license_file(root, new_license, report)
+                 changed = True
 
         if changed:
+            # Write back
+            # tomlkit preserves structure automatically
             with open(pyproject_path, "w") as f:
-                f.write(content)
+                f.write(doc.as_string())
 
     def _detect_project_type(self, root: Path) -> str | None:
         """Detect existing project type from structure and dependencies."""
@@ -589,128 +586,71 @@ class ConfigEngine:
             report.manual_checks.append("License type changed. Verify LICENSE file content.")
 
     def _update_testpaths(self, root: Path, pkg_clean_name: str, report):
-        """Add package tests path to testpaths in pyproject.toml."""
-        import re
+        """Add package tests path to testpaths in pyproject.toml using tomlkit."""
+        import tomlkit
         pyproject_path = root / "pyproject.toml"
         if not pyproject_path.exists():
             return
         
-        content = pyproject_path.read_text()
-        new_path_value = f"src/{pkg_clean_name}/tests"
-        new_testpath = f'"{new_path_value}"'
+        with open(pyproject_path, "r") as f:
+            content = f.read()
+            
+        doc = tomlkit.parse(content)
+        tool = doc.setdefault("tool", tomlkit.table())
+        pytest = tool.setdefault("pytest", tomlkit.table())
+        ini_options = pytest.setdefault("ini_options", tomlkit.table())
         
-        # Check if testpaths section exists
-        testpaths_pattern = re.compile(r'testpaths\s*=\s*\[([^\]]*)\]', re.MULTILINE | re.DOTALL)
-        match = testpaths_pattern.search(content)
+        # Get or create testpaths array
+        if "testpaths" not in ini_options:
+            ini_options["testpaths"] = tomlkit.array()
+            # Format it nicely
+            ini_options["testpaths"].multiline(True)
+            report.updated.append("Created [tool.pytest.ini_options] testpaths")
+
+        testpaths = ini_options["testpaths"]
+        new_path = f"src/{pkg_clean_name}/tests"
         
-        if match:
-            # Section exists, extract and deduplicate paths
-            existing_paths_str = match.group(1)
+        if new_path not in testpaths:
+            testpaths.append(new_path)
+            report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
             
-            # Parse existing paths
-            path_pattern = re.compile(r'"([^"]+)"')
-            existing_paths = path_pattern.findall(existing_paths_str)
-            
-            # Deduplicate existing paths first
-            unique_paths = list(dict.fromkeys(existing_paths))
-            
-            # Check if new path is already present
-            added_new = False
-            if new_path_value not in unique_paths:
-                unique_paths.append(new_path_value)
-                report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
-                added_new = True
-            
-            # Only rewrite if we added something or had duplicates
-            if added_new or len(unique_paths) != len(existing_paths):
-                # Rebuild section
-                paths_formatted = ',\n    '.join(f'"{p}"' for p in unique_paths)
-                new_section = f'testpaths = [\n    {paths_formatted},\n]'
-                content = testpaths_pattern.sub(new_section, content)
-                pyproject_path.write_text(content)
-        else:
-            # Section doesn't exist, check for [tool.pytest.ini_options]
-            pytest_section = re.search(r'\[tool\.pytest\.ini_options\]', content)
-            if pytest_section:
-                # Insert testpaths after section header
-                insert_pos = pytest_section.end()
-                insert_text = f'\ntestpaths = [\n    {new_testpath},\n]'
-                content = content[:insert_pos] + insert_text + content[insert_pos:]
-                report.updated.append(f"Created testpaths with {pkg_clean_name}/tests")
-            else:
-                # No pytest section, append one
-                content += f'\n[tool.pytest.ini_options]\ntestpaths = [\n    {new_testpath},\n]\n'
-                report.updated.append("Created [tool.pytest.ini_options] with testpaths")
-            pyproject_path.write_text(content)
+            with open(pyproject_path, "w") as f:
+                f.write(doc.as_string())
 
     def _update_root_scripts(self, root: Path, scripts: dict, report):
-        """Safely update [project.scripts] in pyproject.toml using text injection."""
+        """Safely update [project.scripts] in pyproject.toml using tomlkit."""
+        import tomlkit
         pyproject_path = root / "pyproject.toml"
         if not pyproject_path.exists():
             return
 
         with open(pyproject_path, "r") as f:
             content = f.read()
-
-        lines = content.splitlines()
-        scripts_header_index = -1
-        for i, line in enumerate(lines):
-            if line.strip() == "[project.scripts]":
-                scripts_header_index = i
-                break
         
-        if scripts_header_index == -1:
-            # Append Header if missing
-            lines.append("")
-            lines.append("[project.scripts]")
-            scripts_header_index = len(lines) - 1
-
+        doc = tomlkit.parse(content)
+        project = doc.get("project", {})
+        
+        # Ensure correct type for scripts table
+        if "scripts" not in project:
+             # Create regular table not inline for scripts to handle multiple entries clearly
+             project["scripts"] = tomlkit.table()
+        
+        existing_scripts = project["scripts"]
         changed = False
-        existing_scripts = {}
         
-        # Parse existing scripts (simple line scanning after header)
-        # Stop at next section [Section]
-        insert_idx = scripts_header_index + 1
-        len(lines)
-        for i in range(scripts_header_index + 1, len(lines)):
-            line = lines[i].strip()
-            if line.startswith("["):
-                break  # Next section
-            if "=" in line:
-                key, val = line.split("=", 1)
-                existing_scripts[key.strip()] = val.strip().strip('"').strip("'")
-            insert_idx = i + 1
-
-        # Calculate Scripts to Add
-        scripts_to_add = []
         for name, entry in scripts.items():
             if name not in existing_scripts:
-                 scripts_to_add.append(f'{name} = "{entry}"')
-                 report.updated.append(f"Script '{name}' -> '{entry}'")
-                 changed = True
+                existing_scripts[name] = entry
+                report.updated.append(f"Script '{name}' -> '{entry}'")
+                changed = True
             elif existing_scripts[name] != entry:
-                # Update logic (Harder with text, for now we skip or simple output)
-                # We prioritize ADDING missing scripts. Changing existing lines is risky without regex.
-                pass 
+                # Optional: Update mismatched scripts?
+                # report.manual_checks.append(f"Script mismatch for '{name}': {existing_scripts[name]} vs {entry}")
+                pass
         
         if changed:
-            # Insert at end of script block (before next section)
-            for s in scripts_to_add:
-                lines.insert(insert_idx, s)
-                insert_idx += 1
-            
-            # Clean up consecutive blank lines in entire file
-            cleaned_lines = []
-            prev_blank = False
-            for line in lines:
-                is_blank = line.strip() == ""
-                if is_blank and prev_blank:
-                    continue  # Skip consecutive blank lines
-                cleaned_lines.append(line)
-                prev_blank = is_blank
-            
             with open(pyproject_path, "w") as f:
-                f.write("\n".join(cleaned_lines) + "\n")
+                f.write(doc.as_string())
                 
     def _print_report(self, report):
         from rich.tree import Tree

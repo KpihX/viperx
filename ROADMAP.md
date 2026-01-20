@@ -5,12 +5,25 @@ This document tracks the evolution of `pypro`.
 
 ## 🚀 To Do
 
+### Phase 2: The "Ecosystem" Era (V1.5+) 🏗️
+- [ ] **CI/CD Integration**
+    - [ ] `viperx init --ci github`: Generate `.github/workflows/test.yml` (Optimized `uv cache`).
 - [ ] **Docker Support** 🐳
-    - [ ] Generate optimized `Dockerfile` based on project type (Slim for Classic, CUDA-ready for DL).
-    - [ ] Generate `docker-compose.yaml` (optional/flag).
-    - [ ] Ensure `uv` is used inside Docker for fast installs.
+    - [ ] Generate optimized `Dockerfile` (Distroless/Alpine).
+    - [ ] Auto-detect DL type -> Use `nvidia/cuda` base image.
+
+### Phase 3: The "Hard Mode" (V2.0) 🧠
+- [ ] **Bidirectional Sync (Diff)**
+    - [ ] `viperx sync`: Show diff between Code and Config before merging.
+- [ ] **Plugins / Custom Templates**
+    - [ ] `viperx template add <git-url>` for external organization templates.
 
 ## ✅ Done
+
+- [x] **V1.4.0: Robustness & DX**
+    - [x] **Safe Parsing**: Migrated regex -> `tomlkit` for `pyproject.toml` editing.
+    - [x] **Ejection**: `viperx eject` to remove vendor lock-in.
+    - [x] **Wizard**: Interactive mode for `viperx config` (no args).
 
 - [x] **V9: Declarative Config (Infrastucture as Code)**
     - [x] `viperx.yaml` schema definition.

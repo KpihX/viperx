@@ -149,13 +149,45 @@ def config_main(
         engine.apply()
         return
 
-    # 2. Imperative Mode (Validation)
+    # 2. Imperative / Interactive Mode
+    
+    # Check if we should trigger Wizard Mode
+    # If NO config, NO name, and NO other flags that imply specific intent (except verbose)
+    interactive_mode = False
+    
+    # We check if context has been invoked with arguments. 
+    # Typer doesn't easily expose "were any options passed?" directly without checking context.
+    # But checking if 'name' is None is a good proxy, as 'name' is required for non-interactive imperative mode.
+    
+    if not config and not name:
+         # Trigger Wizard
+         console.print(Panel("🧙 [bold blue]ViperX Interactive Wizard[/bold blue]", border_style="blue"))
+         
+         # 1. Name
+         name = typer.prompt("Project Name")
+         
+         # 2. Type
+         # We can present choices
+         type = typer.prompt("Project Type", default=TYPE_CLASSIC, show_default=True)
+         if type not in PROJECT_TYPES:
+             if typer.confirm(f"'{type}' is not a standard type ({PROJECT_TYPES}). Use anyway?", default=False):
+                 pass # User insists
+             else:
+                 # Retry once or default
+                 type = typer.prompt("Project Type", default=TYPE_CLASSIC)
+
+         # 3. Framework (if DL)
+         if type == "dl":
+             framework = typer.prompt("Deep Learning Framework", default=FRAMEWORK_PYTORCH)
+         
+         # 4. Author (Git detection is implicit, but we can ask)
+         # author = typer.prompt("Author", default=git_user...) -> Let's stick to defaults for speed unless verbose
+         
+         console.print(f"\n[dim]Initializing {name} ({type})...[/dim]\n")
+         interactive_mode = True
+
     if not name:
-         # Implicitly show help if no options provided?
-         # Or error out. User expects correct run.
-         # If user runs `viperx config` with NO args, and NO config, what happens?
-         # "Missing option name".
-         console.print("[bold red]Error:[/bold red] Missing option '--name' / '-n'. Required in manual mode.")
+         console.print("[bold red]Error:[/bold red] Missing option '--name' / '-n' and interactive mode failed.")
          raise typer.Exit(code=1)
 
     if type not in PROJECT_TYPES:
@@ -271,6 +303,37 @@ def config_update(
             f"Run [bold]viperx config -c {config_path}[/bold] to validate.",
             border_style="green"
         ))
+
+
+@config_app.command("eject")
+def config_eject(
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation")
+):
+    """
+    **Eject ViperX**: Remove viperx.yaml and detach from the tool.
+    
+    Leaves your project as a standard Python/uv project.
+    No lock-in. No hidden files.
+    """
+    config_path = Path("viperx.yaml")
+    
+    if not config_path.exists():
+        console.print("[yellow]No viperx.yaml found. Nothing to eject.[/yellow]")
+        raise typer.Exit()
+        
+    if not force:
+        console.print(Panel(
+            "[bold red]⚠️  Ejecting ViperX[/bold red]\n\n"
+            "This will permanently delete [bold]viperx.yaml[/bold].\n"
+            "Your project code, dependencies, and uv configuration will remain untouched.\n"
+            "You will lose the ability to use 'viperx config update' or 'viperx migrate'.",
+            border_style="red"
+        ))
+        if not typer.confirm("Are you sure you want to eject?"):
+            raise typer.Abort()
+            
+    config_path.unlink()
+    console.print("[bold green]Start[/bold green] Ejected successfully. You are now free! 🦅")
 
 
 # Package management group

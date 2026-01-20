@@ -42,43 +42,42 @@ class ConfigScanner:
         return config
     
     def _parse_pyproject(self, pyproject_path: Path) -> dict:
-        """Parse project metadata from pyproject.toml."""
+        """Parse project metadata from pyproject.toml using tomlkit."""
+        import tomlkit
+        
         content = pyproject_path.read_text()
+        data = tomlkit.parse(content)
+        project_data = data.get("project", {})
+        
         project = {}
         
         # Name
-        name_match = re.search(r'^name\s*=\s*["\']([^"\']+)["\']', content, re.MULTILINE)
-        if name_match:
-            project["name"] = name_match.group(1)
+        if "name" in project_data:
+            project["name"] = project_data["name"]
         
         # Description
-        desc_match = re.search(r'^description\s*=\s*["\']([^"\']+)["\']', content, re.MULTILINE)
-        if desc_match:
-            project["description"] = desc_match.group(1)
+        if "description" in project_data:
+            project["description"] = project_data["description"]
         
         # License
-        lic_match = re.search(r'license\s*=\s*{\s*text\s*=\s*["\']([^"\']+)["\']', content)
-        if lic_match:
-            project["license"] = lic_match.group(1)
+        # Supports license = { text = "MIT" } or license = "MIT" (legacy)
+        license_data = project_data.get("license")
+        if isinstance(license_data, dict):
+             project["license"] = license_data.get("text", "")
+        elif isinstance(license_data, str):
+             project["license"] = license_data
         
-        # Author - Robust parsing for string or table array
-        # 1. Try standard string: authors = ["Name <email>"] (Not standard PEP 621 but possible)
-        # 2. Try PEP 621 table: authors = [{ name = "Name", email = "..." }]
-        
-        # Try table format first (most specific)
-        # authors = [ { name = "Ivann" ... } ]
-        author_table_match = re.search(r'authors\s*=\s*\[\s*\{.*?name\s*=\s*["\']([^"\']+)["\']', content, re.DOTALL)
-        if author_table_match:
-            project["author"] = author_table_match.group(1)
-        else:
-            # Fallback to simple name match if present in a standard way
-            # This regex looks for 'name = "..."' anywhere after authors = ... which is risky but flexible
-            legacy_author = re.search(r'authors\s*=\s*\[.*?["\']([^"\'\{]+)["\']', content, re.DOTALL)
-            if legacy_author:
-                 # Clean up potential <email>
-                 raw = legacy_author.group(1).split('<')[0].strip()
-                 if raw:
-                     project["author"] = raw
+        # Author
+        # Supports:
+        # authors = [{name = "Name", email = "..."}] (PEP 621 Standard)
+        authors = project_data.get("authors")
+        if authors and isinstance(authors, list) and len(authors) > 0:
+            first_author = authors[0]
+            if isinstance(first_author, dict):
+                project["author"] = first_author.get("name", "")
+            elif isinstance(first_author, str):
+                # Handle non-standard list of strings
+                project["author"] = first_author.split('<')[0].strip()
 
         return project
 
