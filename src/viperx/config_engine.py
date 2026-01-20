@@ -465,6 +465,10 @@ class ConfigEngine:
         if (report.added or report.updated) and not is_fresh_init:
              report.manual_checks.append("Review README.md for any necessary updates (e.g. Project Name, Description).")
 
+        # Annotate conflicts in viperx.yaml for total transparency
+        if report.conflicts and not is_fresh_init:
+            self._annotate_config_conflicts(current_root, report)
+
         self._print_report(report)
 
     def _update_root_metadata(self, root: Path, project_conf: dict, report):
@@ -745,3 +749,84 @@ class ConfigEngine:
 
         console.print(tree)
         console.print("\n[dim]Run completed.[/dim]")
+
+    def _annotate_config_conflicts(self, root: Path, report):
+        """Annotate viperx.yaml with inline comments for conflicts (total transparency)."""
+        import re
+        
+        # Find viperx.yaml
+        config_path = root / "viperx.yaml"
+        if not config_path.exists():
+            return
+        
+        content = config_path.read_text()
+        lines = content.split('\n')
+        annotated = False
+        
+        for conflict in report.conflicts:
+            # Parse conflict message to find what to annotate
+            # Format: "Package 'X': use_Y exists but config says disabled"
+            # or: "Type change blocked: X → Y"
+            
+            if "Type change blocked" in conflict:
+                # Find 'type:' line in settings
+                for i, line in enumerate(lines):
+                    if re.match(r'\s*type\s*:', line):
+                        if '# NOT_APPLIED' not in line:
+                            lines[i] = line.rstrip() + '  # NOT_APPLIED: type change blocked'
+                            annotated = True
+                            break
+            
+            elif "use_env" in conflict.lower():
+                # Find the use_env line for the package
+                pkg_match = re.search(r"Package '([^']+)'", conflict)
+                if pkg_match:
+                    pkg_name = pkg_match.group(1)
+                    in_pkg = False
+                    for i, line in enumerate(lines):
+                        if f'name: "{pkg_name}"' in line or f"name: '{pkg_name}'" in line or f'name: {pkg_name}' in line:
+                            in_pkg = True
+                        elif in_pkg and re.match(r'\s*-\s*name:', line):
+                            in_pkg = False
+                        elif in_pkg and re.match(r'\s*use_env\s*:', line):
+                            if '# NOT_APPLIED' not in line:
+                                lines[i] = line.rstrip() + '  # NOT_APPLIED: file exists in codebase'
+                                annotated = True
+                            break
+            
+            elif "use_config" in conflict.lower():
+                pkg_match = re.search(r"Package '([^']+)'", conflict)
+                if pkg_match:
+                    pkg_name = pkg_match.group(1)
+                    in_pkg = False
+                    for i, line in enumerate(lines):
+                        if f'name: "{pkg_name}"' in line or f"name: '{pkg_name}'" in line or f'name: {pkg_name}' in line:
+                            in_pkg = True
+                        elif in_pkg and re.match(r'\s*-\s*name:', line):
+                            in_pkg = False
+                        elif in_pkg and re.match(r'\s*use_config\s*:', line):
+                            if '# NOT_APPLIED' not in line:
+                                lines[i] = line.rstrip() + '  # NOT_APPLIED: file exists in codebase'
+                                annotated = True
+                            break
+            
+            elif "use_tests" in conflict.lower():
+                pkg_match = re.search(r"Package '([^']+)'", conflict)
+                if pkg_match:
+                    pkg_name = pkg_match.group(1)
+                    in_pkg = False
+                    for i, line in enumerate(lines):
+                        if f'name: "{pkg_name}"' in line or f"name: '{pkg_name}'" in line or f'name: {pkg_name}' in line:
+                            in_pkg = True
+                        elif in_pkg and re.match(r'\s*-\s*name:', line):
+                            in_pkg = False
+                        elif in_pkg and re.match(r'\s*use_tests\s*:', line):
+                            if '# NOT_APPLIED' not in line:
+                                lines[i] = line.rstrip() + '  # NOT_APPLIED: folder exists in codebase'
+                                annotated = True
+                            break
+        
+        if annotated:
+            config_path.write_text('\n'.join(lines))
+            report.manual_checks.append("viperx.yaml annotated with NOT_APPLIED comments. Review and resolve.")
+

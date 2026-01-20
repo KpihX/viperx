@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-01-20 🔍
+### Added
+- **Inline Conflict Commenting**: viperx.yaml now annotated with `# NOT_APPLIED` comments on conflicts
+  - Type change blocked → `type: ml  # NOT_APPLIED: type change blocked`
+  - use_env/config/tests disabled but file exists → `use_env: false  # NOT_APPLIED: file exists in codebase`
+- Total transparency philosophy: No hidden conflicts, all visible in config file
+
 ## [1.3.0] - 2026-01-20 🚀
 ### Added
 - **`viperx config update` Command**: Rebuild/sync viperx.yaml from existing codebase
