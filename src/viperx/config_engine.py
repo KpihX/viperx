@@ -170,6 +170,36 @@ class ConfigEngine:
         }
 
         # ---------------------------------------------------------
+        # Phase 0.5: Type Change Detection (Block Breaking Changes)
+        # ---------------------------------------------------------
+        existing_pyproject = current_root / "pyproject.toml"
+        if existing_pyproject.exists():
+            existing_type = self._detect_project_type(current_root)
+            new_type = settings_conf.get("type", TYPE_CLASSIC)
+            
+            if existing_type and existing_type != new_type:
+                # Block the change with clear message
+                console.print(Panel(
+                    f"[bold red]⛔ Type Change Blocked[/bold red]\n\n"
+                    f"Current project type: [cyan]{existing_type}[/cyan]\n"
+                    f"Requested type: [yellow]{new_type}[/yellow]\n\n"
+                    f"[bold]Why is this blocked?[/bold]\n"
+                    f"Changing project type (classic→ml, ml→dl, etc.) is a breaking change that:\n"
+                    f"  • Adds/removes significant dependencies\n"
+                    f"  • Changes directory structure (notebooks, data_loader)\n"
+                    f"  • May break existing code\n\n"
+                    f"[bold]What to do instead:[/bold]\n"
+                    f"  1. Create a new project: [green]viperx init --type {new_type}[/green]\n"
+                    f"  2. Or manually adjust pyproject.toml dependencies\n"
+                    f"  3. Remove the 'type' line from viperx.yaml to keep current type",
+                    border_style="red",
+                    title="🚫 Breaking Change Detected"
+                ))
+                report.conflicts.append(f"Type change blocked: {existing_type} → {new_type}")
+                self._print_report(report)
+                return  # Exit early
+
+        # ---------------------------------------------------------
         # Phase 1: Root Project (Hydration vs Update)
         # ---------------------------------------------------------
         if not (current_root / "pyproject.toml").exists():
@@ -359,7 +389,12 @@ class ConfigEngine:
                                    self._update_testpaths(current_root, pkg_clean_name, report)
                           
                           elif feature_name == "use_readme":
-                               # Render README using template for consistency
+                               # Detect actual files in package for accurate README
+                               actual_use_config = (path_check / "config.py").exists() or (path_check / "config.yaml").exists()
+                               actual_use_env = (path_check / ".env").exists() or (path_check / ".env.example").exists()
+                               actual_use_tests = (path_check / "tests").exists()
+                               
+                               # Render README using template with detected flags
                                from jinja2 import Environment, PackageLoader
                                env = Environment(loader=PackageLoader("viperx", "templates"))
                                template = env.get_template("README.md.j2")
@@ -368,9 +403,9 @@ class ConfigEngine:
                                    package_name=pkg_clean_name,
                                    description=f"{pkg_name_in_label} package.",
                                    project_type="classic",
-                                   use_config=False,
-                                   use_env=False,
-                                   use_tests=False,
+                                   use_config=actual_use_config,
+                                   use_env=actual_use_env,
+                                   use_tests=actual_use_tests,
                                    is_subpackage=True,
                                    packages=[]
                                )
@@ -486,6 +521,33 @@ class ConfigEngine:
         if changed:
             with open(pyproject_path, "w") as f:
                 f.write(content)
+
+    def _detect_project_type(self, root: Path) -> str | None:
+        """Detect existing project type from structure and dependencies."""
+        pyproject_path = root / "pyproject.toml"
+        if not pyproject_path.exists():
+            return None
+        
+        content = pyproject_path.read_text().lower()
+        
+        # Check for DL indicators
+        if "torch" in content or "tensorflow" in content:
+            return TYPE_DL
+        
+        # Check for ML indicators
+        if "scikit-learn" in content or "sklearn" in content or "numpy" in content:
+            # Only ML if no DL libs
+            if "torch" not in content and "tensorflow" not in content:
+                return TYPE_ML
+        
+        # Check for notebooks directory (ML/DL indicator)
+        if (root / "notebooks").exists():
+            # Could be ML or DL, check deps to differentiate
+            if "torch" in content or "tensorflow" in content:
+                return TYPE_DL
+            return TYPE_ML
+        
+        return TYPE_CLASSIC
 
     def _update_license_file(self, root: Path, new_license: str, report):
         """Update LICENSE file content if old license is a recognized template."""

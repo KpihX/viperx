@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-01-20 🚀
+### Added
+- **`viperx config update` Command**: Rebuild/sync viperx.yaml from existing codebase
+  - Scans src/ for packages
+  - Detects use_config, use_env, use_tests from actual files
+  - Adds annotations for mismatches (never deletes config lines)
+- **ConfigScanner Class**: New `config_scanner.py` for codebase analysis
+- **5 New Tests**: Type blocking, README detection, ConfigScanner scenarios
+
+### Changed
+- **README Actual Files**: `use_readme` toggle now detects actual config/env/tests files in package
+- **Type Change Blocking**: Changing project type (classic→ml, etc.) now blocked with explanation
+
+### Fixed
+- README no longer ignores actual config.py when use_config flag is false
+
 ## [1.2.2] - 2026-01-20 🐛
 ### Fixed
 - **testpaths Duplication (Root Cause)**: Fixed template `pyproject.toml.j2` to use list-based deduplication

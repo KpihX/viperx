@@ -205,6 +205,61 @@ def config_get(
     console.print(Panel(f"✅ Generated configuration template: [bold green]{filename}[/bold green]\n\nRun [bold]viperx init -c {filename}[/bold] to create your project.", border_style="green"))
 
 
+@config_app.command("update")
+def config_update(
+    config_path: Path = typer.Option(
+        Path("viperx.yaml"), "-c", "--config",
+        help="Path to viperx.yaml (will be created/updated)"
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output")
+):
+    """
+    **Rebuild viperx.yaml from existing codebase.**
+    
+    Scans the project structure and updates viperx.yaml to match reality.
+    - Detects packages in src/
+    - Detects use_config, use_env, use_tests from actual files
+    - Adds annotations for any mismatches
+    
+    [bold]Safe Mode:[/bold] Never deletes config lines, only updates/adds.
+    """
+    from viperx.config_scanner import ConfigScanner
+    import yaml
+    
+    project_root = Path.cwd()
+    scanner = ConfigScanner(project_root, verbose=verbose)
+    
+    if config_path.exists():
+        # Update existing config
+        with open(config_path, "r") as f:
+            existing_config = yaml.safe_load(f) or {}
+        
+        new_config, annotations = scanner.update_config(existing_config)
+        num_annotations = scanner.write_config(new_config, annotations, config_path)
+        
+        if num_annotations > 0:
+            console.print(Panel(
+                f"✅ Updated [bold green]{config_path}[/bold green]\n\n"
+                f"[yellow]{num_annotations}[/yellow] annotations added (see file header).\n"
+                f"Review the file and resolve any mismatches.",
+                border_style="yellow"
+            ))
+        else:
+            console.print(Panel(
+                f"✅ [bold green]{config_path}[/bold green] is in sync with codebase!",
+                border_style="green"
+            ))
+    else:
+        # Create new config from scan
+        config = scanner.scan()
+        scanner.write_config(config, [], config_path)
+        console.print(Panel(
+            f"✅ Created [bold green]{config_path}[/bold green] from codebase scan.\n\n"
+            f"Run [bold]viperx config -c {config_path}[/bold] to validate.",
+            border_style="green"
+        ))
+
+
 # Package management group
 package_app = typer.Typer(
     help="Manage workspace packages (add, update, delete).",

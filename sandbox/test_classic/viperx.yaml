@@ -9,16 +9,16 @@ project:
   name: "test-classic"
 
   # [Optional] Defaults (Inferred from git/system if omitted)
-  # description: "ML project"
+  description: "Test classic project"
   # author: "KpihX"
-  # license: "MIT"  # Supported: MIT, Apache-2.0, GPLv3
+  license: "GPLv3" # Supported: MIT, Apache-2.0, GPLv3
   # builder: "uv"   # Supported: uv, hatch
 
 settings:
   # [Optional] Project Defaults (Applied to root & workspace members)
 
   # Generate isolated .env files in src/<pkg>/? (Default: false)
-  use_env: true
+  use_env: false
 
   # Generate config.py embedded loader? (Default: true)
   use_config: true
@@ -47,11 +47,18 @@ workspace:
     - name: "preprocess"
       description: "processing utilities"
       use_env: false
+      use_config: false
+      use_tests: true
+      use_readme: true
+    - name: "process"
+      description: "processing utilities"
+      use_env: true
       use_config: true
       use_tests: true
+      use_readme: true
     - name: "proprocess"
       description: "proprocess utilities"
       use_env: true
       use_config: false
-      use_tests: false
+      use_tests: true
       use_readme: true
