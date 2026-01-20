@@ -77,10 +77,14 @@ class ConfigEngine:
             else:
                 console.print(Panel(f"♻️  [bold blue]Syncing Project:[/bold blue] {project_name}", border_style="blue"))
             current_root = self.root_path
-        else:
             # We are outside, check if it exists
+            # STRICT NAMING: directory is always sanitized (underscores)
+            from viperx.utils import sanitize_project_name
+            project_name_clean = sanitize_project_name(project_name)
+            target_dir = self.root_path / project_name_clean
+            
             if target_dir.exists() and (target_dir / "pyproject.toml").exists():
-                console.print(Panel(f"♻️  [bold blue]Updating Existing Project:[/bold blue] {project_name}", border_style="blue"))
+                console.print(Panel(f"♻️  [bold blue]Updating Existing Project:[/bold blue] {project_name} ({target_dir.name})", border_style="blue"))
                 current_root = target_dir
             else:
                 if target_dir.exists():
