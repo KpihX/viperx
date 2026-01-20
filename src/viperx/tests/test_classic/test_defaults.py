@@ -58,6 +58,11 @@ def test_classic_defaults(runner, temp_workspace, mock_git_config):
     assert 'name = "Test User"' in pyproject
     assert 'email = "test@example.com"' in pyproject
     
+    # Check Smart Test Config
+    assert 'testpaths = [' in pyproject
+    assert '"src/classic_default/tests",' in pyproject
+    assert 'pytest>=9.0.2' in pyproject
+    
     # Check License Default (MIT)
     license_text = (project_root / "LICENSE").read_text()
     assert "MIT License" in license_text

@@ -54,4 +54,36 @@ requires = ["uv_build>=0.9.21,<0.10.0"]
 build-backend = "uv_build"
 {%- endif %}
 
+{%- set ns = namespace(any_tests=use_tests) %}
+{%- if not ns.any_tests %}
+    {%- for pkg in packages %}
+        {%- if pkg.use_tests %}
+            {%- set ns.any_tests = True %}
+        {%- endif %}
+    {%- endfor %}
+{%- endif %}
+
+{%- if ns.any_tests %}
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+    {%- if use_tests %}
+    "src/{{ package_name }}/tests",
+    {%- endif %}
+    {%- for pkg in packages %}
+    {%- if pkg.use_tests %}
+    "src/{{ pkg.clean_name }}/tests",
+    {%- endif %}
+    {%- endfor %}
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+{%- endif %}
+
 

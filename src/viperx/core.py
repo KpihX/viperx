@@ -231,6 +231,7 @@ class ProjectGenerator:
             "builder": self.builder,
             "use_uv": self.builder == "uv",
             "use_config": self.use_config,
+            "use_tests": self.use_tests,
             "use_readme": self.use_readme,
             "use_env": self.use_env,
             "framework": self.framework,

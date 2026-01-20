@@ -55,3 +55,8 @@ def test_classic_custom(runner, temp_workspace, mock_git_config, mock_builder_ch
     license_text = (project_root / "LICENSE").read_text()
     assert "GNU GENERAL PUBLIC LICENSE" in license_text
     assert "Version 3" in license_text
+    
+    # Check NO Test Config
+    # usage_tests: false -> no [tool.pytest.ini_options]
+    assert "[tool.pytest.ini_options]" not in pyproject
+    assert "pytest>=" not in pyproject

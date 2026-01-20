@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "0.9.90"
+version = "0.9.92"
 description = "Professional Python Project Initializer with uv, ml/dl support, and embedded config."
 readme = "README.md"
 authors = [
@@ -36,6 +36,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
+testpaths = ["src/viperx/tests"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]

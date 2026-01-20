@@ -330,7 +330,7 @@ wheels = [
 
 [[package]]
 name = "viperx"
-version = "0.9.84"
+version = "0.9.90"
 source = { editable = "." }
 dependencies = [
     { name = "gitpython" },
