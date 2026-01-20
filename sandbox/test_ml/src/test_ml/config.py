@@ -2,11 +2,15 @@ import yaml
 import importlib.resources
 from pathlib import Path
 from typing import Any, Dict
+from dotenv import load_dotenv
+
+# Load Environment Variables from the isolated .env file in this package
+load_dotenv(Path(__file__).parent / ".env")
 
 # Load configuration safely whether installed or local
 try:
     # Modern Way (Python 3.9+) - works when installed as a package
-    _config_path = importlib.resources.files("preprocess").joinpath("config.yaml")
+    _config_path = importlib.resources.files("test_ml").joinpath("config.yaml")
     with _config_path.open("r") as f:
         SETTINGS: Dict[str, Any] = yaml.safe_load(f)
 except Exception:
@@ -21,3 +25,13 @@ except Exception:
 def get_config(key: str, default: Any = None) -> Any:
     """Retrieve a value from the globally loaded settings."""
     return SETTINGS.get(key, default)
+def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str = ".csv") -> str | None:
+    """
+    Helper for notebook data loading.
+    Looks up 'notebook_name' in the 'key' section of config.yaml.
+    """
+    datasets = SETTINGS.get(key, {})
+    dataset_name = datasets.get(notebook_name)
+    if not dataset_name:
+        return None
+    return f"{dataset_name}{extension}"

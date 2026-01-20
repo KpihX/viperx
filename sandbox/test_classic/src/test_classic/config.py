@@ -3,7 +3,6 @@ import importlib.resources
 from pathlib import Path
 from typing import Any, Dict
 
-
 # Load configuration safely whether installed or local
 try:
     # Modern Way (Python 3.9+) - works when installed as a package
@@ -22,4 +21,3 @@ except Exception:
 def get_config(key: str, default: Any = None) -> Any:
     """Retrieve a value from the globally loaded settings."""
     return SETTINGS.get(key, default)
-
