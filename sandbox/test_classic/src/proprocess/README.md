@@ -19,8 +19,8 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 - **Template**: `src/proprocess/.env.example` (Copy this to `.env`)
 
 The project uses a **Config-in-Package** architecture:
-3. `.env` is isolated within the package source.
-4. `.env.example` serves as a template for new developers.
+1. `.env` is isolated within the package source.
+1. `.env.example` serves as a template for new developers.
 
 ---
 

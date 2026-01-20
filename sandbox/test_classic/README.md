@@ -19,7 +19,7 @@ Unlike traditional workflows (pip, poetry, venv mixing), `uv` manages the **enti
 
 The project uses a **Config-in-Package** architecture:
 1. `config.yaml` is inside the package.
-2. `config.py` loads it safely (even in production wheels).
+1. `config.py` loads it safely (even in production wheels).
 
 ---
 ## 🚀 Getting Started

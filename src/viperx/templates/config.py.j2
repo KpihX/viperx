@@ -2,12 +2,12 @@ import yaml
 import importlib.resources
 from pathlib import Path
 from typing import Any, Dict
-{% if use_env %}
+{%- if use_env %}
 from dotenv import load_dotenv
 
 # Load Environment Variables from the isolated .env file in this package
 load_dotenv(Path(__file__).parent / ".env")
-{% endif %}
+{%- endif %}
 
 # Load configuration safely whether installed or local
 try:
@@ -28,7 +28,7 @@ def get_config(key: str, default: Any = None) -> Any:
     """Retrieve a value from the globally loaded settings."""
     return SETTINGS.get(key, default)
 
-{% if project_type != 'classic' %}
+{%- if project_type != 'classic' %}
 def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str = ".csv") -> str | None:
     """
     Helper for notebook data loading.
@@ -39,4 +39,4 @@ def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str =
     if not dataset_name:
         return None
     return f"{dataset_name}{extension}"
-{% endif %}
+{%- endif %}

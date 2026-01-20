@@ -1,7 +1,7 @@
 # Global Project Configuration
 project_name: "{{ project_name }}"
 
-{% if project_type in ['ml', 'dl'] %}
+{%- if project_type in ['ml', 'dl'] %}
 data_urls:
   iris: "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
   titanic: "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
@@ -11,7 +11,7 @@ datasets:
   Base_Kaggle: "titanic"
   # Usage: kh.dataset_download(SETTINGS['datasets']['titanic'])
   titanic: "heptapod/titanic"
-{% else %}
+{%- else %}
 # Configuration file for {{ package_name }}
 # Add your settings here.
-{% endif %}
+{%- endif %}
