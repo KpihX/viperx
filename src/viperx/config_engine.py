@@ -42,6 +42,7 @@ class ConfigEngine:
 
     def apply(self):
         """Apply the configuration to the current directory."""
+        current_root = None
         project_conf = self.config.get("project", {})
         settings_conf = self.config.get("settings", {})
         workspace_conf = self.config.get("workspace", {})
