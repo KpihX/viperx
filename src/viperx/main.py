@@ -152,6 +152,13 @@ def config_main(
 
     console.print(Panel(f"Initializing [bold blue]{name}[/bold blue]", border_style="blue"))
     
+    # Check if target directory (sanitized) exists
+    from viperx.utils import sanitize_project_name
+    name_clean = sanitize_project_name(name)
+    target_dir = Path.cwd() / name_clean
+    if target_dir.exists():
+         console.print(f"[bold yellow]Warning:[/bold yellow] Directory {name_clean} already exists. Updating.")
+    
     generator = ProjectGenerator(
         name=name,
         description=description,
