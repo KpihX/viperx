@@ -183,7 +183,7 @@ class ProjectGenerator:
                     (project_dir / f).unlink()
         
         # 5. Git & Final Steps
-        console.print(f"\n[bold green]✓ Project {self.raw_name} created successfully![/bold green]")
+        console.print(f"\n[bold green]✓ Project {self.raw_name} created in {self.project_name}/ successfully![/bold green]")
         if not is_subpackage:
             console.print(f"  [dim]cd {self.project_name} && uv sync[/dim]")
 
