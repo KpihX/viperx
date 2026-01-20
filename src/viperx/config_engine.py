@@ -527,7 +527,8 @@ class ConfigEngine:
             return
         
         content = pyproject_path.read_text()
-        new_testpath = f'"src/{pkg_clean_name}/tests"'
+        new_path_value = f"src/{pkg_clean_name}/tests"
+        new_testpath = f'"{new_path_value}"'
         
         # Check if testpaths section exists
         testpaths_pattern = re.compile(r'testpaths\s*=\s*\[([^\]]*)\]', re.MULTILINE | re.DOTALL)
@@ -541,20 +542,23 @@ class ConfigEngine:
             path_pattern = re.compile(r'"([^"]+)"')
             existing_paths = path_pattern.findall(existing_paths_str)
             
-            # Check if already present
-            new_path_value = f"src/{pkg_clean_name}/tests"
-            if new_path_value in existing_paths:
-                return  # Already present
+            # Deduplicate existing paths first
+            unique_paths = list(dict.fromkeys(existing_paths))
             
-            # Add new path and deduplicate
-            existing_paths.append(new_path_value)
-            unique_paths = list(dict.fromkeys(existing_paths))  # Preserve order, remove dupes
+            # Check if new path is already present
+            added_new = False
+            if new_path_value not in unique_paths:
+                unique_paths.append(new_path_value)
+                report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
+                added_new = True
             
-            # Rebuild section
-            paths_formatted = ',\n    '.join(f'"{p}"' for p in unique_paths)
-            new_section = f'testpaths = [\n    {paths_formatted},\n]'
-            content = testpaths_pattern.sub(new_section, content)
-            report.updated.append(f"Added {pkg_clean_name}/tests to testpaths")
+            # Only rewrite if we added something or had duplicates
+            if added_new or len(unique_paths) != len(existing_paths):
+                # Rebuild section
+                paths_formatted = ',\n    '.join(f'"{p}"' for p in unique_paths)
+                new_section = f'testpaths = [\n    {paths_formatted},\n]'
+                content = testpaths_pattern.sub(new_section, content)
+                pyproject_path.write_text(content)
         else:
             # Section doesn't exist, check for [tool.pytest.ini_options]
             pytest_section = re.search(r'\[tool\.pytest\.ini_options\]', content)
@@ -568,12 +572,7 @@ class ConfigEngine:
                 # No pytest section, append one
                 content += f'\n[tool.pytest.ini_options]\ntestpaths = [\n    {new_testpath},\n]\n'
                 report.updated.append(f"Created [tool.pytest.ini_options] with testpaths")
-        
-        # Clean up formatting
-        content = re.sub(r',\s*,', ',', content)
-        content = re.sub(r',\s*\]', ',\n]', content)
-        
-        pyproject_path.write_text(content)
+            pyproject_path.write_text(content)
 
     def _update_root_scripts(self, root: Path, scripts: dict, report):
         """Safely update [project.scripts] in pyproject.toml using text injection."""

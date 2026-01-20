@@ -155,6 +155,13 @@ workspace:
         
         pyproject_content = (project_root / "pyproject.toml").read_text()
         assert "new_pkg/tests" in pyproject_content, "testpaths should include new_pkg/tests"
+        
+        # Verify no duplicate testpaths
+        import re
+        testpaths_match = re.search(r'testpaths\s*=\s*\[([^\]]*)\]', pyproject_content, re.DOTALL)
+        if testpaths_match:
+            paths = re.findall(r'"([^"]+)"', testpaths_match.group(1))
+            assert len(paths) == len(set(paths)), f"Duplicate testpaths found: {paths}"
 
 
 class TestTestsFolderStructure:

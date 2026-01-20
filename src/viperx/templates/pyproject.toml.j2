@@ -71,15 +71,20 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
+{# Collect unique test paths to avoid duplicates #}
+{%- set test_paths = [] %}
+{%- if use_tests %}
+{%- set _ = test_paths.append("src/" ~ package_name ~ "/tests") %}
+{%- endif %}
+{%- for pkg in packages %}
+{%- if pkg.use_tests and ("src/" ~ pkg.clean_name ~ "/tests") not in test_paths %}
+{%- set _ = test_paths.append("src/" ~ pkg.clean_name ~ "/tests") %}
+{%- endif %}
+{%- endfor %}
 testpaths = [
-    {%- if use_tests %}
-    "src/{{ package_name }}/tests",
-    {%- endif %}
-    {%- for pkg in packages %}
-    {%- if pkg.use_tests %}
-    "src/{{ pkg.clean_name }}/tests",
-    {%- endif %}
-    {%- endfor %}
+{%- for path in test_paths %}
+    "{{ path }}",
+{%- endfor %}
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2026-01-20 🐛
+### Fixed
+- **testpaths Duplication (Root Cause)**: Fixed template `pyproject.toml.j2` to use list-based deduplication
+- **testpaths Cleanup**: `_update_testpaths` now always removes duplicates when writing
+
+### Changed
+- Added test assertion to verify no duplicate testpaths in initial generation or updates
+
 ## [1.2.1] - 2026-01-20 🧹
 ### Fixed
 - **testpaths Deduplication**: No more duplicate entries in `testpaths`

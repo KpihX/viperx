@@ -10,8 +10,8 @@ project:
 
   # [Optional] Defaults (Inferred from git/system if omitted)
   # description: "ML project"
-  author: "KpihX"
-  license: Apache-2.0 # Supported: MIT, Apache-2.0, GPLv3
+  # author: "KpihX"
+  # license: "MIT"  # Supported: MIT, Apache-2.0, GPLv3
   # builder: "uv"   # Supported: uv, hatch
 
 settings:
@@ -47,12 +47,11 @@ workspace:
     - name: "preprocess"
       description: "processing utilities"
       use_env: false
-      use_config: false
+      use_config: true
       use_tests: true
-      use_readme: true
     - name: "proprocess"
       description: "proprocess utilities"
-      use_env: false
+      use_env: true
       use_config: false
-      use_tests: true
+      use_tests: false
       use_readme: true
