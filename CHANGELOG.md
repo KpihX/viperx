@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.2] - 2026-01-21
+
+### 🚑 Fixed
+- **CLI Rendering**: Fixed "raw string" issue in `viperx --help` (Rich markup now enabled properly).
+- **Interactive Experience**: `viperx --explain` now confirms mode activation when run without commands.
+- **Knowledge Base**: `viperx learn` now contains actual content for `uv`, `packaging`, and `structure`.
+
 ## [1.6.1] - 2026-01-21
 
 ### 🚀 Added

@@ -4,6 +4,9 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.6.2] - 2026-01-21 🚑
+- **Polish**: Fixed `--help` formatting and populated `learn` command content.
+
 ### [1.6.1] - 2026-01-21 🎓
 - **`viperx --explain`**: Your automated mentor is now active.
 - **`viperx learn`**: Built-in documentation/learning hub.

@@ -46,7 +46,7 @@ app = typer.Typer(
     help=HELP_TEXT,
     add_completion=False,
     no_args_is_help=True,
-    rich_markup_mode="markdown",
+    rich_markup_mode="rich",  # Fix: Use 'rich' to support [bold green] tags
     epilog="Made with ❤️  by KpihX"
 )
 
@@ -74,7 +74,7 @@ def cli_callback(
     )
 ):
     """
-    **ViperX**: The Mentor-Based Python Project Initializer.
+    [bold green]ViperX[/bold green]: The Mentor-Based Python Project Initializer.
     
     Automates the creation of professional-grade Python projects using `uv`.
     Focuses on education, transparency, and freedom.
@@ -82,16 +82,76 @@ def cli_callback(
     # Always verbose by default for transparency
     state["verbose"] = True
     state["explain"] = explain
+    
+    if explain and ctx.invoked_subcommand is None:
+        console.print(Panel(
+            "🎓 [bold green]Explain Mode Enabled[/bold green]\n\n"
+            "ViperX will now explain its actions in detail.\n"
+            "Try running a command to see it in action:\n"
+            "  [cyan]viperx config -n my-project[/cyan]",
+            border_style="green"
+        ))
+
+# --- Educational Content ---
+KNOWLEDGE_BASE = {
+    "uv": """
+# Why uv?
+
+**uv** is an extremely fast Python package installer and resolver, written in Rust.
+
+### Why ViperX uses it:
+1.  **Speed**: It's 10-100x faster than pip/poetry.
+2.  **determinism**: It generates a universal `uv.lock` file.
+3.  **workspace support**: It handles multi-package repos natively.
+4.  **no python dependency**: You don't need Python installed to bootstrap Python.
+
+ViperX leverages `uv` to ensure your project setup is instantaneous.
+""",
+    "packaging": """
+# Modern Python Packaging
+
+Gone are the days of `setup.py` and `requirements.txt`.
+
+### The Standard: `pyproject.toml`
+ViperX generates a PEP-621 compliant `pyproject.toml`.
+- **[project]**: Metadata (name, version, dependencies).
+- **[build-system]**: How to build the package (we use `hatchling` or `uv` backend).
+- **[tool.uv]**: Dependency management (dev-dependencies, workspaces).
+
+### Src Layout
+We use the `src/` layout (e.g., `src/my_pkg/`).
+- **Prevents import errors**: You can't accidentally import the local folder without installing it.
+- **Forces installation**: Ensures you test the *installed* package, not the local files.
+""",
+    "structure": """
+# The ViperX Project Structure
+
+### `viperx.yaml`
+The single source of truth. Defines your project as code.
+
+### `src/<package_name>/`
+Your actual code lives here.
+
+### `src/<package_name>/.env`
+**Security Feature**: We place `.env` inside the package, not at root.
+- **Why?** When you distribute or deploy, the config travels with the package context (if needed) but is excluded via `.gitignore`.
+- It keeps environment variables scoped to the specific package in a workspace.
+
+### `src/<package_name>/config.py`
+A robust configuration loader that reads `.env` and `config.yaml`.
+- It uses `pydantic-settings` (if ML) or standard `os.environ` patterns.
+- It ensures your code crashes *early* if secrets are missing.
+"""
+}
 
 @app.command("learn")
 def learn_command(
-    topic: str = typer.Argument(None, help="Specific topic to learn about (e.g. 'packaging', 'uv', 'testing')")
+    topic: str = typer.Argument(None, help="Specific topic: 'uv', 'packaging', 'structure'")
 ):
     """
     🦅 **Access the Knowledge Base.**
     
-    Lists curated resources and educational explanations about Python best practices,
-    ViperX philosophy, and modern tooling.
+    Lists curated resources and educational explanations.
     """
     from rich.markdown import Markdown
     
@@ -102,14 +162,16 @@ def learn_command(
             "Available topics:\n"
             "- [green]packaging[/green]: Modern Python packaging (pyproject.toml)\n"
             "- [green]uv[/green]: Why we use uv over pip/poetry\n"
-            "- [green]testing[/green]: Pytest best practices\n"
-            "- [green]structure[/green]: The 'src' layout explained\n"
-            "- [green]config[/green]: Robust configuration patterns",
+            "- [green]structure[/green]: The 'src' layout explained\n",
             border_style="blue"
         ))
+        return
+
+    content = KNOWLEDGE_BASE.get(topic.lower())
+    if content:
+        console.print(Panel(Markdown(content), title=f"🦅 ViperX Academy: {topic}", border_style="cyan"))
     else:
-        # Placeholder for future expansion - for now just general guidance
-        console.print(f"[bold]Learning about: {topic}[/bold] (Content coming soon in V1.7)")
+        console.print(f"[red]Topic '{topic}' not found.[/red] Try 'packaging', 'uv', or 'structure'.")
         
 
 
