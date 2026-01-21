@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-01-21
+
+### 🦅 Philosophy Shift
+- **Rebranding**: Officially "The Mentor-Based Project Initializer".
+- **Mission**: Focus on "Conscious Mastery" and "Freedom & Grip" (documented in README/Docs).
+- **Education First**: Documentation overhauled to prioritize understanding over speed.
+
 ## [1.5.1] - 2026-01-20
 
 ### 🐛 Fixed

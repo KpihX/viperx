@@ -4,6 +4,11 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.6.0] - 2026-01-21 🦅
+- **The Mentor Release**: Official re-branding.
+- **Philosophy**: "Grip (Mentorship)" & "Freedom (No Lock-in)".
+- **Docs**: Complete rewrite of the landing page focus.
+
 ### [1.5.1] - 2026-01-20 🚑
 - **Hotfix**: Crash in `config update` (NoneType error) fixed.
 
