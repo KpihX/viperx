@@ -1,3 +1,34 @@
+# =============================================================================
+# ⚙️ CONFIG.PY - The Configuration Loader
+# =============================================================================
+#
+# 🎓 WHY THIS PATTERN EXISTS:
+# 
+# Problem 1: "Where do I put my settings?"
+#   - Environment variables? (12-factor app style)
+#   - JSON file? YAML file? .ini file?
+#   - Hardcoded in code? (NO!)
+#
+# Problem 2: "My config works locally but breaks on Colab/Kaggle"
+#   - Root-level config.yaml isn't packaged in wheels
+#   - Notebooks can't find relative paths
+#
+# Solution: CONFIG-IN-PACKAGE pattern
+#   - config.yaml lives INSIDE the package (src/mypackage/config.yaml)
+#   - config.py loads it using importlib.resources (works everywhere!)
+#   - .env is also inside the package (isolated per project)
+#
+# 🎓 WHY importlib.resources?
+# - Works when code is installed as a package
+# - Works when code is in a zip file
+# - Works on Colab/Kaggle where file paths are weird
+# - It's the modern standard (Python 3.9+)
+#
+# 📚 Learn more:
+# - importlib.resources: https://docs.python.org/3/library/importlib.resources.html
+# - 12-Factor App Config: https://12factor.net/config
+# =============================================================================
+
 import yaml
 import importlib.resources
 from pathlib import Path
@@ -5,34 +36,88 @@ from typing import Any, Dict
 {%- if use_env %}
 from dotenv import load_dotenv
 
-# Load Environment Variables from the isolated .env file in this package
+# 🎓 WHY .env IS INSIDE THE PACKAGE:
+# Traditional approach: .env at project root
+# Problem: In monorepos or notebooks, which .env gets loaded?
+# 
+# ViperX approach: .env inside src/package/
+# Benefits:
+# - Each package has its OWN secrets
+# - No confusion in workspaces
+# - Works identically on local, Colab, Kaggle
+#
+# ⚠️ NEVER commit .env to git! Use .env.example as a template.
 load_dotenv(Path(__file__).parent / ".env")
 {%- endif %}
 
+# 🎓 THE TWO-PATH LOADING STRATEGY:
+# 
+# Path 1 (Production): importlib.resources
+#   - Used when package is pip-installed
+#   - Reads from the installed package location
+#   - Works even if package is in a .whl or .egg
+#
+# Path 2 (Development): Direct file path
+#   - Used when running from source (uv run, python -m)
+#   - Falls back to reading config.yaml relative to this file
+
 # Load configuration safely whether installed or local
 try:
-    # Modern Way (Python 3.9+) - works when installed as a package
+    # 🎓 Modern Way (Python 3.9+) - works when installed as a package
     _config_path = importlib.resources.files("{{ package_name }}").joinpath("config.yaml")
     with _config_path.open("r") as f:
         SETTINGS: Dict[str, Any] = yaml.safe_load(f)
 except Exception:
-    # Fallback for local dev without install or older python
+    # 🎓 Fallback for local dev without install or older python
     _local_path = Path(__file__).parent / "config.yaml"
     if _local_path.exists():
         with open(_local_path, "r") as f:
             SETTINGS = yaml.safe_load(f)
     else:
-        SETTINGS = {}
+        SETTINGS = {}  # 🎓 Empty dict fallback when config.yaml is not found. Allows graceful operation without config.
 
 def get_config(key: str, default: Any = None) -> Any:
-    """Retrieve a value from the globally loaded settings."""
+    """
+    Retrieve a configuration value.
+    
+    🎓 WHY A FUNCTION INSTEAD OF DIRECT DICT ACCESS?
+    - Provides a default value mechanism (no KeyError crashes)
+    - Single point of access (easy to add logging, validation later)
+    - Cleaner API: get_config('db_host') vs SETTINGS.get('db_host', None)
+    
+    Args:
+        key: The configuration key to look up
+        default: Value to return if key doesn't exist (default: None)
+    
+    Returns:
+        The configuration value, or the default
+    
+    Example:
+        >>> db_host = get_config('database_host', 'localhost')
+    """
     return SETTINGS.get(key, default)
 
 {%- if project_type != 'classic' %}
 def get_dataset_path(notebook_name: str, key: str = "datasets", extension: str = ".csv") -> str | None:
     """
     Helper for notebook data loading.
-    Looks up 'notebook_name' in the 'key' section of config.yaml.
+    
+    🎓 WHY THIS HELPER?
+    Notebooks often need to load datasets. This centralizes the logic.
+    Instead of hardcoding paths in notebooks, we look them up from config.
+    
+    Args:
+        notebook_name: Name of the notebook (e.g., "Base_Kaggle")
+        key: Section in config.yaml (default: "datasets")
+        extension: File extension (default: ".csv")
+    
+    Returns:
+        Dataset path string, or None if not found
+    
+    Example (in notebook):
+        >>> from {{ package_name }} import get_dataset_path
+        >>> path = get_dataset_path("Base_Kaggle")
+        >>> df = pd.read_csv(path)
     """
     datasets = SETTINGS.get(key, {})
     dataset_name = datasets.get(notebook_name)

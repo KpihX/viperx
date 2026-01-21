@@ -1,13 +1,79 @@
+# =============================================================================
+# 🚀 MAIN.PY - The Entry Point
+# =============================================================================
+#
+# 🎓 WHY THIS FILE EXISTS:
+#
+# When you run `{{ project_name }}` or `python -m {{ package_name }}`,
+# Python needs to know WHERE to start executing your code.
+#
+# This file serves as that entry point. The main() function is referenced
+# in pyproject.toml under [project.scripts].
+#
+# 🎓 THE ENTRY POINT CHAIN:
+# 1. User runs: `{{ project_name }}`
+# 2. System looks up pyproject.toml [project.scripts]
+# 3. Finds: {{ project_name }} = "{{ package_name }}.main:main"
+# 4. Executes the main() function in this file
+#
+# 🎓 WHY `if __name__ == "__main__"`?
+# This is a Python idiom that means:
+# "Only run this code if this file is executed directly"
+#
+# Without it:
+# - `import {{ package_name }}.main` would ALSO run main()
+# - That's usually not what you want!
+#
+# With it:
+# - `import {{ package_name }}.main` → nothing happens (safe)
+# - `python main.py` → main() runs
+# - `{{ project_name }}` → main() runs (via entry point)
+#
+# 📚 Learn more: https://docs.python.org/3/library/__main__.html
+# =============================================================================
+
 {%- if use_config %}
+# 🎓 Importing from our own package - this works because:
+# 1. The package is installed (uv sync creates a virtual env with our package)
+# 2. Or we're running from the src/ directory
 from {{ package_name }} import SETTINGS
 {%- endif %}
 
+
 def main():
+    """
+    Main entry point for the {{ project_name }} application.
+    
+    🎓 WHY A FUNCTION AND NOT TOP-LEVEL CODE?
+    - Functions are testable (you can call main() in tests)
+    - Functions can be imported without side effects
+    - Entry points REQUIRE a callable (function or class)
+    - It's cleaner and more Pythonic
+    
+    🎓 YOUR CODE STARTS HERE:
+    This is where you add your application logic.
+    - For a CLI app, consider using `typer` or `click` for argument parsing
+    - For a library, this might just print a version or help message
+    - For an API, this might start a FastAPI/Flask server
+    """
     {%- if use_config %}
-    print(f"Hi from {SETTINGS['project_name']}!")
+    # 🎓 Accessing configuration loaded from config.yaml
+    # The SETTINGS dictionary was populated when config.py was imported
+    project_name = SETTINGS.get('project_name', '{{ project_name }}')
+    print(f"Hi from {project_name}!")
     {%- else %}
-    print("Hi from viperx!")
+    print("Hi from {{ project_name }}!")
     {%- endif %}
+    
+    # TODO: Add your application logic here
+    # Examples:
+    # - CLI: Use typer/click to parse arguments
+    # - API: Start a web server (FastAPI, Flask)
+    # - Script: Run your data processing pipeline
+    # - Library: Print help/version info
+
 
 if __name__ == "__main__":
+    # 🎓 This block only runs when executing this file directly
+    # See explanation above for why this pattern is important
     main()

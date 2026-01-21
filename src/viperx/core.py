@@ -141,6 +141,11 @@ class ProjectGenerator:
         # STRICT DIRECTORY NAMING: Always use sanitized name
         project_dir = target_dir / self.project_name
         
+        # Educational: Explain uv init (only if explain mode is active)
+        if self.verbose:  # Check if verbose/explain mode
+            from viperx.explanations import explain
+            explain("uv_init")
+        
         # 1. Scaffolding with uv init
         try:
             if project_dir.exists():
@@ -187,6 +192,11 @@ class ProjectGenerator:
                 if (project_dir / "src").exists() and not any((project_dir / "src").iterdir()):
                      shutil.rmtree(project_dir / "src")
                 self.log("Converted to Ultra-Flat Layout (Code at Root)")
+
+        # Educational: Explain src layout (only if explain mode is active)
+        if not is_subpackage and self.verbose:
+            from viperx.explanations import explain
+            explain("src_layout")
 
         # 3. Create extra directories (First, so templates have target dirs)
         self._create_extra_dirs(project_dir, is_subpackage)
@@ -260,6 +270,14 @@ class ProjectGenerator:
         }
         # Merge dependency context overrides
         context.update(self.dependency_context)
+        
+        # Educational: Explain key concepts when generating files (only if explain mode is active)
+        if not is_subpackage and self.verbose:
+            from viperx.explanations import explain
+            if self.use_config:
+                explain("config_in_package")
+            if self.use_env:
+                explain("env_isolation")
         
         # pyproject.toml (Overwrite uv's basic one to add our specific deps)
         # Even subpackages need this if they are Workspace Members (which they are in our model)
@@ -344,10 +362,8 @@ class ProjectGenerator:
         # .gitignore
         # Only for Root
         if not is_subpackage: 
-            with open(root / ".gitignore", "a") as f:
-                # Add data/ to gitignore but allow .gitkeep
-                f.write("\n# ViperX specific\n.ipynb_checkpoints/\n# Isolated Env\nsrc/**/.env\n# Data (Local)\ndata/*\n!data/.gitkeep\n")
-            self.log("Updated .gitignore")
+            self._render(".gitignore.j2", root / ".gitignore", context)
+            self.log("Generated .gitignore")
 
     def _render(self, template_name: str, target_path: Path, context: dict):
         template = self.env.get_template(template_name)
