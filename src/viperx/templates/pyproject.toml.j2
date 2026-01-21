@@ -68,7 +68,7 @@ dependencies = [
     # - Libraries: Use >= (let users choose)
     # - Applications: Use == or lock files (reproducibility)
     {%- if use_config %}
-    "pyyaml>=6.0",  # 🎓 For config.yaml parsing. Industry standard for configuration.
+    "pyyaml>=6.0",  # 🎓 For config.yaml parsing. An industry standard for configuration.
     {%- endif %}
     {%- if has_env %}
     "python-dotenv>=1.0.0",  # 🎓 Loads .env files. Keeps secrets out of code!

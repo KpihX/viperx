@@ -59,7 +59,8 @@ def main():
     {%- if use_config %}
     # 🎓 Accessing configuration loaded from config.yaml
     # The SETTINGS dictionary was populated when config.py was imported
-    print(f"Hi from {SETTINGS['project_name']}!")
+    project_name = SETTINGS.get('project_name', '{{ project_name }}')
+    print(f"Hi from {project_name}!")
     {%- else %}
     print("Hi from {{ project_name }}!")
     {%- endif %}

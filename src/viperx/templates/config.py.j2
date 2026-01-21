@@ -74,7 +74,7 @@ except Exception:
         with open(_local_path, "r") as f:
             SETTINGS = yaml.safe_load(f)
     else:
-        SETTINGS = {}  # 🎓 Graceful degradation - don't crash if no config
+        SETTINGS = {}  # 🎓 Empty dict fallback when config.yaml is not found. Allows graceful operation without config.
 
 def get_config(key: str, default: Any = None) -> Any:
     """

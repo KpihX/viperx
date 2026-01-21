@@ -138,13 +138,13 @@ class ProjectGenerator:
 
     def generate(self, target_dir: Path, is_subpackage: bool = False):
         """Main generation flow using uv init."""
-        from viperx.explanations import explain
-        
         # STRICT DIRECTORY NAMING: Always use sanitized name
         project_dir = target_dir / self.project_name
         
-        # Educational: Explain uv init
-        explain("uv_init")
+        # Educational: Explain uv init (only if explain mode is active)
+        if self.verbose:  # Check if verbose/explain mode
+            from viperx.explanations import explain
+            explain("uv_init")
         
         # 1. Scaffolding with uv init
         try:
@@ -193,8 +193,8 @@ class ProjectGenerator:
                      shutil.rmtree(project_dir / "src")
                 self.log("Converted to Ultra-Flat Layout (Code at Root)")
 
-        # Educational: Explain src layout
-        if not is_subpackage:
+        # Educational: Explain src layout (only if explain mode is active)
+        if not is_subpackage and self.verbose:
             from viperx.explanations import explain
             explain("src_layout")
 
@@ -271,8 +271,8 @@ class ProjectGenerator:
         # Merge dependency context overrides
         context.update(self.dependency_context)
         
-        # Educational: Explain key concepts when generating files
-        if not is_subpackage:
+        # Educational: Explain key concepts when generating files (only if explain mode is active)
+        if not is_subpackage and self.verbose:
             from viperx.explanations import explain
             if self.use_config:
                 explain("config_in_package")
