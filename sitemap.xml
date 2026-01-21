@@ -2,42 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://kpihx.github.io/viperx/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/changelog/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/cli-reference/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/configuration/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/contributing/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/installation/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/publishing/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/quickstart/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/templates/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
     </url>
     <url>
          <loc>https://kpihx.github.io/viperx/workspaces/</loc>
-         <lastmod>2026-01-20</lastmod>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/</loc>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/config/</loc>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/packaging/</loc>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/structure/</loc>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/testing/</loc>
+         <lastmod>2026-01-21</lastmod>
+    </url>
+    <url>
+         <loc>https://kpihx.github.io/viperx/learn/uv/</loc>
+         <lastmod>2026-01-21</lastmod>
     </url>
 </urlset>

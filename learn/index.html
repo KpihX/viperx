@@ -12,13 +12,13 @@
         <meta name="author" content="KpihX">
       
       
-        <link rel="canonical" href="https://kpihx.github.io/viperx/configuration/">
+        <link rel="canonical" href="https://kpihx.github.io/viperx/learn/">
       
       
-        <link rel="prev" href="../cli-reference/">
+        <link rel="prev" href="../contributing/">
       
       
-        <link rel="next" href="../workspaces/">
+        <link rel="next" href="uv/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Configuration - ViperX</title>
+        <title>Introduction - ViperX</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#configuration-deep-dive" class="md-skip">
+        <a href="#viperx-academy" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Configuration
+              Introduction
             
           </span>
         </div>
@@ -262,12 +262,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../cli-reference/" class="md-tabs__link">
           
   
@@ -304,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../learn/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -530,31 +530,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -572,7 +567,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -615,37 +610,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -661,204 +629,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#why-declarative-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Declarative Config?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Why Declarative Config?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-problem-with-cli-flags" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Problem with CLI Flags
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-solution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Solution
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#full-specification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full Specification
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Full Specification">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#project-section" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        project Section
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#settings-section" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        settings Section
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#real-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Real Examples
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Real Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#minimal-just-the-basics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimal (Just the basics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#full-ml-project" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full ML Project
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-package-platform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-package Platform
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#applying-your-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applying Your Config
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#safe-mode-what-happens-on-update" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Safe Mode: What Happens on Update?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Safe Mode: What Happens on Update?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conflict-transparency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conflict Transparency
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#generating-a-template" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Generating a Template
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1046,26 +816,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1083,7 +858,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1098,10 +873,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../learn/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1117,6 +919,37 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1129,7 +962,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learn/uv/" class="md-nav__link">
+      <a href="uv/" class="md-nav__link">
         
   
   
@@ -1157,7 +990,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learn/packaging/" class="md-nav__link">
+      <a href="packaging/" class="md-nav__link">
         
   
   
@@ -1185,7 +1018,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learn/structure/" class="md-nav__link">
+      <a href="structure/" class="md-nav__link">
         
   
   
@@ -1213,7 +1046,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learn/config/" class="md-nav__link">
+      <a href="config/" class="md-nav__link">
         
   
   
@@ -1241,7 +1074,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learn/testing/" class="md-nav__link">
+      <a href="testing/" class="md-nav__link">
         
   
   
@@ -1323,177 +1156,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-declarative-config" class="md-nav__link">
+  <a href="#topics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Declarative Config?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Why Declarative Config?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-problem-with-cli-flags" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Problem with CLI Flags
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-solution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Solution
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#full-specification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full Specification
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Full Specification">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#project-section" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        project Section
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#settings-section" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        settings Section
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#real-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Real Examples
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Real Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#minimal-just-the-basics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimal (Just the basics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#full-ml-project" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full ML Project
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-package-platform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-package Platform
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#applying-your-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applying Your Config
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#safe-mode-what-happens-on-update" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Safe Mode: What Happens on Update?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Safe Mode: What Happens on Update?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conflict-transparency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conflict Transparency
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#generating-a-template" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Generating a Template
+        Topics
       
     </span>
   </a>
@@ -1520,194 +1186,24 @@
   
 
 
-<h1 id="configuration-deep-dive">Configuration Deep Dive<a class="headerlink" href="#configuration-deep-dive" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>The <code>viperx.yaml</code> file is your project's DNA.</strong></p>
-</blockquote>
-<hr />
-<h2 id="why-declarative-config">Why Declarative Config?<a class="headerlink" href="#why-declarative-config" title="Permanent link">&para;</a></h2>
-<h3 id="the-problem-with-cli-flags">The Problem with CLI Flags<a class="headerlink" href="#the-problem-with-cli-flags" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Week 1: You run this</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>viperx<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my-proj<span class="w"> </span>-t<span class="w"> </span>ml<span class="w"> </span>--env<span class="w"> </span>-l<span class="w"> </span>Apache-2.0<span class="w"> </span>-b<span class="w"> </span>hatch
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Week 4: You need another project</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># &quot;What flags did I use again?&quot;</span>
-</code></pre></div>
-<h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># viperx.yaml - Always here, always clear</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">project</span><span class="p">:</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-proj&quot;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">license</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Apache-2.0&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">builder</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hatch&quot;</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nt">settings</span><span class="p">:</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ml&quot;</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">use_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div>
-<hr />
-<h2 id="full-specification">Full Specification<a class="headerlink" href="#full-specification" title="Permanent link">&para;</a></h2>
-<h3 id="project-section"><code>project</code> Section<a class="headerlink" href="#project-section" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Key</th>
-<th>What it does</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>name</code></td>
-<td>Your project name</td>
-<td><strong>Required</strong></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>Shows in PyPI</td>
-<td><code>""</code></td>
-</tr>
-<tr>
-<td><code>author</code></td>
-<td>Package author</td>
-<td>git user</td>
-</tr>
-<tr>
-<td><code>license</code></td>
-<td>MIT, Apache-2.0, GPLv3</td>
-<td><code>MIT</code></td>
-</tr>
-<tr>
-<td><code>builder</code></td>
-<td>uv or hatch</td>
-<td><code>uv</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="settings-section"><code>settings</code> Section<a class="headerlink" href="#settings-section" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Key</th>
-<th>What it does</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>type</code></td>
-<td>classic, ml, dl</td>
-<td><code>classic</code></td>
-</tr>
-<tr>
-<td><code>framework</code></td>
-<td>pytorch, tensorflow (DL only)</td>
-<td><code>pytorch</code></td>
-</tr>
-<tr>
-<td><code>use_env</code></td>
-<td>Generate <code>.env</code> file</td>
-<td><code>false</code></td>
-</tr>
-<tr>
-<td><code>use_config</code></td>
-<td>Generate <code>config.py</code></td>
-<td><code>true</code></td>
-</tr>
-<tr>
-<td><code>use_tests</code></td>
-<td>Generate <code>tests/</code> folder</td>
-<td><code>true</code></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="real-examples">Real Examples<a class="headerlink" href="#real-examples" title="Permanent link">&para;</a></h2>
-<h3 id="minimal-just-the-basics">Minimal (Just the basics)<a class="headerlink" href="#minimal-just-the-basics" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">project</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-lib&quot;</span>
-</code></pre></div>
-<h3 id="full-ml-project">Full ML Project<a class="headerlink" href="#full-ml-project" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">project</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;churn-model&quot;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Customer</span><span class="nv"> </span><span class="s">churn</span><span class="nv"> </span><span class="s">prediction&quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Data</span><span class="nv"> </span><span class="s">Science</span><span class="nv"> </span><span class="s">Team&quot;</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">license</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Apache-2.0&quot;</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">settings</span><span class="p">:</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ml&quot;</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nt">use_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div>
-<h3 id="multi-package-platform">Multi-package Platform<a class="headerlink" href="#multi-package-platform" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">project</span><span class="p">:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-platform&quot;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">settings</span><span class="p">:</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">use_tests</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nt">workspace</span><span class="p">:</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;api&quot;</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;classic&quot;</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;model&quot;</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ml&quot;</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">      </span><span class="nt">use_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">      </span><span class="c1"># Only model needs secrets</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;worker&quot;</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;classic&quot;</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="nt">use_tests</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">   </span><span class="c1"># No tests for worker</span>
-</code></pre></div>
-<hr />
-<h2 id="applying-your-config">Applying Your Config<a class="headerlink" href="#applying-your-config" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># First time: Creates everything</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>viperx<span class="w"> </span>config<span class="w"> </span>-c<span class="w"> </span>viperx.yaml
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Later: Updates safely (adds missing, never deletes)</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>viperx<span class="w"> </span>config<span class="w"> </span>-c<span class="w"> </span>viperx.yaml
-</code></pre></div>
-<hr />
-<h2 id="safe-mode-what-happens-on-update">Safe Mode: What Happens on Update?<a class="headerlink" href="#safe-mode-what-happens-on-update" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>You change...</th>
-<th>ViperX does...</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>use_env: false → true</code></td>
-<td>✅ Creates <code>.env</code></td>
-</tr>
-<tr>
-<td><code>use_env: true → false</code></td>
-<td>⚠️ Warns you <code>.env</code> exists (doesn't delete)</td>
-</tr>
-<tr>
-<td>Add new package</td>
-<td>✅ Creates it</td>
-</tr>
-<tr>
-<td>Remove package from yaml</td>
-<td>⚠️ Warns you folder exists (doesn't delete)</td>
-</tr>
-<tr>
-<td>Change license</td>
-<td>⚠️ Warns you <code>LICENSE</code> differs (doesn't overwrite)</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Philosophy</strong>: ViperX will never destroy your work.</p>
-<h3 id="conflict-transparency">Conflict Transparency<a class="headerlink" href="#conflict-transparency" title="Permanent link">&para;</a></h3>
-<p>If your <code>viperx.yaml</code> disagrees with reality (e.g., config says <code>use_env: false</code> but <code>.env</code> exists), ViperX will:
-1. <strong>NOT</strong> delete the file
-2. <strong>Annotate</strong> the conflict in <code>viperx.yaml</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">use_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># NOT_APPLIED: file exists in codebase</span>
-</code></pre></div>
-<p>This ensures you have <strong>total transparency</strong> on the state of your project.</p>
-<hr />
-<h2 id="generating-a-template">Generating a Template<a class="headerlink" href="#generating-a-template" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viperx<span class="w"> </span>config<span class="w"> </span>get
-</code></pre></div>
-<p>Creates a commented <code>viperx.yaml</code> with all options explained.</p>
+<h1 id="viperx-academy">ViperX Academy 🦅<a class="headerlink" href="#viperx-academy" title="Permanent link">&para;</a></h1>
+<p>Welcome to the <strong>ViperX Academy</strong>.</p>
+<p>ViperX is not just a tool; it is a <strong>mentor</strong>. This section of the documentation serves as a knowledge base to help you understand the "Why" behind the "How".</p>
+<p>Each topic below dives deep into the architectural decisions and modern tooling standards that ViperX automates for you.</p>
+<h2 id="topics">Topics<a class="headerlink" href="#topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="uv/">Why uv?</a></strong>: Speed, stability, and rust-based power.</li>
+<li><strong><a href="packaging/">Modern Packaging</a></strong>: Understanding PEP 621 and <code>pyproject.toml</code>.</li>
+<li><strong><a href="structure/">Project Structure</a></strong>: The importance of the <code>src/</code> layout.</li>
+<li><strong><a href="config/">Configuration</a></strong>: Robust configuration management with <code>.env</code> isolation.</li>
+<li><strong><a href="testing/">Testing</a></strong>: Best practices for unit and integration testing.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">In the Terminal</p>
+<p>You can also access condensed versions of these guides directly in your CLI:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>viperx<span class="w"> </span>learn<span class="w"> </span>packaging
+</code></pre></div></p>
+</div>
 
 
 
