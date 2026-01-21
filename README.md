@@ -109,6 +109,16 @@ viperx config [OPTIONS]
 | `--env / --no-env`  | Generate `.env` file              | `--no-env` |
 | `-c, --config`      | Path to `viperx.yaml`             | -          |
 
+### `learn` - Educational Hub
+```bash
+viperx learn         # List topics
+viperx learn uv      # Learn about uv
+```
+
+### Global Options
+- `--explain`: Enable detailed architectural explanations during execution.
+- `--version`: Show version.
+
 ### `config get` - Generate Template
 
 ```bash

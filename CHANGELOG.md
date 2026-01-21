@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2026-01-21
+
+### 🚀 Added
+- **`--explain` Flag**: Global option to enable educational insights during commands.
+- **`viperx learn`**: New command to access the "Knowledge Base" (topics: packaging, uv, etc).
+- **CLI Help**: Updated `viperx --help` to reflect the "Mentor" branding.
+
 ## [1.6.0] - 2026-01-21
 
 ### 🦅 Philosophy Shift

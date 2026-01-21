@@ -50,8 +50,8 @@ app = typer.Typer(
     epilog="Made with ❤️  by KpihX"
 )
 
-# Global state for verbose flag
-state = {"verbose": False}
+# Global state for verbose and explain flags
+state = {"verbose": False, "explain": False}
 console = Console(force_terminal=True)
 
 def version_callback(value: bool):
@@ -67,16 +67,49 @@ def cli_callback(
         callback=version_callback,
         is_eager=True,
         help="Show version and exit."
+    ),
+    explain: bool = typer.Option(
+         False, "--explain",
+         help="Enable educational mode: explains decisions and architectural choices."
     )
 ):
     """
-    **ViperX**: Professional Python Project Initializer.
+    **ViperX**: The Mentor-Based Python Project Initializer.
     
     Automates the creation of professional-grade Python projects using `uv`.
-    Supports Standard Libraries, Machine Learning, and Deep Learning templates.
+    Focuses on education, transparency, and freedom.
     """
     # Always verbose by default for transparency
     state["verbose"] = True
+    state["explain"] = explain
+
+@app.command("learn")
+def learn_command(
+    topic: str = typer.Argument(None, help="Specific topic to learn about (e.g. 'packaging', 'uv', 'testing')")
+):
+    """
+    🦅 **Access the Knowledge Base.**
+    
+    Lists curated resources and educational explanations about Python best practices,
+    ViperX philosophy, and modern tooling.
+    """
+    from rich.markdown import Markdown
+    
+    if not topic:
+        console.print(Panel(
+            "📚 [bold blue]ViperX Learning Hub[/bold blue]\n\n"
+            "Use [bold]viperx learn <topic>[/bold] to dive deeper.\n"
+            "Available topics:\n"
+            "- [green]packaging[/green]: Modern Python packaging (pyproject.toml)\n"
+            "- [green]uv[/green]: Why we use uv over pip/poetry\n"
+            "- [green]testing[/green]: Pytest best practices\n"
+            "- [green]structure[/green]: The 'src' layout explained\n"
+            "- [green]config[/green]: Robust configuration patterns",
+            border_style="blue"
+        ))
+    else:
+        # Placeholder for future expansion - for now just general guidance
+        console.print(f"[bold]Learning about: {topic}[/bold] (Content coming soon in V1.7)")
         
 
 

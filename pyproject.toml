@@ -1,6 +1,6 @@
 [project]
 name = "viperx"
-version = "1.6.0"
+version = "1.6.1"
 description = "The Mentor-Based Python Project Initializer. Learn best practices while building."
 readme = "README.md"
 authors = [

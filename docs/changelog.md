@@ -4,6 +4,10 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.6.1] - 2026-01-21 🎓
+- **`viperx --explain`**: Your automated mentor is now active.
+- **`viperx learn`**: Built-in documentation/learning hub.
+
 ### [1.6.0] - 2026-01-21 🦅
 - **The Mentor Release**: Official re-branding.
 - **Philosophy**: "Grip (Mentorship)" & "Freedom (No Lock-in)".
