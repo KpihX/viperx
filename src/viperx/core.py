@@ -46,7 +46,8 @@ class ProjectGenerator:
                  framework: str = "pytorch",
                  scripts: Optional[dict] = None,
                  dependency_context: Optional[dict] = None,
-                 verbose: bool = False):
+                 verbose: bool = False,
+                 explain: bool = False):
         self.raw_name = name
         self.project_name = sanitize_project_name(name)
         self.description = description or name
@@ -83,6 +84,7 @@ class ProjectGenerator:
         self.use_readme = use_readme
         self.use_tests = use_tests
         self.verbose = verbose
+        self.explain_mode = explain
         
         # Detect System Python (For logging/diagnostics)
         self.system_python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -136,8 +138,36 @@ class ProjectGenerator:
         if self.verbose:
             console.print(f"  [{style}]{message}[/{style}]")
 
+    def explain(self, title: str, content: str):
+        """Educational Explainer Block (Only visible with --explain)"""
+        # We rely on an external state or pass it in? 
+        # Ideally we pass 'explain_mode' to __init__, but user didn't ask us to refactor everything.
+        # We can check defaults or just use a new attribute if we modify init call in main.
+        # Let's rely on the passed 'verbose' or better, let's fix the class to accept 'explain_mode'.
+        # Since I cannot easily change the signature everywhere safely without checking all callers (main.py updated), 
+        # I will check a global state or simple attribute.
+        # Ah, main.py instantiates ProjectGenerator. I should update main.py to pass 'explain=state["explain"]'.
+        # For now, let's assume I will update main.py next.
+        if getattr(self, "explain_mode", False):
+            from rich.panel import Panel
+            from rich.markdown import Markdown
+            console.print(Panel(
+                Markdown(content),
+                title=f"🎓 Explain: {title}",
+                border_style="green",
+                padding=(0, 2)
+            ))
+
     def generate(self, target_dir: Path, is_subpackage: bool = False):
         """Main generation flow using uv init."""
+        
+        self.explain("Project Structure Strategy", f"""
+We are about to create **{self.project_name}**.
+- **Layout**: `src/` layout (Standard)
+- **Why?**: Placing code in `src/` prevents "import side effects". It forces you to install the package (in editable mode) to test it, which mirrors how users will actually use it.
+- **Tool**: We use `uv init` because it sets up a modern `pyproject.toml` with standards-compliant metadata automatically.
+        """)
+
         # STRICT DIRECTORY NAMING: Always use sanitized name
         project_dir = target_dir / self.project_name
         

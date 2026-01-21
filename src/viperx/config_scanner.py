@@ -141,6 +141,17 @@ class ConfigScanner:
         scanned = self.scan()
         annotations = []
         
+        from viperx.settings import settings
+        if settings.explain_mode:
+            from rich.panel import Panel
+            console.print(Panel(
+                f"[bold]Scanning Project Structure[/bold]\n"
+                f"- Found packages: {[p['name'] for p in scanned.get('workspace', {}).get('packages', [])]}\n"
+                f"- Detected type: {scanned['settings'].get('type')}\n"
+                f"- Comparison Strategy: Merging codebase reality into viperx.yaml.",
+                title="🎓 Explain: Config Update"
+            ))
+
         # Merge project section
         for key, value in scanned["project"].items():
             if key not in existing_config.get("project", {}):

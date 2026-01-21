@@ -22,7 +22,8 @@ TESTS_DIR = "tests"
 # Templates
 TEMPLATE_DIR_NAME = "templates"
 TEMPLATES_DIR = Path(__file__).parent / TEMPLATE_DIR_NAME
-USER_TEMPLATES_DIR = Path.home() / ".config" / "viperx" / "templates"
+USER_CONFIG_DIR = Path.home() / ".config" / "viperx"
+USER_TEMPLATES_DIR = USER_CONFIG_DIR / "templates"
 
 # Types
 TYPE_CLASSIC = "classic"

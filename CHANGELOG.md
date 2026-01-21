@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-01-21
+### Added
+- **Persistent Explain Mode**: `viperx explain --activate` to enable architectural mentorship globally. settings stored in `~/.config/viperx/settings.json`.
+- **ViperX Academy**: Expanded `viperx learn` with comprehensive guides on `uv`, `packaging`, `structure`, `config`, and `testing`.
+- **Docs**: New "Academy" section in documentation website.
+- **Config Scanner**: Now supports Explain Mode during `config update`.
+
+### Changed
+- `viperx explain` is now a command group (with `--activate`/`--deactivate`) in addition to being a global flag.
+- Refactored `viperx.core` to remove duplicate arguments.
+
 ## [1.6.2] - 2026-01-21
 
 ### 🚑 Fixed

@@ -4,6 +4,11 @@ See the full changelog at [CHANGELOG.md](https://github.com/KpihX/viperx/blob/ma
 
 ## Recent Releases
 
+### [1.7.0] - 2026-01-21 (The "Academy" Release) 🧠
+- **Feature**: Persistent `viperx explain --activate` mentorship mode.
+- **Feature**: Comprehensive `viperx learn` Knowledge Base.
+- **Docs**: New dedicated "Academy" section.
+
 ### [1.6.2] - 2026-01-21 🚑
 - **Polish**: Fixed `--help` formatting and populated `learn` command content.
 

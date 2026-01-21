@@ -10,6 +10,41 @@
 2.  **Freedom (No Lock-in)**: Use `viperx eject` to remove the tool entirely. Your code remains standard Python.
 3.  **Conscious Mastery**: We aim to make you autonomous, not dependent.
 
+## 🎓 Educational Features
+
+### 1. The Knowledge Base (`viperx learn`)
+Don't leave the terminal to read generic tutorials. ViperX includes a curated knowledge base about modern Python tooling.
+
+```bash
+viperx learn uv          # Why uv is the future of packaging
+viperx learn structure   # Why we use the src/ layout
+viperx learn packaging   # Understanding pyproject.toml
+```
+
+### 2. Explain Mode (`--explain` or Persistent)
+Pass the global `--explain` flag to any command to get a real-time architectural breakdown.
+**Or make it permanent:**
+
+```bash
+viperx explain --activate    # I want a mentor for everything
+viperx explain --deactivate  # I know what I'm doing now
+```
+
+When active, every command explains itself:
+
+```bash
+$ viperx config -n my-lib --explain
+
+╭─ 🎓 Explain: Project Structure Strategy ────────────────────────╮
+│ We are about to create my-lib.                                  │
+│ - Layout: src/ layout (Standard)                                │
+│ - Why?: Placing code in src/ prevents "import side effects".    │
+│   It forces you to install the package to test it.              │
+│ - Tool: We use uv init because it sets up a modern              │
+│   pyproject.toml automatically.                                 │
+╰─────────────────────────────────────────────────────────────────╯
+```
+
 ## ✨ Features
 
 - **Education First**: Generated files are learning materials. `viperx --explain` tells you the "why".

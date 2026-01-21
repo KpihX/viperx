@@ -6,7 +6,7 @@
 
 project:
   # [Required] Root project name
-  name: "viperx"
+  name: "dummy"
   
   # [Optional] Defaults (Inferred from git/system if omitted)
   description: "Professional Python Project Initializer with uv, ml/dl support, and embedded config."

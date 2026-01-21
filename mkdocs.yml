@@ -44,6 +44,13 @@ nav:
       - Templates: templates.md
       - Publishing: publishing.md
       - Contributing: contributing.md
+  - Academy:
+      - Introduction: learn/index.md
+      - Why uv?: learn/uv.md
+      - Packaging: learn/packaging.md
+      - Project Structure: learn/structure.md
+      - Configuration: learn/config.md
+      - Testing: learn/testing.md
   - Changelog: changelog.md
 
 markdown_extensions:

@@ -70,7 +70,7 @@ def cli_callback(
     ),
     explain: bool = typer.Option(
          False, "--explain",
-         help="Enable educational mode: explains decisions and architectural choices."
+         help="Temporarily enable educational mode for this command."
     )
 ):
     """
@@ -79,74 +79,54 @@ def cli_callback(
     Automates the creation of professional-grade Python projects using `uv`.
     Focuses on education, transparency, and freedom.
     """
+    # Load persistent state
+    from viperx.settings import settings
+    
     # Always verbose by default for transparency
     state["verbose"] = True
-    state["explain"] = explain
+    # Explain comes from persistent settings OR temporary flag
+    state["explain"] = settings.explain_mode or explain
     
-    if explain and ctx.invoked_subcommand is None:
+    if state["explain"] and ctx.invoked_subcommand is None:
         console.print(Panel(
-            "🎓 [bold green]Explain Mode Enabled[/bold green]\n\n"
-            "ViperX will now explain its actions in detail.\n"
-            "Try running a command to see it in action:\n"
-            "  [cyan]viperx config -n my-project[/cyan]",
+            "🎓 [bold green]Explain Mode is Active[/bold green]\n\n"
+            "ViperX will explain its architectural decisions.\n"
+            "To disable: [bold]viperx explain --deactivate[/bold]",
             border_style="green"
         ))
 
-# --- Educational Content ---
-KNOWLEDGE_BASE = {
-    "uv": """
-# Why uv?
-
-**uv** is an extremely fast Python package installer and resolver, written in Rust.
-
-### Why ViperX uses it:
-1.  **Speed**: It's 10-100x faster than pip/poetry.
-2.  **determinism**: It generates a universal `uv.lock` file.
-3.  **workspace support**: It handles multi-package repos natively.
-4.  **no python dependency**: You don't need Python installed to bootstrap Python.
-
-ViperX leverages `uv` to ensure your project setup is instantaneous.
-""",
-    "packaging": """
-# Modern Python Packaging
-
-Gone are the days of `setup.py` and `requirements.txt`.
-
-### The Standard: `pyproject.toml`
-ViperX generates a PEP-621 compliant `pyproject.toml`.
-- **[project]**: Metadata (name, version, dependencies).
-- **[build-system]**: How to build the package (we use `hatchling` or `uv` backend).
-- **[tool.uv]**: Dependency management (dev-dependencies, workspaces).
-
-### Src Layout
-We use the `src/` layout (e.g., `src/my_pkg/`).
-- **Prevents import errors**: You can't accidentally import the local folder without installing it.
-- **Forces installation**: Ensures you test the *installed* package, not the local files.
-""",
-    "structure": """
-# The ViperX Project Structure
-
-### `viperx.yaml`
-The single source of truth. Defines your project as code.
-
-### `src/<package_name>/`
-Your actual code lives here.
-
-### `src/<package_name>/.env`
-**Security Feature**: We place `.env` inside the package, not at root.
-- **Why?** When you distribute or deploy, the config travels with the package context (if needed) but is excluded via `.gitignore`.
-- It keeps environment variables scoped to the specific package in a workspace.
-
-### `src/<package_name>/config.py`
-A robust configuration loader that reads `.env` and `config.yaml`.
-- It uses `pydantic-settings` (if ML) or standard `os.environ` patterns.
-- It ensures your code crashes *early* if secrets are missing.
-"""
-}
+@app.command("explain")
+def explain_command(
+    activate: bool = typer.Option(False, "--activate", "-a", help="Enable explain mode persistently"),
+    deactivate: bool = typer.Option(False, "--deactivate", "-d", help="Disable explain mode persistently")
+):
+    """
+    🎓 **Global Explanation Mode**
+    
+    Toggle the persistent educational mode. When enabled, ViperX will verify
+    archtitectural choices in real-time for ALL commands.
+    """
+    from viperx.settings import settings
+    
+    if activate and deactivate:
+        console.print("[red]Error: Cannot activate and deactivate at the same time.[/red]")
+        raise typer.Exit(1)
+        
+    if activate:
+        settings.explain_mode = True
+        console.print(Panel("✅ [bold green]Explain Mode ACTIVATED[/bold green]\n\nViperX is now your active mentor.", border_style="green"))
+    elif deactivate:
+        settings.explain_mode = False
+        console.print(Panel("❌ [bold yellow]Explain Mode DEACTIVATED[/bold yellow]\n\nViperX returns to silent execution.", border_style="yellow"))
+    else:
+        # Status
+        status = "[green]ACTIVE[/green]" if settings.explain_mode else "[dim]INACTIVE[/dim]"
+        console.print(f"Explain Mode Status: {status}")
+        console.print("Use -a to activate or -d to deactivate.")
 
 @app.command("learn")
 def learn_command(
-    topic: str = typer.Argument(None, help="Specific topic: 'uv', 'packaging', 'structure'")
+    topic: str = typer.Argument(None, help="Specific topic: 'uv', 'packaging', 'structure', 'config', 'testing'")
 ):
     """
     🦅 **Access the Knowledge Base.**
@@ -154,6 +134,7 @@ def learn_command(
     Lists curated resources and educational explanations.
     """
     from rich.markdown import Markdown
+    from viperx.content import KNOWLEDGE_BASE
     
     if not topic:
         console.print(Panel(
@@ -162,7 +143,9 @@ def learn_command(
             "Available topics:\n"
             "- [green]packaging[/green]: Modern Python packaging (pyproject.toml)\n"
             "- [green]uv[/green]: Why we use uv over pip/poetry\n"
-            "- [green]structure[/green]: The 'src' layout explained\n",
+            "- [green]structure[/green]: The 'src' layout explained\n"
+            "- [green]config[/green]: Robust configuration patterns\n"
+            "- [green]testing[/green]: Testing strategy",
             border_style="blue"
         ))
         return
@@ -308,7 +291,8 @@ def config_main(
         use_env=use_env,
         use_config=use_config,
         framework=framework,
-        verbose=verbose or state["verbose"]
+        verbose=verbose or state["verbose"],
+        explain=verbose or state["explain"]
     )
     
     # Generate in current directory
@@ -472,7 +456,8 @@ def package_add(
         use_config=use_config,
         use_readme=use_readme,
         framework=framework,
-        verbose=verbose or state["verbose"]
+        verbose=verbose or state["verbose"],
+        explain=verbose or state["explain"]
     )
     generator.add_to_workspace(Path.cwd())
 
@@ -496,7 +481,16 @@ def package_delete(
     console.print(Panel(f"Deleting package [bold red]{name}[/bold red]", border_style="red"))
     
     # We init generator just to use its helper methods (could be static, but this is fine)
-    generator = ProjectGenerator(name=name, description="", type="classic", author="", use_env=False, use_config=False, verbose=verbose)
+    generator = ProjectGenerator(
+        name=name, 
+        description="", 
+        type="classic", 
+        author="", 
+        use_env=False, 
+        use_config=False, 
+        verbose=verbose,
+        explain=verbose or state["explain"]
+    )
     generator.delete_from_workspace(Path.cwd())
 
 @package_app.command("update")
@@ -510,7 +504,16 @@ def package_update(
     verbose = verbose or state["verbose"]
     console.print(Panel(f"Updating package [bold blue]{name}[/bold blue]", border_style="blue"))
     
-    generator = ProjectGenerator(name=name, description="", type="classic", author="", use_env=False, use_config=False, verbose=verbose)
+    generator = ProjectGenerator(
+        name=name, 
+        description="", 
+        type="classic", 
+        author="", 
+        use_env=False, 
+        use_config=False, 
+        verbose=verbose,
+        explain=verbose or state["explain"]
+    )
     generator.update_package(Path.cwd())
 
 

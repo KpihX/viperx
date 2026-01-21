@@ -58,34 +58,53 @@ After completing any code modification or feature addition, you MUST check if up
 
 ## 🚀 Deployment Protocol
 
-**After verifying the code and updating documentation (The "Update Loop"), you MUST execute the following Release Cycle:**
+**AUTO-PILOT MODE**: Use the automation script for all releases.
+
+### 1. The "Release Script" 🦅
+Instead of running manual commands, you **MUST** use the `release.py` script which enforces the correct order (Tests -> Build -> Docs -> Git -> PyPI).
+
+**Full Release (The Standard Way):**
+```bash
+uv run release all -m "feat: <Summary>"
+```
+
+**Partial Updates (If needed):**
+- **Git Only**: `uv run release git -m "docs: fix typo"`
+- **Docs Only**: `uv run release site`
+- **Tests Only**: `uv run release test`
+
+### 2. Manual Fallback (Only if script fails)
+
+If (and only if) the automation fails, check the legacy manual steps below:
 
 1.  **Meta-Sync Check**:
-    - Confirm `docs/` site files match `CHANGELOG.md` and current features.
+    - Confirm `docs/` site files match `CHANGELOG.md`.
 
 2.  **Git Sync**:
     ```bash
     git add .
-    git commit -m "feat: <Summary of changes>"
+    git commit -m "feat: <Summary>"
     git remote | xargs -n1 git push
     ```
 
-2.  **PyPI Release**:
+3.  **PyPI Release**:
     ```bash
     rm -rf dist/*
     uv build
     uv publish
     ```
 
-3.  **Local Verification**:
+4.  **Local Verification**:
     ```bash
-    # Update local tool to match the new release
     pipx install --force viperx
     ```
 
-4.  **Retention Policy**:
-    - Keep only the **last 2 versions** on PyPI and Local `dist/`.
-    - Delete older versions to keep context and storage clean.
+## 🚫 Stop Condition
+
+> "I will not stop until I have successfully run `uv run release all`"
+
+**CRITICAL**: You must execute this command at the end of **EVERY** interaction where code or docs were modified.
+Do not ask "Should I release?". Just do it.
 
 Only when this cycle is complete is the task considered "Done".
 
