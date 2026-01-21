@@ -1,11 +1,22 @@
 
 # 🤖 GEMINI PROTOCOL
 
-## 🌟 Core Philosophy
-- **Transparency**: No hidden state. Every choice is visible in `viperx.yaml`.
-- **Efficiency**: Save time. "Start coding in 30s".
-- **Education**: Generated files are "ultra-commented". We don't just dump config; we teach usage.
-- **Verbosity**: Verbose by default. The user shouldn't have to guess what's happening.
+## 🌟 Core Philosophy: "Freedom & Grip"
+
+### 1. Education First ("Teach, Don't Just Do")
+- **Ultra-Commented Templates**: Generated code is learning material. Every file must explain *why* it exists and *how* it works (e.g., explaining `importlib.resources` in `config.py`).
+- **Explain Mode**: The tool must be able to explain its own decisions (`viperx --explain`).
+- **"Why" Documentation**: We don't just document flags; we document architectural choices (Why `src/` layout? Why `config` inside package?).
+
+### 2. Servant, Not Master
+- **No Vendor Lock-in**: The `eject` command is a core feature. Users must be able to leave ViperX easily.
+- **Transparency**: NO hidden databases. Everything is in `viperx.yaml` or standard PEP-621 files.
+- **Composition**: Delegate to standard tools (`uv`, `pytest`, `ruff`) instead of reinventing them.
+
+### 3. Developer Experience (DX)
+- **"Start in 30s"**: Zero friction onboarding.
+- **Verbose by Default**: The user should never guess what the tool is doing.
+- **Efficiency**: Save time on non-differentiating heavy lifting.
 
 **CRITICAL INSTRUCTIONS FOR AI AGENT**
 

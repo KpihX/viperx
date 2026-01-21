@@ -1,18 +1,23 @@
 # 🐍 ViperX
 
-> **Stop wasting time on project setup.**  
-> **Start coding in 30 seconds.**
+> **Don't just build. Understand.**  
+> **A tool that teaches you to fly solo.**
 
-## The Problem
+## The Problem: "Magic Black Boxes"
 
-Every time you start a new Python project, you face the same tedious questions:
+Most tools hide complexity. They say *"Trust us"*. 
+This creates dependency: when things break, you don't know why.
 
-- *"How do I structure this properly?"*
-- *"What goes in `pyproject.toml`?"*
-- *"Where should I put my config files so Colab can find them?"*
-- *"Do I need `.env` at root or in the package?"*
+## The ViperX Way: Conscious Mastery
 
-**ViperX solves this.** One command, one config file, done.
+ViperX is built on a different principle: **Education First**.
+When you run `viperx config -t dl`, we don't just dump files. We generate **ultra-commented templates** that explain:
+
+- Why `src/` layout prevents import errors.
+- Why `importlib.resources` is safer than `open()`.
+- Why your `.env` is isolated.
+
+We handle the heavy lifting (dependencies, boilerplate) so you can focus on **learning the architecture**.
 
 ---
 

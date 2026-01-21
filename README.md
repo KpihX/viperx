@@ -1,13 +1,19 @@
 # 🐍 ViperX
 
-> **Professional Python Project Initializer**
-> *The modern, snake-fast way to bootstrap Python projects.*
+> **The Mentor-Based Project Initializer**
+> *Stop memorizing boilerplate. Start learning best practices.*
 
-**ViperX** is a CLI tool designed to generate production-ready Python projects instantly. It leverages **[uv](https://github.com/astral-sh/uv)** for blazing fast dependency management and offers specialized templates for **Machine Learning** (`ml`) and **Deep Learning** (`dl`).
+**ViperX** is more than a CLI—it's an **automated mentor**. It generates production-ready Python projects (Classic, ML, DL) using **[uv](https://github.com/astral-sh/uv)**, but crucially, it creates **ultra-commented code** that teaches you *why* the structure is built that way.
+
+## 🦅 Philosophy: "Freedom & Grip"
+1.  **Grip (Mentorship)**: We hold your hand at the start with strict, educational defaults.
+2.  **Freedom (No Lock-in)**: Use `viperx eject` to remove the tool entirely. Your code remains standard Python.
+3.  **Conscious Mastery**: We aim to make you autonomous, not dependent.
 
 ## ✨ Features
 
-- **Blazing Fast**: Built on top of `uv`.
+- **Education First**: Generated files are learning materials. `viperx --explain` tells you the "why".
+- **Blazing Fast**: Built on top of `uv` for sub-second setup.
 - **Pre-configured**: `pyproject.toml`, proper `src` layout, `ruff` ready.
 - **ML/DL First**: Templates with `torch`, `tensorflow`, `kagglehub` and **Smart Caching**.
 - **Smart Caching**: Auto-downloads and caches datasets to `~/.cache/viperx/data` (or local `data/`).
